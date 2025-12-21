@@ -1,0 +1,86 @@
+import axios from 'axios'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+
+export const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('accessToken')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+  }
+  return config
+})
+
+// Handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+export const auth = {
+  login: (email: string, password: string) =>
+    api.post('/auth/login', { email, password }),
+  register: (data: any) => api.post('/auth/register', data),
+}
+
+export const obligations = {
+  getAll: () => api.get('/obligations'),
+  getOne: (id: string) => api.get(`/obligations/${id}`),
+  create: (data: any) => api.post('/obligations', data),
+  update: (id: string, data: any) => api.put(`/obligations/${id}`, data),
+}
+
+export const controls = {
+  getAll: () => api.get('/controls'),
+  getOne: (id: string) => api.get(`/controls/${id}`),
+  create: (data: any) => api.post('/controls', data),
+  update: (id: string, data: any) => api.put(`/controls/${id}`, data),
+}
+
+export const artifacts = {
+  getAll: () => api.get('/artifacts'),
+  getOne: (id: string) => api.get(`/artifacts/${id}`),
+  upload: (file: File, data: any) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    Object.keys(data).forEach((key) => {
+      formData.append(key, data[key])
+    })
+    return api.post('/artifacts/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+}
+
+export const risks = {
+  getAll: () => api.get('/risks'),
+  create: (data: any) => api.post('/risks', data),
+  update: (id: string, data: any) => api.put(`/risks/${id}`, data),
+}
+
+export const readiness = {
+  getScore: () => api.get('/readiness/score'),
+}
+
+export const inspectionPacks = {
+  getAll: () => api.get('/inspection-packs'),
+  getOne: (id: string) => api.get(`/inspection-packs/${id}`),
+  create: (data: any) => api.post('/inspection-packs', data),
+  getDownloadUrls: (id: string) => api.get(`/inspection-packs/${id}/download-urls`),
+}
