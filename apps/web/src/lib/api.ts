@@ -104,3 +104,15 @@ export const inspectionPacks = {
   create: (data: any) => api.post('/inspection-packs', data),
   getDownloadUrls: (id: string) => api.get(`/inspection-packs/${id}/download-urls`),
 }
+
+export const exceptions = {
+  getAll: (status?: string) => api.get('/exceptions', { params: { status } }),
+  getOne: (id: string) => api.get(`/exceptions/${id}`),
+  create: (data: any) => api.post('/exceptions', data),
+  approve: (id: string, comments?: string) => api.patch(`/exceptions/${id}/approve`, { comments }),
+  reject: (id: string, reason: string) => api.patch(`/exceptions/${id}/reject`, { reason }),
+  revoke: (id: string, reason: string) => api.patch(`/exceptions/${id}/revoke`, { reason }),
+  getStats: () => api.get('/exceptions/stats'),
+  getPending: () => api.get('/exceptions/pending'),
+  getActive: () => api.get('/exceptions/active'),
+}
