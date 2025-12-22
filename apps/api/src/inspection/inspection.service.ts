@@ -89,7 +89,6 @@ export class InspectionService {
         packId,
         token,
         expiresAt,
-        createdById: userId,
       },
     });
 

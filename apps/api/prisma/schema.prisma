@@ -66,6 +66,7 @@ enum DataType {
   FINANCIAL_DATA
   BIOMETRIC_DATA
   LOCATION_DATA
+  PAYMENT_DATA
 }
 
 enum RevenueRange {
@@ -130,14 +131,15 @@ model User {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  ownedObligations    Obligation[]
-  ownedControls       Control[]
-  ownedRisks          RiskItem[]
-  assignedTasks       Task[]
-  createdArtifacts    Artifact[]
-  policyAcks          PolicyAcknowledgment[]
-  trainingAssignments TrainingAssignment[]
-  createdPacks        InspectionPack[]
+  ownedObligations     Obligation[]
+  ownedControls        Control[]
+  ownedRisks           RiskItem[]
+  assignedTasks        Task[]
+  createdArtifacts     Artifact[]
+  policyAcks           PolicyAcknowledgment[]
+  trainingAssignments  TrainingAssignment[]
+  createdPacks         InspectionPack[]
+  startedWorkflows     WorkflowInstance[]
 
   @@index([tenantId])
   @@index([email])
@@ -155,6 +157,12 @@ enum ObligationDomain {
   CONTRACTS
   SECURITY
   TRAINING
+  EQUALITY
+  RECORDS
+  GOVERNANCE
+  FINANCIAL
+  SAFETY
+  SYSTEM
 }
 
 enum EvidenceFrequency {
@@ -201,11 +209,14 @@ model Obligation {
   tenantId             String
   templateId           String?
   fromTemplateCode     String?           @map("from_template_code") // Template code this was instantiated from
+  code                 String? // Obligation code
   title                String
   titleKo              String?
   description          String            @db.Text
   domain               ObligationDomain
   evidenceFrequency    EvidenceFrequency
+  severity             RiskSeverity      @default(MEDIUM) // Severity level
+  status               String            @default("ACTIVE") // Status: ACTIVE, INACTIVE, etc.
   ownerId              String?
   applicabilityMatched Json?             @map("applicability_matched") // Matched applicability conditions
   isActive             Boolean           @default(true)
@@ -223,6 +234,8 @@ model Obligation {
   @@index([tenantId])
   @@index([domain])
   @@index([fromTemplateCode])
+  @@index([code])
+  @@index([status])
   @@map("obligations")
 }
 
@@ -267,22 +280,25 @@ model ControlTemplate {
 }
 
 model Control {
-  id                String          @id @default(uuid())
-  tenantId          String
-  templateId        String?
-  fromTemplateCode  String?         @map("from_template_code") // Template code this was instantiated from
-  name              String
-  description       String          @db.Text
-  type              ControlType
-  automationLevel   AutomationLevel
-  ownerId           String?
-  isActive          Boolean         @default(true)
+  id                     String          @id @default(uuid())
+  tenantId               String
+  templateId             String?
+  fromTemplateCode       String?         @map("from_template_code") // Template code this was instantiated from
+  code                   String? // Control code
+  name                   String
+  description            String          @db.Text
+  type                   ControlType
+  controlType            String?         @map("controlType") // Alias for type (for evaluation service)
+  automationLevel        AutomationLevel
+  implementationStatus   String          @default("NOT_STARTED") @map("implementationStatus") // Implementation status
+  ownerId                String?
+  isActive               Boolean         @default(true)
   // Evaluation tracking
-  lastEvaluatedAt   DateTime?       @map("last_evaluated_at")
-  evaluationStatus  String?         @map("evaluation_status") // PASS/FAIL/WARN
-  evaluationDetails Json?           @map("evaluation_details")
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  lastEvaluatedAt        DateTime?       @map("last_evaluated_at")
+  evaluationStatus       String?         @map("evaluation_status") // PASS/FAIL/WARN
+  evaluationDetails      Json?           @map("evaluation_details")
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
   tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   template ControlTemplate? @relation(fields: [templateId], references: [id])
@@ -297,6 +313,8 @@ model Control {
   @@index([tenantId])
   @@index([fromTemplateCode])
   @@index([evaluationStatus])
+  @@index([code])
+  @@index([implementationStatus])
   @@map("controls")
 }
 
@@ -320,7 +338,10 @@ model ControlEvidenceRequirement {
   description         String   @db.Text
   freshnessWindowDays Int
   required            Boolean  @default(true)
+  isMandatory         Boolean  @default(true) @map("isMandatory") // Alias for required
+  evidenceType        String   @default("DOCUMENT") @map("evidenceType") // Type of evidence
   cadenceRule         Json?    @map("cadence_rule") // Cadence rule from template
+  retentionRule       Json?    @map("retentionRule") // Retention rule
   requiredFields      String[] @map("required_fields") // Required fields from template
   acceptanceCriteria  String[] @map("acceptance_criteria") // Acceptance criteria from template
   createdAt           DateTime @default(now())
@@ -356,26 +377,33 @@ enum AccessClassification {
 }
 
 model Artifact {
-  id                   String               @id @default(uuid())
-  tenantId             String
-  name                 String
-  description          String?              @db.Text
-  type                 ArtifactType
-  source               String
-  accessClassification AccessClassification
-  retentionDays        Int?
-  metadata             Json?
-  hash                 String?
-  uploadedById         String
-  isDeleted            Boolean              @default(false)
-  deletedAt            DateTime?
+  id                      String               @id @default(uuid())
+  tenantId                String
+  name                    String
+  description             String?              @db.Text
+  type                    ArtifactType
+  source                  String
+  accessClassification    AccessClassification
+  retentionDays           Int?
+  metadata                Json?
+  hash                    String?
+  fileName                String?              @map("fileName") // File name
+  fileSize                Int?                 @map("fileSize") // File size in bytes
+  mimeType                String?              @map("mimeType") // MIME type
+  sha256Hash              String?              @map("sha256Hash") // SHA-256 hash
+  uploadedAt              DateTime?            @map("uploadedAt") // Upload timestamp
+  s3Key                   String?              @map("s3Key") // S3 key for storage
+  evidenceRequirementId   String?              @map("evidenceRequirementId") // Linked evidence requirement
+  uploadedById            String
+  isDeleted               Boolean              @default(false)
+  deletedAt               DateTime?
   // Immutability & approval tracking
-  isApproved           Boolean              @default(false)
-  approvedById         String?
-  approvedAt           DateTime?
-  isImmutable          Boolean              @default(false) // Once true, binary cannot be modified
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  isApproved              Boolean              @default(false)
+  approvedById            String?
+  approvedAt              DateTime?
+  isImmutable             Boolean              @default(false) // Once true, binary cannot be modified
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
 
   tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   uploadedBy User   @relation(fields: [uploadedById], references: [id])
@@ -390,7 +418,9 @@ model Artifact {
   @@index([source])
   @@index([isDeleted])
   @@index([hash])
+  @@index([sha256Hash])
   @@index([isApproved])
+  @@index([evidenceRequirementId])
   @@map("artifacts")
 }
 
@@ -525,19 +555,32 @@ enum TaskStatus {
   BLOCKED
   VERIFIED
   CLOSED
+  COMPLETED
+  REJECTED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
 
 model Task {
-  id          String     @id @default(uuid())
+  id          String        @id @default(uuid())
   tenantId    String
   title       String
-  description String?    @db.Text
-  status      TaskStatus @default(OPEN)
+  description String?       @db.Text
+  status      TaskStatus    @default(OPEN)
+  type        String?       // e.g., 'APPROVAL', 'NOTIFICATION', 'ACTION', 'ESCALATION'
+  priority    TaskPriority? @default(MEDIUM)
   riskItemId  String?
   assigneeId  String?
   dueDate     DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  completedAt DateTime?
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   riskItem RiskItem? @relation(fields: [riskItemId], references: [id])
@@ -576,21 +619,30 @@ enum WorkflowInstanceStatus {
   COMPLETED
   REJECTED
   CANCELLED
+  SLA_VIOLATED
 }
 
 model WorkflowInstance {
   id           String                 @id @default(uuid())
+  tenantId     String
+  workflowId   String // alias for definitionId
   definitionId String
   status       WorkflowInstanceStatus @default(PENDING)
+  currentStep  Int                    @default(0)
   context      Json?
+  metadata     Json?
+  startedById  String?
+  completedAt  DateTime?
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
 
   definition WorkflowDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+  startedBy  User?              @relation(fields: [startedById], references: [id])
 
   steps ApprovalStep[]
 
   @@index([definitionId])
+  @@index([tenantId])
   @@map("workflow_instances")
 }
 
@@ -824,29 +876,38 @@ enum InspectionPackStatus {
 }
 
 model InspectionPack {
-  id            String               @id @default(uuid())
-  tenantId      String
-  name          String
-  domain        ObligationDomain
-  startDate     DateTime
-  endDate       DateTime
-  status        InspectionPackStatus @default(GENERATING)
-  createdById   String
-  manifestS3Key String?
-  bundleS3Key   String?
-  summaryS3Key  String?
-  manifestJson  Json?                @map("manifest_json") // Embedded manifest with hashes/timestamps
-  isImmutable   Boolean              @default(false) @map("is_immutable") // Once true, cannot be modified
-  presetCode    String?              @map("preset_code") // Inspection preset used
-  metadata      Json? // Watermark, draft status, etc
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  id                String               @id @default(uuid())
+  tenantId          String
+  companyId         String?              @map("companyId") // Company ID (alias for tenantId)
+  name              String
+  domain            ObligationDomain
+  inspectionType    String               @default("GENERAL") @map("inspectionType") // Type of inspection
+  startDate         DateTime
+  endDate           DateTime
+  status            InspectionPackStatus @default(GENERATING)
+  createdById       String
+  manifestS3Key     String?
+  bundleS3Key       String?
+  summaryS3Key      String?
+  manifestJson      Json?                @map("manifest_json") // Embedded manifest with hashes/timestamps
+  manifestHash      String?              @map("manifestHash") // SHA-256 hash of manifest
+  manifestSignature String?              @map("manifestSignature") @db.Text // HMAC signature of manifest
+  isImmutable       Boolean              @default(false) @map("is_immutable") // Once true, cannot be modified
+  presetCode        String?              @map("preset_code") // Inspection preset used
+  metadata          Json? // Watermark, draft status, etc
+  finalizedAt       DateTime?            @map("finalizedAt") // When pack was finalized
+  finalizedById     String?              @map("finalizedById") // Who finalized the pack
+  revokedAt         DateTime?            @map("revokedAt") // When pack was revoked
+  revocationReason  String?              @map("revocationReason") @db.Text // Why pack was revoked
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
 
   tenant    Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdBy User   @relation(fields: [createdById], references: [id])
 
-  artifacts  PackArtifact[]
-  shareLinks PackShareLink[]
+  artifacts       PackArtifact[]
+  shareLinks      PackShareLink[]
+  inspectorAccess InspectorAccess[]
 
   @@index([tenantId])
   @@index([domain])
@@ -1022,14 +1083,22 @@ enum AuditEventType {
   ARTIFACT_APPROVED
   PACK_GENERATED
   PACK_DOWNLOADED
+  DRAFT_PACK_GENERATED
   EXCEPTION_REQUESTED
   EXCEPTION_APPROVED
+  WORKFLOW_STARTED
   WORKFLOW_APPROVED
+  WORKFLOW_COMPLETED
+  WORKFLOW_CANCELLED
+  APPROVAL_GRANTED
+  APPROVAL_REJECTED
   CONTROL_CREATED
   CONTROL_UPDATED
   RISK_CREATED
   RISK_UPDATED
   SIMULATION_RUN
+  SHARE_LINK_CREATED
+  SHARE_LINK_REVOKED
 }
 
 model AuditLogEvent {
@@ -1125,4 +1194,104 @@ model ContentVersion {
 
   @@index([isCurrent], map: "content_versions_is_current_idx")
   @@map("content_versions")
+}
+
+// ============================================
+// Inspector Access (for external auditors)
+// ============================================
+
+model InspectorAccess {
+  id                     String    @id @default(uuid())
+  packId                 String    @map("packId")
+  token                  String    @unique
+  inspectorEmail         String    @map("inspectorEmail")
+  inspectorName          String    @map("inspectorName")
+  inspectorOrganization  String    @map("inspectorOrganization")
+  expiresAt              DateTime  @map("expiresAt")
+  isActive               Boolean   @default(true) @map("isActive")
+  permissions            Json      @default("{}") // Permissions JSON
+  createdAt              DateTime  @default(now()) @map("createdAt")
+  revokedAt              DateTime? @map("revokedAt")
+  revocationReason       String?   @map("revocationReason") @db.Text
+
+  pack       InspectionPack         @relation(fields: [packId], references: [id], onDelete: Cascade)
+  activities InspectorActivityLog[]
+
+  @@index([packId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("inspector_access")
+}
+
+model InspectorActivityLog {
+  id                String   @id @default(uuid())
+  inspectorAccessId String   @map("inspectorAccessId")
+  activityType      String   @map("activityType")
+  metadata          Json?
+  occurredAt        DateTime @default(now()) @map("occurredAt")
+
+  inspectorAccess InspectorAccess @relation(fields: [inspectorAccessId], references: [id], onDelete: Cascade)
+
+  @@index([inspectorAccessId])
+  @@index([occurredAt])
+  @@map("inspector_activity_log")
+}
+
+// ============================================
+// Evidence Requirements (for evaluation engine)
+// ============================================
+
+model EvidenceRequirement {
+  id            String    @id @default(uuid())
+  companyId     String    @map("companyId")
+  controlId     String    @map("controlId")
+  name          String
+  description   String?   @db.Text
+  cadenceRule   Json?     @map("cadenceRule")
+  retentionRule Json?     @map("retentionRule")
+  isMandatory   Boolean   @default(true) @map("isMandatory")
+  evidenceType  String    @default("DOCUMENT") @map("evidenceType")
+  createdAt     DateTime  @default(now()) @map("createdAt")
+  updatedAt     DateTime  @updatedAt @map("updatedAt")
+
+  @@index([companyId])
+  @@index([controlId])
+  @@map("evidence_requirements")
+}
+
+// ============================================
+// Risks (for auto-generated compliance risks)
+// ============================================
+
+model Risk {
+  id          String    @id @default(uuid())
+  companyId   String    @map("companyId")
+  title       String
+  description String?   @db.Text
+  severity    String    @default("MEDIUM")
+  status      String    @default("OPEN")
+  source      String    @default("MANUAL") // MANUAL, AUTO_EVALUATION, etc.
+  metadata    Json?
+  createdAt   DateTime  @default(now()) @map("createdAt")
+  updatedAt   DateTime  @updatedAt @map("updatedAt")
+  resolvedAt  DateTime? @map("resolvedAt")
+
+  @@index([companyId])
+  @@index([status])
+  @@index([severity])
+  @@index([source])
+  @@map("risks")
+}
+
+// ============================================
+// Company (compatibility alias for Tenant)
+// ============================================
+
+model Company {
+  id        String   @id
+  name      String
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  @@map("companies")
 }

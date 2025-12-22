@@ -1,0 +1,767 @@
+version: 1
+controls:
+  # ============================================================================
+  # PHASE 1: CORE OBLIGATIONS (1-12)
+  # ============================================================================
+
+  # OB_LSA_WORKING_TIME_RECORDS (1)
+  - code: CTL_LSA_TIME_TRACKING_SYSTEM
+    obligationCode: OB_LSA_WORKING_TIME_RECORDS
+    titleKo: 근태 관리 시스템 운영
+    title: Time Tracking System Operation
+    descriptionKo: 근로자의 출퇴근 시각, 휴게시간, 연장근로 시각을 자동으로 기록하는 시스템을 운영합니다.
+    description: Operate a system that automatically records employees' clock-in/out times, break times, and overtime hours.
+
+  - code: CTL_LSA_TIME_RECORDS_RETENTION
+    obligationCode: OB_LSA_WORKING_TIME_RECORDS
+    titleKo: 근로시간 기록 보존
+    title: Working Time Records Retention
+    descriptionKo: 근로시간 기록을 법정 보존기간(3년) 이상 안전하게 보관합니다.
+    description: Securely retain working time records for the statutory retention period (3+ years).
+
+  # OB_LSA_OVERTIME_PRE_APPROVAL (2)
+  - code: CTL_LSA_OVERTIME_APPROVAL_PROCESS
+    obligationCode: OB_LSA_OVERTIME_PRE_APPROVAL
+    titleKo: 연장근로 사전승인 절차
+    title: Overtime Pre-Approval Process
+    descriptionKo: 연장·야간·휴일근로 발생 전 근로자의 동의를 받고 승인 기록을 유지합니다.
+    description: Obtain employee consent and maintain approval records before overtime, night, or holiday work occurs.
+
+  - code: CTL_LSA_OVERTIME_LIMITS
+    obligationCode: OB_LSA_OVERTIME_PRE_APPROVAL
+    titleKo: 연장근로 한도 모니터링
+    title: Overtime Limits Monitoring
+    descriptionKo: 주 12시간 연장근로 한도를 모니터링하고 초과 방지 조치를 취합니다.
+    description: Monitor the 12-hour weekly overtime limit and take preventive measures.
+
+  # OB_LSA_WAGE_LEDGER (3)
+  - code: CTL_LSA_WAGE_LEDGER_SYSTEM
+    obligationCode: OB_LSA_WAGE_LEDGER
+    titleKo: 임금대장 시스템 운영
+    title: Wage Ledger System Operation
+    descriptionKo: 근로자별 임금 지급 내역을 기록한 임금대장을 작성·관리합니다.
+    description: Create and manage wage ledgers recording payment details for each employee.
+
+  - code: CTL_LSA_WAGE_LEDGER_RETENTION
+    obligationCode: OB_LSA_WAGE_LEDGER
+    titleKo: 임금대장 보존
+    title: Wage Ledger Retention
+    descriptionKo: 임금대장을 3년 이상 보존하고 검색·제공 가능한 상태로 유지합니다.
+    description: Retain wage ledgers for 3+ years in a searchable and retrievable format.
+
+  # OB_LSA_EMPLOYMENT_CONTRACT (4)
+  - code: CTL_LSA_CONTRACT_TEMPLATE
+    obligationCode: OB_LSA_EMPLOYMENT_CONTRACT
+    titleKo: 근로계약서 템플릿 관리
+    title: Employment Contract Template Management
+    descriptionKo: 법정 필수 기재사항을 포함한 근로계약서 템플릿을 유지·관리합니다.
+    description: Maintain employment contract templates containing all statutory required items.
+
+  - code: CTL_LSA_CONTRACT_ISSUANCE
+    obligationCode: OB_LSA_EMPLOYMENT_CONTRACT
+    titleKo: 근로계약서 교부 프로세스
+    title: Contract Issuance Process
+    descriptionKo: 근로계약 체결 시 근로자에게 서면 계약서를 교부하고 수령 확인을 받습니다.
+    description: Issue written contracts to employees upon hiring and obtain acknowledgment of receipt.
+
+  # OB_LSA_MINIMUM_WAGE_COMPLIANCE (5)
+  - code: CTL_LSA_MINIMUM_WAGE_CHECK
+    obligationCode: OB_LSA_MINIMUM_WAGE_COMPLIANCE
+    titleKo: 최저임금 준수 검증
+    title: Minimum Wage Compliance Verification
+    descriptionKo: 급여 지급 시 최저임금 이상 지급 여부를 검증합니다.
+    description: Verify that wages paid meet or exceed minimum wage requirements.
+
+  - code: CTL_LSA_MINIMUM_WAGE_UPDATE
+    obligationCode: OB_LSA_MINIMUM_WAGE_COMPLIANCE
+    titleKo: 최저임금 고시 반영
+    title: Minimum Wage Update Process
+    descriptionKo: 매년 최저임금 고시 내용을 급여 시스템에 반영합니다.
+    description: Update payroll systems annually to reflect new minimum wage announcements.
+
+  # OB_PIPA_PRIVACY_POLICY (6)
+  - code: CTL_PIPA_PRIVACY_POLICY_DOC
+    obligationCode: OB_PIPA_PRIVACY_POLICY
+    titleKo: 개인정보 처리방침 문서화
+    title: Privacy Policy Documentation
+    descriptionKo: 법정 필수 기재사항을 포함한 개인정보 처리방침을 작성·유지합니다.
+    description: Create and maintain a privacy policy containing all statutory required items.
+
+  - code: CTL_PIPA_PRIVACY_POLICY_PUBLICATION
+    obligationCode: OB_PIPA_PRIVACY_POLICY
+    titleKo: 개인정보 처리방침 공개
+    title: Privacy Policy Publication
+    descriptionKo: 개인정보 처리방침을 홈페이지 등에 공개하고 변경 시 즉시 반영합니다.
+    description: Publish privacy policy on website and update immediately upon changes.
+
+  # OB_PIPA_CONSENT_COLLECTION (7)
+  - code: CTL_PIPA_CONSENT_FORM
+    obligationCode: OB_PIPA_CONSENT_COLLECTION
+    titleKo: 개인정보 수집 동의서 관리
+    title: Consent Form Management
+    descriptionKo: 수집 목적, 항목, 보유기간이 명시된 동의서를 관리합니다.
+    description: Manage consent forms specifying collection purpose, items, and retention period.
+
+  - code: CTL_PIPA_CONSENT_LOGGING
+    obligationCode: OB_PIPA_CONSENT_COLLECTION
+    titleKo: 동의 내역 기록
+    title: Consent Logging
+    descriptionKo: 정보주체의 동의 일시, 내용, 방법을 기록·보존합니다.
+    description: Record and preserve date, content, and method of data subject consent.
+
+  # OB_PIPA_DATA_INVENTORY (8)
+  - code: CTL_PIPA_DATA_INVENTORY
+    obligationCode: OB_PIPA_DATA_INVENTORY
+    titleKo: 개인정보 처리 현황 작성
+    title: Personal Data Inventory Creation
+    descriptionKo: 처리 중인 개인정보의 종류, 보유 현황, 처리 목적을 문서화합니다.
+    description: Document types, retention status, and processing purposes of personal data.
+
+  - code: CTL_PIPA_DATA_INVENTORY_REVIEW
+    obligationCode: OB_PIPA_DATA_INVENTORY
+    titleKo: 개인정보 처리 현황 정기 검토
+    title: Data Inventory Periodic Review
+    descriptionKo: 개인정보 처리 현황을 정기적으로(연 1회 이상) 검토·갱신합니다.
+    description: Review and update data inventory periodically (at least annually).
+
+  # OB_PIPA_RETENTION_PERIOD (9)
+  - code: CTL_PIPA_RETENTION_SCHEDULE
+    obligationCode: OB_PIPA_RETENTION_PERIOD
+    titleKo: 개인정보 보유기간 설정
+    title: Data Retention Schedule
+    descriptionKo: 개인정보 항목별 보유기간을 설정하고 문서화합니다.
+    description: Set and document retention periods for each personal data item.
+
+  - code: CTL_PIPA_AUTOMATIC_DELETION
+    obligationCode: OB_PIPA_RETENTION_PERIOD
+    titleKo: 개인정보 자동 파기
+    title: Automatic Data Deletion
+    descriptionKo: 보유기간 경과 시 개인정보를 자동으로 파기하는 프로세스를 운영합니다.
+    description: Operate processes that automatically delete personal data upon expiration.
+
+  # OB_PIPA_VENDOR_CONTRACT (10)
+  - code: CTL_PIPA_VENDOR_CONTRACT_TEMPLATE
+    obligationCode: OB_PIPA_VENDOR_CONTRACT
+    titleKo: 위탁 계약서 템플릿 관리
+    title: Vendor Contract Template Management
+    descriptionKo: 법정 필수 기재사항을 포함한 위탁 계약서 템플릿을 유지합니다.
+    description: Maintain vendor contract templates with all statutory required clauses.
+
+  - code: CTL_PIPA_VENDOR_CONTRACT_EXECUTION
+    obligationCode: OB_PIPA_VENDOR_CONTRACT
+    titleKo: 위탁 계약 체결
+    title: Vendor Contract Execution
+    descriptionKo: 개인정보 처리 위탁 시 서면 계약을 체결하고 보관합니다.
+    description: Execute and retain written contracts when outsourcing personal data processing.
+
+  # OB_PIPA_VENDOR_OVERSIGHT (11)
+  - code: CTL_PIPA_VENDOR_OVERSIGHT_PLAN
+    obligationCode: OB_PIPA_VENDOR_OVERSIGHT
+    titleKo: 수탁자 관리·감독 계획
+    title: Vendor Oversight Plan
+    descriptionKo: 수탁자에 대한 관리·감독 계획을 수립하고 실행합니다.
+    description: Establish and execute oversight plans for data processors.
+
+  - code: CTL_PIPA_VENDOR_AUDIT
+    obligationCode: OB_PIPA_VENDOR_OVERSIGHT
+    titleKo: 수탁자 점검 실시
+    title: Vendor Audit Execution
+    descriptionKo: 정기적으로 수탁자의 개인정보 보호 조치를 점검합니다.
+    description: Periodically audit processors' personal data protection measures.
+
+  # OB_PIPA_BREACH_RESPONSE (12)
+  - code: CTL_PIPA_BREACH_PROCEDURE
+    obligationCode: OB_PIPA_BREACH_RESPONSE
+    titleKo: 유출 대응 절차 수립
+    title: Breach Response Procedure
+    descriptionKo: 개인정보 유출 사고 발생 시 대응 절차를 문서화합니다.
+    description: Document response procedures for personal data breach incidents.
+
+  - code: CTL_PIPA_BREACH_TRAINING
+    obligationCode: OB_PIPA_BREACH_RESPONSE
+    titleKo: 유출 대응 교육
+    title: Breach Response Training
+    descriptionKo: 유출 대응 담당자에게 절차를 교육하고 모의훈련을 실시합니다.
+    description: Train response personnel and conduct drills on breach procedures.
+
+  # ============================================================================
+  # PHASE 2: ENFORCEMENT-FREQUENT OBLIGATIONS (13-26)
+  # ============================================================================
+
+  # OB_LSA_ANNUAL_LEAVE_ENTITLEMENT (13)
+  - code: CTL_LSA_ANNUAL_LEAVE_CALCULATION
+    obligationCode: OB_LSA_ANNUAL_LEAVE_ENTITLEMENT
+    titleKo: 연차휴가 일수 산정
+    title: Annual Leave Calculation
+    descriptionKo: 근로자별 연차휴가 발생 일수를 정확히 산정합니다.
+    description: Accurately calculate annual leave entitlements for each employee.
+
+  - code: CTL_LSA_ANNUAL_LEAVE_NOTIFICATION
+    obligationCode: OB_LSA_ANNUAL_LEAVE_ENTITLEMENT
+    titleKo: 연차휴가 일수 통지
+    title: Annual Leave Notification
+    descriptionKo: 근로자에게 연차휴가 일수를 통지하고 확인받습니다.
+    description: Notify employees of their annual leave entitlements and obtain acknowledgment.
+
+  # OB_LSA_LEAVE_USAGE_RECORDS (14)
+  - code: CTL_LSA_LEAVE_USAGE_TRACKING
+    obligationCode: OB_LSA_LEAVE_USAGE_RECORDS
+    titleKo: 휴가 사용 기록 관리
+    title: Leave Usage Tracking
+    descriptionKo: 근로자별 휴가 신청, 승인, 사용 내역을 기록·관리합니다.
+    description: Record and manage leave requests, approvals, and usage for each employee.
+
+  - code: CTL_LSA_LEAVE_RECORDS_RETENTION
+    obligationCode: OB_LSA_LEAVE_USAGE_RECORDS
+    titleKo: 휴가 기록 보존
+    title: Leave Records Retention
+    descriptionKo: 휴가 사용 기록을 3년 이상 보존합니다.
+    description: Retain leave usage records for 3+ years.
+
+  # OB_LSA_UNUSED_LEAVE_SETTLEMENT (15)
+  - code: CTL_LSA_UNUSED_LEAVE_CALCULATION
+    obligationCode: OB_LSA_UNUSED_LEAVE_SETTLEMENT
+    titleKo: 미사용 연차 수당 산정
+    title: Unused Leave Allowance Calculation
+    descriptionKo: 미사용 연차에 대한 수당을 정확히 산정합니다.
+    description: Accurately calculate allowances for unused annual leave.
+
+  - code: CTL_LSA_UNUSED_LEAVE_PAYMENT
+    obligationCode: OB_LSA_UNUSED_LEAVE_SETTLEMENT
+    titleKo: 미사용 연차 수당 지급
+    title: Unused Leave Payment
+    descriptionKo: 미사용 연차 수당을 기한 내 지급하고 증빙을 유지합니다.
+    description: Pay unused leave allowances within deadlines and maintain evidence.
+
+  # OB_LSA_TERMINATION_DOCUMENTATION (16)
+  - code: CTL_LSA_TERMINATION_CHECKLIST
+    obligationCode: OB_LSA_TERMINATION_DOCUMENTATION
+    titleKo: 퇴직 절차 체크리스트
+    title: Termination Checklist
+    descriptionKo: 퇴직 시 필요한 서류와 절차를 체크리스트로 관리합니다.
+    description: Manage required documents and procedures with a termination checklist.
+
+  - code: CTL_LSA_TERMINATION_RECORDS
+    obligationCode: OB_LSA_TERMINATION_DOCUMENTATION
+    titleKo: 퇴직 서류 보존
+    title: Termination Records Retention
+    descriptionKo: 퇴직 관련 서류를 3년 이상 보존합니다.
+    description: Retain termination-related documents for 3+ years.
+
+  # OB_LSA_FINAL_WAGE_SETTLEMENT (17)
+  - code: CTL_LSA_FINAL_WAGE_CALCULATION
+    obligationCode: OB_LSA_FINAL_WAGE_SETTLEMENT
+    titleKo: 최종 임금 정산 계산
+    title: Final Wage Calculation
+    descriptionKo: 퇴직 시 미지급 임금, 미사용 연차, 퇴직금을 정확히 산정합니다.
+    description: Accurately calculate unpaid wages, unused leave, and severance upon termination.
+
+  - code: CTL_LSA_FINAL_WAGE_PAYMENT
+    obligationCode: OB_LSA_FINAL_WAGE_SETTLEMENT
+    titleKo: 최종 임금 지급
+    title: Final Wage Payment
+    descriptionKo: 퇴직일로부터 14일 이내 최종 임금을 지급하고 증빙을 유지합니다.
+    description: Pay final wages within 14 days of termination and maintain evidence.
+
+  # OB_LSA_DISCIPLINARY_DOCUMENTATION (18)
+  - code: CTL_LSA_DISCIPLINARY_RULES
+    obligationCode: OB_LSA_DISCIPLINARY_DOCUMENTATION
+    titleKo: 징계 규정 수립
+    title: Disciplinary Rules Establishment
+    descriptionKo: 징계 사유, 종류, 절차를 명시한 규정을 수립합니다.
+    description: Establish rules specifying grounds, types, and procedures for disciplinary actions.
+
+  - code: CTL_LSA_DISCIPLINARY_RECORDS
+    obligationCode: OB_LSA_DISCIPLINARY_DOCUMENTATION
+    titleKo: 징계 기록 관리
+    title: Disciplinary Records Management
+    descriptionKo: 징계 사유, 절차, 결과를 문서화하고 보존합니다.
+    description: Document and retain disciplinary grounds, procedures, and outcomes.
+
+  # OB_EEO_ANTI_HARASSMENT_POLICY (19)
+  - code: CTL_EEO_HARASSMENT_POLICY
+    obligationCode: OB_EEO_ANTI_HARASSMENT_POLICY
+    titleKo: 직장 내 괴롭힘 방지 정책
+    title: Anti-Harassment Policy
+    descriptionKo: 직장 내 괴롭힘 금지, 신고 절차, 조치 방법을 명시한 정책을 수립합니다.
+    description: Establish policy prohibiting workplace harassment with reporting and response procedures.
+
+  - code: CTL_EEO_HARASSMENT_EDUCATION
+    obligationCode: OB_EEO_ANTI_HARASSMENT_POLICY
+    titleKo: 직장 내 괴롭힘 예방 교육
+    title: Harassment Prevention Education
+    descriptionKo: 전 직원에게 직장 내 괴롭힘 예방 교육을 실시합니다.
+    description: Conduct harassment prevention training for all employees.
+
+  # OB_EEO_COMPLAINT_HANDLING (20)
+  - code: CTL_EEO_COMPLAINT_PROCEDURE
+    obligationCode: OB_EEO_COMPLAINT_HANDLING
+    titleKo: 고충 처리 절차 수립
+    title: Complaint Handling Procedure
+    descriptionKo: 고충 신고 접수, 조사, 처리 절차를 문서화합니다.
+    description: Document procedures for receiving, investigating, and resolving complaints.
+
+  - code: CTL_EEO_COMPLAINT_RECORDS
+    obligationCode: OB_EEO_COMPLAINT_HANDLING
+    titleKo: 고충 처리 기록 관리
+    title: Complaint Records Management
+    descriptionKo: 고충 접수, 조사, 처리 내역을 기록·보존합니다.
+    description: Record and retain complaint receipt, investigation, and resolution details.
+
+  # OB_EEO_COMPLAINT_CONFIDENTIALITY (21)
+  - code: CTL_EEO_COMPLAINT_CONFIDENTIALITY
+    obligationCode: OB_EEO_COMPLAINT_CONFIDENTIALITY
+    titleKo: 고충 처리 비밀유지
+    title: Complaint Confidentiality
+    descriptionKo: 고충 처리 담당자에게 비밀유지 의무를 부여하고 교육합니다.
+    description: Assign confidentiality obligations to complaint handlers and provide training.
+
+  - code: CTL_EEO_RETALIATION_PROHIBITION
+    obligationCode: OB_EEO_COMPLAINT_CONFIDENTIALITY
+    titleKo: 신고자 불이익 금지
+    title: Retaliation Prohibition
+    descriptionKo: 신고자에 대한 불이익 조치를 금지하고 모니터링합니다.
+    description: Prohibit and monitor retaliation against complainants.
+
+  # OB_EEO_REQUIRED_TRAINING (22)
+  - code: CTL_EEO_TRAINING_SCHEDULE
+    obligationCode: OB_EEO_REQUIRED_TRAINING
+    titleKo: 법정 의무교육 일정 관리
+    title: Required Training Schedule
+    descriptionKo: 성희롱 예방, 개인정보 보호 등 법정 의무교육 일정을 관리합니다.
+    description: Manage schedules for statutory training (harassment, privacy, etc.).
+
+  - code: CTL_EEO_TRAINING_RECORDS
+    obligationCode: OB_EEO_REQUIRED_TRAINING
+    titleKo: 법정 의무교육 기록 관리
+    title: Training Records Management
+    descriptionKo: 교육 일시, 참석자, 내용을 기록하고 3년 이상 보존합니다.
+    description: Record training date, attendees, and content; retain for 3+ years.
+
+  # OB_PIPA_ACCESS_CONTROL (23)
+  - code: CTL_PIPA_ACCESS_CONTROL_POLICY
+    obligationCode: OB_PIPA_ACCESS_CONTROL
+    titleKo: 개인정보 접근 통제 정책
+    title: Access Control Policy
+    descriptionKo: 개인정보 접근 권한 부여 기준과 절차를 정책으로 수립합니다.
+    description: Establish policy with criteria and procedures for granting access to personal data.
+
+  - code: CTL_PIPA_ACCESS_AUTHORIZATION
+    obligationCode: OB_PIPA_ACCESS_CONTROL
+    titleKo: 개인정보 접근 권한 관리
+    title: Access Authorization Management
+    descriptionKo: 개인정보 접근 권한을 최소한으로 부여하고 기록합니다.
+    description: Grant minimal access to personal data and maintain records.
+
+  # OB_PIPA_ACCESS_LOGS (24)
+  - code: CTL_PIPA_ACCESS_LOGGING
+    obligationCode: OB_PIPA_ACCESS_LOGS
+    titleKo: 개인정보 접근 기록 생성
+    title: Access Logging
+    descriptionKo: 개인정보 접근, 변경, 삭제 이력을 자동으로 기록합니다.
+    description: Automatically log access, modification, and deletion of personal data.
+
+  - code: CTL_PIPA_ACCESS_LOG_RETENTION
+    obligationCode: OB_PIPA_ACCESS_LOGS
+    titleKo: 접근 기록 보관
+    title: Access Log Retention
+    descriptionKo: 접근 기록을 2년 이상 안전하게 보관합니다.
+    description: Securely retain access logs for 2+ years.
+
+  # OB_PIPA_ACCESS_REVIEW (25)
+  - code: CTL_PIPA_ACCESS_REVIEW_PROCESS
+    obligationCode: OB_PIPA_ACCESS_REVIEW
+    titleKo: 접근 권한 정기 검토
+    title: Access Review Process
+    descriptionKo: 개인정보 접근 권한을 정기적으로(반기 1회 이상) 검토합니다.
+    description: Periodically review access to personal data (at least semi-annually).
+
+  - code: CTL_PIPA_ACCESS_REVOCATION
+    obligationCode: OB_PIPA_ACCESS_REVIEW
+    titleKo: 불필요 권한 회수
+    title: Access Revocation
+    descriptionKo: 퇴사자 및 업무 변경자의 불필요한 권한을 즉시 회수합니다.
+    description: Immediately revoke unnecessary access for terminated or transferred employees.
+
+  # OB_PIPA_PRIVACY_TRAINING (26)
+  - code: CTL_PIPA_PRIVACY_TRAINING_PLAN
+    obligationCode: OB_PIPA_PRIVACY_TRAINING
+    titleKo: 개인정보 보호 교육 계획
+    title: Privacy Training Plan
+    descriptionKo: 개인정보 취급자를 대상으로 연 1회 이상 교육 계획을 수립합니다.
+    description: Establish training plan for personal data handlers (at least annually).
+
+  - code: CTL_PIPA_PRIVACY_TRAINING_RECORDS
+    obligationCode: OB_PIPA_PRIVACY_TRAINING
+    titleKo: 개인정보 보호 교육 기록
+    title: Privacy Training Records
+    descriptionKo: 교육 일시, 참석자, 내용을 기록하고 보존합니다.
+    description: Record and retain training date, attendees, and content.
+
+  # ============================================================================
+  # PHASE 3: BASELINE GOVERNANCE OBLIGATIONS (27-40)
+  # ============================================================================
+
+  # OB_REC_RETENTION_POLICY (27)
+  - code: CTL_REC_RETENTION_POLICY
+    obligationCode: OB_REC_RETENTION_POLICY
+    titleKo: 기록물 보존 정책 수립
+    title: Records Retention Policy
+    descriptionKo: 법정 보존 의무가 있는 기록물의 보존기간과 방법을 정책으로 수립합니다.
+    description: Establish policy specifying retention periods and methods for legally required records.
+
+  - code: CTL_REC_RETENTION_SCHEDULE
+    obligationCode: OB_REC_RETENTION_POLICY
+    titleKo: 기록물 보존 일정표
+    title: Retention Schedule
+    descriptionKo: 기록물 종류별 보존기간을 일정표로 관리합니다.
+    description: Manage retention periods by record type in a schedule.
+
+  # OB_REC_RETRIEVAL_CAPABILITY (28)
+  - code: CTL_REC_RETRIEVAL_SYSTEM
+    obligationCode: OB_REC_RETRIEVAL_CAPABILITY
+    titleKo: 기록물 검색 시스템
+    title: Records Retrieval System
+    descriptionKo: 보존된 기록물을 신속히 검색·제공할 수 있는 시스템을 운영합니다.
+    description: Operate a system that can quickly search and retrieve retained records.
+
+  - code: CTL_REC_RETRIEVAL_SLA
+    obligationCode: OB_REC_RETRIEVAL_CAPABILITY
+    titleKo: 기록물 제공 시한 관리
+    title: Retrieval SLA Management
+    descriptionKo: 요청 시 기록물을 정해진 시한 내 제공할 수 있도록 관리합니다.
+    description: Manage ability to provide records within specified timeframes upon request.
+
+  # OB_REC_TAMPER_RESISTANCE (29)
+  - code: CTL_REC_IMMUTABILITY
+    obligationCode: OB_REC_TAMPER_RESISTANCE
+    titleKo: 기록물 불변성 보장
+    title: Records Immutability
+    descriptionKo: 확정된 기록물의 위·변조를 기술적으로 방지합니다.
+    description: Technically prevent tampering with finalized records.
+
+  - code: CTL_REC_INTEGRITY_VERIFICATION
+    obligationCode: OB_REC_TAMPER_RESISTANCE
+    titleKo: 기록물 무결성 검증
+    title: Records Integrity Verification
+    descriptionKo: 기록물의 무결성을 검증할 수 있는 메커니즘을 운영합니다.
+    description: Operate mechanisms to verify record integrity.
+
+  # OB_REC_CONTROLLED_DELETION (30)
+  - code: CTL_REC_DELETION_APPROVAL
+    obligationCode: OB_REC_CONTROLLED_DELETION
+    titleKo: 기록물 삭제 승인
+    title: Deletion Approval
+    descriptionKo: 기록물 삭제 시 승인 절차를 거치도록 통제합니다.
+    description: Control record deletion through approval procedures.
+
+  - code: CTL_REC_DELETION_LOGGING
+    obligationCode: OB_REC_CONTROLLED_DELETION
+    titleKo: 기록물 삭제 로그
+    title: Deletion Logging
+    descriptionKo: 기록물 삭제 일시, 사유, 승인자를 로그로 기록합니다.
+    description: Log deletion date, reason, and approver.
+
+  # OB_GOV_AUTHORITY_DELEGATION (31)
+  - code: CTL_GOV_AUTHORITY_MATRIX
+    obligationCode: OB_GOV_AUTHORITY_DELEGATION
+    titleKo: 권한 위임 매트릭스
+    title: Authority Delegation Matrix
+    descriptionKo: 업무별 권한 위임 범위를 매트릭스로 문서화합니다.
+    description: Document authority delegation scope by function in a matrix.
+
+  - code: CTL_GOV_DELEGATION_RECORDS
+    obligationCode: OB_GOV_AUTHORITY_DELEGATION
+    titleKo: 권한 위임 기록
+    title: Delegation Records
+    descriptionKo: 권한 위임 일시, 범위, 근거를 기록·보존합니다.
+    description: Record and retain delegation date, scope, and basis.
+
+  # OB_GOV_INTERNAL_POLICIES (32)
+  - code: CTL_GOV_POLICY_REPOSITORY
+    obligationCode: OB_GOV_INTERNAL_POLICIES
+    titleKo: 내부 정책 저장소
+    title: Policy Repository
+    descriptionKo: 내부 정책을 중앙 저장소에서 버전 관리합니다.
+    description: Manage internal policies with version control in a central repository.
+
+  - code: CTL_GOV_POLICY_APPROVAL
+    obligationCode: OB_GOV_INTERNAL_POLICIES
+    titleKo: 정책 승인 절차
+    title: Policy Approval Process
+    descriptionKo: 정책 제·개정 시 승인 절차를 거치고 기록합니다.
+    description: Require approval for policy creation and revision and maintain records.
+
+  # OB_GOV_POLICY_ACKNOWLEDGMENT (33)
+  - code: CTL_GOV_POLICY_COMMUNICATION
+    obligationCode: OB_GOV_POLICY_ACKNOWLEDGMENT
+    titleKo: 정책 전달
+    title: Policy Communication
+    descriptionKo: 신규·개정 정책을 대상 직원에게 전달합니다.
+    description: Communicate new and revised policies to target employees.
+
+  - code: CTL_GOV_POLICY_ACKNOWLEDGMENT_RECORDS
+    obligationCode: OB_GOV_POLICY_ACKNOWLEDGMENT
+    titleKo: 정책 숙지 확인
+    title: Policy Acknowledgment Records
+    descriptionKo: 직원의 정책 숙지 확인을 받고 기록합니다.
+    description: Obtain and record employee acknowledgment of policies.
+
+  # OB_GOV_DECISION_TRACEABILITY (34)
+  - code: CTL_GOV_DECISION_LOG
+    obligationCode: OB_GOV_DECISION_TRACEABILITY
+    titleKo: 의사결정 기록
+    title: Decision Log
+    descriptionKo: 중요 의사결정의 배경, 근거, 결과를 기록합니다.
+    description: Record background, rationale, and outcomes of key decisions.
+
+  - code: CTL_GOV_DECISION_AUDIT_TRAIL
+    obligationCode: OB_GOV_DECISION_TRACEABILITY
+    titleKo: 의사결정 추적성
+    title: Decision Audit Trail
+    descriptionKo: 의사결정 과정을 추적·검증할 수 있는 증적을 유지합니다.
+    description: Maintain audit trails to trace and verify decision-making processes.
+
+  # OB_FIN_PAYROLL_TAX_RECORDS (35)
+  - code: CTL_FIN_PAYROLL_TAX_CALCULATION
+    obligationCode: OB_FIN_PAYROLL_TAX_RECORDS
+    titleKo: 급여 세무 계산
+    title: Payroll Tax Calculation
+    descriptionKo: 급여 지급 시 원천징수 세액을 정확히 계산합니다.
+    description: Accurately calculate withholding taxes on payroll.
+
+  - code: CTL_FIN_PAYROLL_TAX_RETENTION
+    obligationCode: OB_FIN_PAYROLL_TAX_RECORDS
+    titleKo: 급여 세무 기록 보존
+    title: Payroll Tax Records Retention
+    descriptionKo: 급여 세무 관련 기록을 5년 이상 보존합니다.
+    description: Retain payroll tax records for 5+ years.
+
+  # OB_FIN_PAYROLL_ACCOUNTING_CONSISTENCY (36)
+  - code: CTL_FIN_PAYROLL_ACCOUNTING_RECONCILIATION
+    obligationCode: OB_FIN_PAYROLL_ACCOUNTING_CONSISTENCY
+    titleKo: 급여-회계 대사
+    title: Payroll-Accounting Reconciliation
+    descriptionKo: 급여 지급 내역과 회계 장부를 정기적으로 대사합니다.
+    description: Periodically reconcile payroll details with accounting ledgers.
+
+  - code: CTL_FIN_PAYROLL_ACCOUNTING_EVIDENCE
+    obligationCode: OB_FIN_PAYROLL_ACCOUNTING_CONSISTENCY
+    titleKo: 급여-회계 일관성 증빙
+    title: Payroll-Accounting Consistency Evidence
+    descriptionKo: 급여와 회계의 일관성을 증빙할 수 있는 기록을 유지합니다.
+    description: Maintain records evidencing consistency between payroll and accounting.
+
+  # OB_SAFETY_POLICY (37)
+  - code: CTL_SAFETY_POLICY_DOC
+    obligationCode: OB_SAFETY_POLICY
+    titleKo: 안전 보건 정책 문서
+    title: Safety Policy Document
+    descriptionKo: 안전 보건 목표, 책임, 절차를 명시한 정책을 수립합니다.
+    description: Establish policy specifying safety objectives, responsibilities, and procedures.
+
+  - code: CTL_SAFETY_POLICY_COMMUNICATION
+    obligationCode: OB_SAFETY_POLICY
+    titleKo: 안전 보건 정책 공유
+    title: Safety Policy Communication
+    descriptionKo: 안전 보건 정책을 전 직원에게 공유하고 접근 가능하게 합니다.
+    description: Share safety policy with all employees and ensure accessibility.
+
+  # OB_SAFETY_TRAINING (38)
+  - code: CTL_SAFETY_TRAINING_PLAN
+    obligationCode: OB_SAFETY_TRAINING
+    titleKo: 안전 보건 교육 계획
+    title: Safety Training Plan
+    descriptionKo: 정기 안전 보건 교육 계획을 수립하고 실행합니다.
+    description: Establish and execute periodic safety training plans.
+
+  - code: CTL_SAFETY_TRAINING_RECORDS
+    obligationCode: OB_SAFETY_TRAINING
+    titleKo: 안전 보건 교육 기록
+    title: Safety Training Records
+    descriptionKo: 교육 일시, 참석자, 내용을 기록·보존합니다.
+    description: Record and retain training date, attendees, and content.
+
+  # OB_SAFETY_INCIDENT_LOG (39)
+  - code: CTL_SAFETY_INCIDENT_REPORTING
+    obligationCode: OB_SAFETY_INCIDENT_LOG
+    titleKo: 안전사고 신고 절차
+    title: Safety Incident Reporting
+    descriptionKo: 안전사고 발생 시 신고 절차를 운영합니다.
+    description: Operate reporting procedures for safety incidents.
+
+  - code: CTL_SAFETY_INCIDENT_RECORDS
+    obligationCode: OB_SAFETY_INCIDENT_LOG
+    titleKo: 안전사고 기록 관리
+    title: Safety Incident Records
+    descriptionKo: 안전사고 일시, 원인, 조치를 기록·보존합니다.
+    description: Record and retain incident date, cause, and response.
+
+  # OB_SAFETY_CORRECTIVE_ACTION (40)
+  - code: CTL_SAFETY_CORRECTIVE_ACTION_PROCESS
+    obligationCode: OB_SAFETY_CORRECTIVE_ACTION
+    titleKo: 안전 개선조치 절차
+    title: Safety Corrective Action Process
+    descriptionKo: 안전 문제 식별 시 개선조치 절차를 운영합니다.
+    description: Operate corrective action procedures when safety issues are identified.
+
+  - code: CTL_SAFETY_CORRECTIVE_ACTION_TRACKING
+    obligationCode: OB_SAFETY_CORRECTIVE_ACTION
+    titleKo: 안전 개선조치 추적
+    title: Safety Corrective Action Tracking
+    descriptionKo: 개선조치 계획, 실행, 완료를 추적·기록합니다.
+    description: Track and record corrective action plans, execution, and completion.
+
+  # ============================================================================
+  # SYSTEM-LEVEL OBLIGATIONS (41-50)
+  # ============================================================================
+
+  # OB_SYS_EVIDENCE_IMMUTABILITY (41)
+  - code: CTL_SYS_EVIDENCE_HASHING
+    obligationCode: OB_SYS_EVIDENCE_IMMUTABILITY
+    titleKo: 증빙자료 해시 생성
+    title: Evidence Hashing
+    descriptionKo: 증빙자료 업로드 시 암호화 해시를 생성·저장합니다.
+    description: Generate and store cryptographic hashes upon evidence upload.
+
+  - code: CTL_SYS_EVIDENCE_LOCK
+    obligationCode: OB_SYS_EVIDENCE_IMMUTABILITY
+    titleKo: 증빙자료 잠금
+    title: Evidence Lock
+    descriptionKo: 확정된 증빙자료를 수정 불가능 상태로 잠급니다.
+    description: Lock finalized evidence to prevent modification.
+
+  # OB_SYS_CHAIN_OF_CUSTODY (42)
+  - code: CTL_SYS_CUSTODY_LOG
+    obligationCode: OB_SYS_CHAIN_OF_CUSTODY
+    titleKo: 증빙자료 관리 이력
+    title: Custody Log
+    descriptionKo: 증빙자료의 생성, 수정, 접근 이력을 기록합니다.
+    description: Record creation, modification, and access history of evidence.
+
+  - code: CTL_SYS_CUSTODY_VERIFICATION
+    obligationCode: OB_SYS_CHAIN_OF_CUSTODY
+    titleKo: 관리 이력 검증
+    title: Custody Verification
+    descriptionKo: 증빙자료의 관리 이력을 검증할 수 있는 메커니즘을 제공합니다.
+    description: Provide mechanisms to verify evidence custody history.
+
+  # OB_SYS_AUDIT_LOGS (43)
+  - code: CTL_SYS_AUDIT_LOGGING
+    obligationCode: OB_SYS_AUDIT_LOGS
+    titleKo: 감사 로그 생성
+    title: Audit Logging
+    descriptionKo: 시스템의 주요 활동을 감사 로그로 자동 기록합니다.
+    description: Automatically record key system activities in audit logs.
+
+  - code: CTL_SYS_AUDIT_LOG_RETENTION
+    obligationCode: OB_SYS_AUDIT_LOGS
+    titleKo: 감사 로그 보존
+    title: Audit Log Retention
+    descriptionKo: 감사 로그를 3년 이상 안전하게 보존합니다.
+    description: Securely retain audit logs for 3+ years.
+
+  # OB_SYS_INSPECTOR_READONLY (44)
+  - code: CTL_SYS_INSPECTOR_ACCOUNT
+    obligationCode: OB_SYS_INSPECTOR_READONLY
+    titleKo: 감독관 계정 관리
+    title: Inspector Account Management
+    descriptionKo: 감독관용 읽기 전용 계정을 생성·관리합니다.
+    description: Create and manage read-only accounts for inspectors.
+
+  - code: CTL_SYS_INSPECTOR_ACCESS_LOG
+    obligationCode: OB_SYS_INSPECTOR_READONLY
+    titleKo: 감독관 접근 로그
+    title: Inspector Access Log
+    descriptionKo: 감독관의 시스템 접근 이력을 기록합니다.
+    description: Record inspector system access history.
+
+  # OB_SYS_INSPECTION_SIMULATION (45)
+  - code: CTL_SYS_SIMULATION_MODE
+    obligationCode: OB_SYS_INSPECTION_SIMULATION
+    titleKo: 점검 시뮬레이션 모드
+    title: Inspection Simulation Mode
+    descriptionKo: 점검 시뮬레이션 기능을 제공합니다.
+    description: Provide inspection simulation functionality.
+
+  - code: CTL_SYS_SIMULATION_RESULTS
+    obligationCode: OB_SYS_INSPECTION_SIMULATION
+    titleKo: 시뮬레이션 결과 제공
+    title: Simulation Results
+    descriptionKo: 시뮬레이션 결과를 준비도 점수로 제공합니다.
+    description: Provide simulation results as readiness scores.
+
+  # OB_SYS_DRAFT_FINAL_PACKS (46)
+  - code: CTL_SYS_DRAFT_PACK
+    obligationCode: OB_SYS_DRAFT_FINAL_PACKS
+    titleKo: 점검 팩 초안 생성
+    title: Draft Pack Creation
+    descriptionKo: 점검 팩 초안을 생성하고 수정 가능하게 관리합니다.
+    description: Create draft inspection packs and allow modifications.
+
+  - code: CTL_SYS_FINAL_PACK
+    obligationCode: OB_SYS_DRAFT_FINAL_PACKS
+    titleKo: 점검 팩 확정
+    title: Final Pack Creation
+    descriptionKo: 점검 팩을 확정하여 불변 상태로 전환합니다.
+    description: Finalize inspection packs and transition to immutable state.
+
+  # OB_SYS_EVIDENCE_MANIFEST (47)
+  - code: CTL_SYS_MANIFEST_GENERATION
+    obligationCode: OB_SYS_EVIDENCE_MANIFEST
+    titleKo: 증빙자료 매니페스트 생성
+    title: Evidence Manifest Generation
+    descriptionKo: 점검 팩에 포함된 증빙자료 목록을 매니페스트로 생성합니다.
+    description: Generate manifests listing evidence included in inspection packs.
+
+  - code: CTL_SYS_MANIFEST_INTEGRITY
+    obligationCode: OB_SYS_EVIDENCE_MANIFEST
+    titleKo: 매니페스트 무결성
+    title: Manifest Integrity
+    descriptionKo: 매니페스트의 무결성을 검증할 수 있도록 해시를 포함합니다.
+    description: Include hashes to verify manifest integrity.
+
+  # OB_SYS_READINESS_SCORING (48)
+  - code: CTL_SYS_READINESS_CALCULATION
+    obligationCode: OB_SYS_READINESS_SCORING
+    titleKo: 준비도 점수 계산
+    title: Readiness Score Calculation
+    descriptionKo: 컴플라이언스 준비도를 점수로 계산합니다.
+    description: Calculate compliance readiness as a score.
+
+  - code: CTL_SYS_READINESS_BREAKDOWN
+    obligationCode: OB_SYS_READINESS_SCORING
+    titleKo: 준비도 세부 분석
+    title: Readiness Breakdown
+    descriptionKo: 준비도 점수를 의무·컨트롤별로 분해하여 제공합니다.
+    description: Break down readiness scores by obligation and control.
+
+  # OB_SYS_RISK_REGISTER (49)
+  - code: CTL_SYS_RISK_IDENTIFICATION
+    obligationCode: OB_SYS_RISK_REGISTER
+    titleKo: 리스크 식별
+    title: Risk Identification
+    descriptionKo: 컴플라이언스 리스크를 자동으로 식별합니다.
+    description: Automatically identify compliance risks.
+
+  - code: CTL_SYS_RISK_REGISTER_MAINTENANCE
+    obligationCode: OB_SYS_RISK_REGISTER
+    titleKo: 리스크 등록부 유지
+    title: Risk Register Maintenance
+    descriptionKo: 식별된 리스크를 등록부에 기록·관리합니다.
+    description: Record and manage identified risks in a register.
+
+  # OB_SYS_HISTORICAL_SNAPSHOTS (50)
+  - code: CTL_SYS_SNAPSHOT_CAPTURE
+    obligationCode: OB_SYS_HISTORICAL_SNAPSHOTS
+    titleKo: 준비도 스냅샷 생성
+    title: Snapshot Capture
+    descriptionKo: 일정 주기로 준비도 상태의 스냅샷을 생성합니다.
+    description: Generate snapshots of readiness state at regular intervals.
+
+  - code: CTL_SYS_SNAPSHOT_RETENTION
+    obligationCode: OB_SYS_HISTORICAL_SNAPSHOTS
+    titleKo: 스냅샷 보존
+    title: Snapshot Retention
+    descriptionKo: 준비도 스냅샷을 3년 이상 보존합니다.
+    description: Retain readiness snapshots for 3+ years.

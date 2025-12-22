@@ -12,6 +12,7 @@ export interface GapItem {
   description: string;
   lastEvidenceDate?: Date;
   daysSinceEvidence?: number;
+  expectedFrequency?: string;
 }
 
 @Injectable()

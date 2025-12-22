@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditLogService } from '../audit-log/audit-log.service';
 import { CompanyProfileDto } from '@complianceos/shared';
+import { TemplateInstantiationService } from './template-instantiation.service';
+import { CompanyProfile } from '../common/types/company-profile.types';
 
 interface ObligationActivationRule {
   templateId: string;
@@ -12,9 +14,12 @@ interface ObligationActivationRule {
 
 @Injectable()
 export class OnboardingService {
+  private readonly logger = new Logger(OnboardingService.name);
+
   constructor(
     private prisma: PrismaService,
     private auditLog: AuditLogService,
+    private templateInstantiation: TemplateInstantiationService,
   ) {}
 
   /**
@@ -150,100 +155,44 @@ export class OnboardingService {
   }
 
   /**
-   * Complete onboarding: create profile and activate obligations
+   * Complete onboarding: create profile and instantiate applicable compliance templates
    */
   async completeOnboarding(
-    tenantId: string,
+    companyId: string,
     userId: string,
     profileDto: CompanyProfileDto,
   ) {
-    // Create company profile
-    const profile = await this.prisma.companyProfile.create({
-      data: {
-        tenantId,
-        industry: profileDto.industry,
-        employeeCount: profileDto.employeeCount,
-        hasRemoteWork: profileDto.hasRemoteWork,
-        hasOvertimeWork: profileDto.hasOvertimeWork,
-        hasContractors: profileDto.hasContractors,
-        hasVendors: profileDto.hasVendors,
-        dataTypes: profileDto.dataTypes,
-        hasInternationalTransfer: profileDto.hasInternationalTransfer,
-        annualRevenue: profileDto.annualRevenue,
-      },
-    });
+    this.logger.log(`Starting onboarding for company ${companyId}`);
 
-    // Find all obligation templates
-    const templates = await this.prisma.obligationTemplate.findMany();
+    // Convert CompanyProfileDto to CompanyProfile format for applicability engine
+    const profile: CompanyProfile = this.convertToCompanyProfile(profileDto);
 
-    // Apply activation rules
-    const activatedObligations: any[] = [];
-    const controlsCreated: string[] = [];
+    // Instantiate compliance templates based on applicability
+    const instantiationResult =
+      await this.templateInstantiation.instantiateTemplatesForCompany(
+        companyId,
+        profile,
+      );
 
-    for (const rule of this.activationRules) {
-      if (!rule.condition(profileDto)) continue;
-
-      const template = templates.find((t) => t.id === rule.templateId);
-      if (!template) continue;
-
-      // Create obligation
-      const obligation = await this.prisma.obligation.create({
-        data: {
-          tenantId,
-          templateId: template.id,
-          title: template.title,
-          titleKo: template.titleKo,
-          description: template.description,
-          domain: template.domain,
-          evidenceFrequency: template.evidenceFrequency,
-          isActive: true,
-        },
-        include: {
-          template: true,
-        },
-      });
-
-      activatedObligations.push({
-        id: obligation.id,
-        title: obligation.title,
-        titleKo: obligation.titleKo,
-        domain: obligation.domain,
-        reason: rule.reason,
-      });
-
-      // Auto-create controls if specified
-      if (rule.autoCreateControls) {
-        const controls = await this.createDefaultControls(
-          tenantId,
-          userId,
-          obligation.id,
-          template,
-        );
-        controlsCreated.push(...controls.map((c) => c.id));
-      }
-    }
-
-    // Mark tenant onboarding as complete
-    await this.prisma.tenant.update({
-      where: { id: tenantId },
-      data: {
-        onboardingComplete: true,
-        industry: profileDto.industry,
-        headcount: profileDto.employeeCount,
-      },
-    });
+    this.logger.log(
+      `Instantiated ${instantiationResult.obligationsCreated} obligations, ` +
+        `${instantiationResult.controlsCreated} controls, ` +
+        `${instantiationResult.evidenceRequirementsCreated} evidence requirements`,
+    );
 
     // Log onboarding completion
     await this.auditLog.log({
-      tenantId,
+      tenantId: companyId,
       userId,
       eventType: 'USER_CREATED', // Using closest existing event type
-      resourceType: 'Tenant',
-      resourceId: tenantId,
+      resourceType: 'Company',
+      resourceId: companyId,
       metadata: {
         action: 'ONBOARDING_COMPLETED',
-        obligationsActivated: activatedObligations.length,
-        controlsCreated: controlsCreated.length,
+        obligationsCreated: instantiationResult.obligationsCreated,
+        controlsCreated: instantiationResult.controlsCreated,
+        evidenceRequirementsCreated:
+          instantiationResult.evidenceRequirementsCreated,
       },
     });
 
@@ -253,16 +202,79 @@ export class OnboardingService {
     // Generate next steps
     const nextSteps = this.generateNextSteps(
       profileDto,
-      activatedObligations.length,
+      instantiationResult.obligationsCreated,
     );
 
     return {
       profile,
-      activatedObligations,
-      controlsCreated: controlsCreated.length,
+      instantiation: instantiationResult,
       recommendedIntegrations,
       nextSteps,
     };
+  }
+
+  /**
+   * Convert CompanyProfileDto to CompanyProfile format
+   */
+  private convertToCompanyProfile(dto: CompanyProfileDto): CompanyProfile {
+    // Map employee count to headcount band
+    let headcount_band: CompanyProfile['headcount_band'];
+    if (dto.employeeCount >= 300) {
+      headcount_band = '300+';
+    } else if (dto.employeeCount >= 100) {
+      headcount_band = '100-299';
+    } else if (dto.employeeCount >= 30) {
+      headcount_band = '30-99';
+    } else if (dto.employeeCount >= 10) {
+      headcount_band = '10-29';
+    } else {
+      headcount_band = '1-9';
+    }
+
+    // Map work style
+    let work_style: CompanyProfile['work_style'];
+    if (dto.hasRemoteWork) {
+      work_style = 'hybrid';
+    } else {
+      work_style = 'office';
+    }
+
+    // Map data types
+    const data_types: CompanyProfile['data_types'] = {};
+    if (dto.dataTypes?.includes('EMPLOYEE_DATA')) {
+      data_types.employee_pii = true;
+    }
+    if (dto.dataTypes?.includes('CUSTOMER_DATA')) {
+      data_types.customer_pii = true;
+    }
+    if (dto.dataTypes?.includes('RESIDENT_NUMBERS')) {
+      data_types.resident_id = true;
+    }
+    if (dto.dataTypes?.includes('HEALTH_DATA')) {
+      data_types.health_data = true;
+    }
+    if (
+      dto.dataTypes?.includes('PAYMENT_DATA') ||
+      dto.dataTypes?.includes('FINANCIAL_DATA')
+    ) {
+      data_types.payment_data = true;
+    }
+
+    return {
+      headcount_band,
+      industry: dto.industry,
+      work_style,
+      data_types,
+      uses_vendors_for_data: dto.hasVendors || false,
+    };
+  }
+
+  /**
+   * Preview what will be instantiated for a profile
+   */
+  async previewOnboarding(profileDto: CompanyProfileDto) {
+    const profile = this.convertToCompanyProfile(profileDto);
+    return this.templateInstantiation.previewInstantiation(profile);
   }
 
   /**

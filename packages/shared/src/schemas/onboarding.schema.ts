@@ -25,6 +25,7 @@ export const CompanyProfileSchema = z.object({
       'FINANCIAL_DATA',
       'BIOMETRIC_DATA',
       'LOCATION_DATA',
+      'PAYMENT_DATA',
     ]),
   ),
   hasInternationalTransfer: z.boolean(),

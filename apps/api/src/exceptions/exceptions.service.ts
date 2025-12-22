@@ -371,12 +371,11 @@ export class ExceptionsService {
     metadata: any,
   ) {
     try {
-      await this.prisma.auditLog.create({
+      await this.prisma.auditLogEvent.create({
         data: {
           tenantId,
           userId,
-          action,
-          description,
+          eventType: action as any,
           metadata: metadata as any,
         },
       });

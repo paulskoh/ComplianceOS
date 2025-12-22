@@ -36,11 +36,12 @@ export class WorkflowExecutionService {
     }
 
     // Create execution
-    const execution = await this.prisma.workflowExecution.create({
+    const execution = await this.prisma.workflowInstance.create({
       data: {
         tenantId,
         workflowId,
-        status: 'RUNNING',
+        definitionId: workflowId,
+        status: 'IN_PROGRESS',
         currentStep: 0,
         context,
         startedById: userId,
@@ -70,17 +71,18 @@ export class WorkflowExecutionService {
     tenantId: string,
     userId: string,
   ) {
-    const execution = await this.prisma.workflowExecution.findFirst({
-      where: { id: executionId, tenantId },
-      include: { workflow: true },
+    const execution = await this.prisma.workflowInstance.findFirst({
+      where: { id: executionId },
+      include: { definition: true },
     });
 
-    if (!execution || execution.status !== 'RUNNING') {
+    if (!execution || execution.status !== 'IN_PROGRESS') {
       return;
     }
 
-    const steps = (execution.workflow.steps as any[]) || [];
-    const currentStepIndex = execution.currentStep;
+    const workflowConfig = execution.definition.config as any;
+    const steps = (workflowConfig.steps as any[]) || [];
+    const currentStepIndex = (execution.context as any)?.currentStep || 0;
 
     if (currentStepIndex >= steps.length) {
       // Workflow complete
@@ -123,9 +125,9 @@ export class WorkflowExecutionService {
       data: {
         tenantId,
         title: `[승인 필요] ${step.name}`,
-        description: step.description || `${execution.workflow.name} 워크플로우 승인 필요`,
+        description: step.description || `${execution.definition.name} 워크플로우 승인 필요`,
         type: 'APPROVAL',
-        status: 'PENDING',
+        status: 'OPEN',
         priority: step.priority || 'MEDIUM',
         dueDate: new Date(Date.now() + (step.timeoutHours || 48) * 60 * 60 * 1000),
         assigneeId: step.approverId,
@@ -138,9 +140,9 @@ export class WorkflowExecutionService {
     });
 
     // Update execution status
-    await this.prisma.workflowExecution.update({
+    await this.prisma.workflowInstance.update({
       where: { id: execution.id },
-      data: { status: 'WAITING_APPROVAL' },
+      data: { status: 'PENDING' },
     });
   }
 
@@ -159,7 +161,7 @@ export class WorkflowExecutionService {
         title: `[알림] ${step.name}`,
         description: step.message || step.description,
         type: 'NOTIFICATION',
-        status: 'COMPLETED',
+        status: 'CLOSED',
         priority: 'LOW',
         assigneeId: step.recipientId,
       },
@@ -185,7 +187,7 @@ export class WorkflowExecutionService {
         title: step.taskTitle || step.name,
         description: step.taskDescription || step.description,
         type: step.taskType || 'ACTION',
-        status: 'PENDING',
+        status: 'OPEN',
         priority: step.priority || 'MEDIUM',
         dueDate: step.dueDate
           ? new Date(step.dueDate)
@@ -219,11 +221,11 @@ export class WorkflowExecutionService {
     if (conditionMet) {
       // Execute "then" branch
       if (step.thenStepId) {
-        const thenStepIndex = (execution.workflow.steps as any[]).findIndex(
+        const thenStepIndex = (execution.definition.steps as any[]).findIndex(
           (s) => s.id === step.thenStepId,
         );
         if (thenStepIndex !== -1) {
-          await this.prisma.workflowExecution.update({
+          await this.prisma.workflowInstance.update({
             where: { id: execution.id },
             data: { currentStep: thenStepIndex },
           });
@@ -234,11 +236,11 @@ export class WorkflowExecutionService {
     } else {
       // Execute "else" branch
       if (step.elseStepId) {
-        const elseStepIndex = (execution.workflow.steps as any[]).findIndex(
+        const elseStepIndex = (execution.definition.steps as any[]).findIndex(
           (s) => s.id === step.elseStepId,
         );
         if (elseStepIndex !== -1) {
-          await this.prisma.workflowExecution.update({
+          await this.prisma.workflowInstance.update({
             where: { id: execution.id },
             data: { currentStep: elseStepIndex },
           });
@@ -290,11 +292,11 @@ export class WorkflowExecutionService {
     userId: string,
     request: ApprovalRequest,
   ) {
-    const execution = await this.prisma.workflowExecution.findFirst({
+    const execution = await this.prisma.workflowInstance.findFirst({
       where: { id: request.workflowExecutionId, tenantId },
     });
 
-    if (!execution || execution.status !== 'WAITING_APPROVAL') {
+    if (!execution || execution.status !== 'PENDING') {
       throw new Error('Invalid workflow execution');
     }
 
@@ -307,7 +309,7 @@ export class WorkflowExecutionService {
           equals: execution.id,
         },
         type: 'APPROVAL',
-        status: 'PENDING',
+        status: 'OPEN',
       },
       data: {
         status: request.decision === 'APPROVED' ? 'COMPLETED' : 'REJECTED',
@@ -330,7 +332,7 @@ export class WorkflowExecutionService {
 
     if (request.decision === 'REJECTED') {
       // Reject workflow
-      await this.prisma.workflowExecution.update({
+      await this.prisma.workflowInstance.update({
         where: { id: execution.id },
         data: {
           status: 'REJECTED',
@@ -341,9 +343,9 @@ export class WorkflowExecutionService {
     }
 
     // Continue workflow
-    await this.prisma.workflowExecution.update({
+    await this.prisma.workflowInstance.update({
       where: { id: execution.id },
-      data: { status: 'RUNNING' },
+      data: { status: 'IN_PROGRESS' },
     });
 
     await this.moveToNextStep(execution.id, tenantId, userId);
@@ -359,7 +361,7 @@ export class WorkflowExecutionService {
     tenantId: string,
     userId: string,
   ) {
-    await this.prisma.workflowExecution.update({
+    await this.prisma.workflowInstance.update({
       where: { id: executionId },
       data: { currentStep: { increment: 1 } },
     });
@@ -375,7 +377,7 @@ export class WorkflowExecutionService {
     tenantId: string,
     userId: string,
   ) {
-    await this.prisma.workflowExecution.update({
+    await this.prisma.workflowInstance.update({
       where: { id: executionId },
       data: {
         status: 'COMPLETED',
@@ -396,7 +398,7 @@ export class WorkflowExecutionService {
    * Cancel workflow
    */
   async cancelWorkflow(tenantId: string, userId: string, executionId: string) {
-    await this.prisma.workflowExecution.update({
+    await this.prisma.workflowInstance.update({
       where: { id: executionId },
       data: {
         status: 'CANCELLED',
@@ -418,17 +420,17 @@ export class WorkflowExecutionService {
    */
   @Cron(CronExpression.EVERY_HOUR)
   async checkSLAViolations() {
-    const executions = await this.prisma.workflowExecution.findMany({
+    const executions = await this.prisma.workflowInstance.findMany({
       where: {
-        status: 'WAITING_APPROVAL',
+        status: 'PENDING',
         createdAt: { lt: new Date(Date.now() - 48 * 60 * 60 * 1000) }, // 48 hours
       },
-      include: { workflow: true },
+      include: { definition: true },
     });
 
     for (const execution of executions) {
       // Escalate or auto-reject
-      await this.prisma.workflowExecution.update({
+      await this.prisma.workflowInstance.update({
         where: { id: execution.id },
         data: {
           status: 'SLA_VIOLATED',
@@ -444,10 +446,10 @@ export class WorkflowExecutionService {
       await this.prisma.task.create({
         data: {
           tenantId: execution.tenantId,
-          title: `[SLA 위반] ${execution.workflow.name} 승인 지연`,
-          description: `워크플로우 "${execution.workflow.name}"이(가) 48시간 이상 승인 대기 중입니다.`,
+          title: `[SLA 위반] ${execution.definition.name} 승인 지연`,
+          description: `워크플로우 "${execution.definition.name}"이(가) 48시간 이상 승인 대기 중입니다.`,
           type: 'ESCALATION',
-          status: 'PENDING',
+          status: 'OPEN',
           priority: 'CRITICAL',
           metadata: {
             workflowExecutionId: execution.id,
@@ -462,10 +464,10 @@ export class WorkflowExecutionService {
    * Get workflow execution status
    */
   async getExecutionStatus(tenantId: string, executionId: string) {
-    const execution = await this.prisma.workflowExecution.findFirst({
+    const execution = await this.prisma.workflowInstance.findFirst({
       where: { id: executionId, tenantId },
       include: {
-        workflow: true,
+        definition: true,
         startedBy: { select: { firstName: true, lastName: true, email: true } },
       },
     });
@@ -474,8 +476,9 @@ export class WorkflowExecutionService {
       throw new Error('Execution not found');
     }
 
-    const steps = (execution.workflow.steps as any[]) || [];
-    const currentStepIndex = execution.currentStep;
+    const workflowConfig = execution.definition.config as any;
+    const steps = (workflowConfig.steps as any[]) || [];
+    const currentStepIndex = execution.currentStep || 0;
 
     return {
       ...execution,

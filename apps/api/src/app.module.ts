@@ -24,6 +24,8 @@ import { S3Module } from './s3/s3.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { PlansModule } from './plans/plans.module';
 import { InspectionModule } from './inspection/inspection.module';
+import { ApplicabilityModule } from './applicability/applicability.module';
+import { EvaluationModule } from './evaluation/evaluation.module';
 
 @Module({
   imports: [
@@ -55,6 +57,8 @@ import { InspectionModule } from './inspection/inspection.module';
     OnboardingModule,
     PlansModule,
     InspectionModule,
+    ApplicabilityModule,
+    EvaluationModule,
   ],
 })
 export class AppModule {}

@@ -329,7 +329,7 @@ export class ArtifactsService {
 
     const updated = await this.prisma.artifact.update({
       where: { id },
-      data: updates,
+      data: updates as any,
       include: {
         binary: true,
         uploadedBy: true,

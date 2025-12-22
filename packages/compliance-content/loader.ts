@@ -173,7 +173,7 @@ async function loadObligations(contentVersion: number) {
 }
 
 async function loadControls(contentVersion: number) {
-  const filePath = path.join(__dirname, 'controls.yaml')
+  const filePath = path.join(__dirname, 'controls-full.yaml')
   const fileContents = fs.readFileSync(filePath, 'utf8')
   const data = yaml.load(fileContents) as { version: number; controls: YamlControl[] }
 
@@ -214,7 +214,7 @@ async function loadControls(contentVersion: number) {
 }
 
 async function loadEvidenceRequirements(contentVersion: number) {
-  const filePath = path.join(__dirname, 'evidence-requirements.yaml')
+  const filePath = path.join(__dirname, 'evidence-requirements-full.yaml')
   const fileContents = fs.readFileSync(filePath, 'utf8')
   const data = yaml.load(fileContents) as {
     version: number
