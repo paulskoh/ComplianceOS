@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { AuditLogService } from '../audit-log/audit-log.service';
+import { ArtifactEventsService } from './artifact-events.service';
 import { CreateArtifactDto, LinkArtifactDto } from '@complianceos/shared';
+import { ArtifactEventType } from '@prisma/client';
 
 @Injectable()
 export class ArtifactsService {
@@ -10,6 +12,7 @@ export class ArtifactsService {
     private prisma: PrismaService,
     private s3: S3Service,
     private auditLog: AuditLogService,
+    private artifactEvents: ArtifactEventsService,
   ) {}
 
   async uploadFile(
@@ -58,6 +61,19 @@ export class ArtifactsService {
       },
     });
 
+    // Record creation event (chain of custody)
+    await this.artifactEvents.recordEvent(tenantId, {
+      artifactId: artifact.id,
+      eventType: ArtifactEventType.CREATED,
+      userId,
+      metadata: {
+        fileName: file.originalname,
+        fileSize: file.size,
+        mimeType: file.mimetype,
+        hash,
+      },
+    });
+
     await this.auditLog.log({
       tenantId,
       userId,
@@ -83,15 +99,36 @@ export class ArtifactsService {
   }
 
   async findOne(tenantId: string, id: string) {
-    return this.prisma.artifact.findFirst({
+    const artifact = await this.prisma.artifact.findFirst({
       where: { id, tenantId, isDeleted: false },
       include: {
         binary: true,
         uploadedBy: true,
         controls: { include: { control: true } },
         obligations: { include: { obligation: true } },
+        events: {
+          orderBy: { createdAt: 'desc' },
+          take: 50, // Last 50 events
+        },
       },
     });
+
+    return artifact;
+  }
+
+  /**
+   * Get artifact with full chain of custody
+   */
+  async findOneWithChainOfCustody(tenantId: string, id: string) {
+    const artifact = await this.findOne(tenantId, id);
+    if (!artifact) return null;
+
+    const chainOfCustody = await this.artifactEvents.getChainOfCustody(tenantId, id);
+
+    return {
+      ...artifact,
+      chainOfCustody,
+    };
   }
 
   async getDownloadUrl(tenantId: string, id: string) {
@@ -145,12 +182,25 @@ export class ArtifactsService {
   }
 
   async softDelete(tenantId: string, userId: string, id: string) {
-    const artifact = await this.prisma.artifact.update({
+    // Check if artifact is immutable
+    const artifact = await this.findOne(tenantId, id);
+    if (artifact?.isImmutable) {
+      throw new ForbiddenException('Cannot delete immutable artifact. Artifact has been approved and is part of the compliance record.');
+    }
+
+    const updated = await this.prisma.artifact.update({
       where: { id },
       data: {
         isDeleted: true,
         deletedAt: new Date(),
       },
+    });
+
+    // Record tombstone event
+    await this.artifactEvents.recordEvent(tenantId, {
+      artifactId: id,
+      eventType: ArtifactEventType.TOMBSTONED,
+      userId,
     });
 
     await this.auditLog.log({
@@ -159,6 +209,158 @@ export class ArtifactsService {
       eventType: 'ARTIFACT_DELETED',
       resourceType: 'Artifact',
       resourceId: id,
+    });
+
+    return updated;
+  }
+
+  /**
+   * Approve artifact - makes it immutable
+   * CRITICAL: Once approved, the binary cannot be replaced or modified
+   */
+  async approveArtifact(
+    tenantId: string,
+    userId: string,
+    id: string,
+    ipAddress?: string,
+  ) {
+    const artifact = await this.findOne(tenantId, id);
+    if (!artifact) {
+      throw new BadRequestException('Artifact not found');
+    }
+
+    if (artifact.isApproved) {
+      throw new BadRequestException('Artifact is already approved');
+    }
+
+    // Mark as approved and immutable
+    const approved = await this.prisma.artifact.update({
+      where: { id },
+      data: {
+        isApproved: true,
+        approvedById: userId,
+        approvedAt: new Date(),
+        isImmutable: true, // Once approved, binary is locked
+      },
+      include: {
+        binary: true,
+        uploadedBy: true,
+        controls: { include: { control: true } },
+        obligations: { include: { obligation: true } },
+      },
+    });
+
+    // Record approval event
+    await this.artifactEvents.recordApproval(tenantId, id, userId, ipAddress);
+
+    await this.auditLog.log({
+      tenantId,
+      userId,
+      eventType: 'ARTIFACT_APPROVED',
+      resourceType: 'Artifact',
+      resourceId: id,
+    });
+
+    return approved;
+  }
+
+  /**
+   * Get download URL with event tracking
+   * Records who downloaded what and when (for audit trail)
+   */
+  async getDownloadUrlWithTracking(
+    tenantId: string,
+    userId: string,
+    id: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    const artifact = await this.findOne(tenantId, id);
+    if (!artifact?.binary) {
+      throw new BadRequestException('Artifact not found');
+    }
+
+    // Record download event
+    await this.artifactEvents.recordDownload(
+      tenantId,
+      id,
+      userId,
+      ipAddress,
+      userAgent,
+    );
+
+    return this.s3.getArtifactUrl(artifact.binary.s3Key);
+  }
+
+  /**
+   * Update artifact metadata (whitelisted fields only)
+   * Binary cannot be modified if immutable
+   */
+  async updateMetadata(
+    tenantId: string,
+    userId: string,
+    id: string,
+    updates: {
+      name?: string;
+      description?: string;
+      accessClassification?: string;
+      retentionDays?: number;
+    },
+  ) {
+    const artifact = await this.findOne(tenantId, id);
+    if (!artifact) {
+      throw new BadRequestException('Artifact not found');
+    }
+
+    // Track what changed
+    const changes: any = {};
+    if (updates.name && updates.name !== artifact.name) {
+      changes.name = { from: artifact.name, to: updates.name };
+    }
+    if (updates.description !== undefined && updates.description !== artifact.description) {
+      changes.description = { from: artifact.description, to: updates.description };
+    }
+    if (updates.accessClassification && updates.accessClassification !== artifact.accessClassification) {
+      changes.accessClassification = { from: artifact.accessClassification, to: updates.accessClassification };
+    }
+    if (updates.retentionDays && updates.retentionDays !== artifact.retentionDays) {
+      changes.retentionDays = { from: artifact.retentionDays, to: updates.retentionDays };
+    }
+
+    const updated = await this.prisma.artifact.update({
+      where: { id },
+      data: updates,
+      include: {
+        binary: true,
+        uploadedBy: true,
+        controls: { include: { control: true } },
+        obligations: { include: { obligation: true } },
+      },
+    });
+
+    // Record metadata edit event
+    if (Object.keys(changes).length > 0) {
+      await this.artifactEvents.recordMetadataEdit(tenantId, id, userId, changes);
+    }
+
+    return updated;
+  }
+
+  /**
+   * Get immutability status and approval info
+   */
+  async getImmutabilityStatus(tenantId: string, id: string) {
+    const artifact = await this.prisma.artifact.findFirst({
+      where: { id, tenantId },
+      select: {
+        id: true,
+        name: true,
+        hash: true,
+        isApproved: true,
+        isImmutable: true,
+        approvedById: true,
+        approvedAt: true,
+      },
     });
 
     return artifact;

@@ -40,8 +40,10 @@ async function main() {
         title: 'Labor Standards - Overtime Management',
         titleKo: '근로기준법 - 연장근로 관리',
         description: 'Requirement to track and approve overtime work, ensuring compliance with maximum working hours and proper compensation.',
+        descriptionKo: '연장근로를 추적하고 승인하여, 최대 근로시간 준수 및 적절한 보상을 보장해야 합니다.',
         domain: ObligationDomain.LABOR,
         evidenceFrequency: 'MONTHLY',
+        severity: RiskSeverity.HIGH,
       },
     }),
     prisma.obligationTemplate.create({
@@ -49,14 +51,17 @@ async function main() {
         title: 'Personal Information Protection - Consent Management',
         titleKo: '개인정보보호법 - 동의 관리',
         description: 'Requirement to obtain and document user consent for personal information collection and processing.',
+        descriptionKo: '개인정보 수집 및 처리에 대한 사용자 동의를 획득하고 문서화해야 합니다.',
         domain: ObligationDomain.PRIVACY,
         evidenceFrequency: 'ON_CHANGE',
+        severity: RiskSeverity.CRITICAL,
       },
     }),
     prisma.obligationTemplate.create({
       data: {
         title: 'Financial Documentation - Expense Records',
         titleKo: '재무 증빙 - 비용 기록',
+        descriptionKo: '모든 사업 비용을 적절히 문서화하고 기록을 보관해야 합니다.',
         description: 'Requirement to maintain proper expense documentation and receipts for tax compliance.',
         domain: ObligationDomain.FINANCE,
         evidenceFrequency: 'MONTHLY',
@@ -221,6 +226,25 @@ async function main() {
     },
   });
   console.log('✅ Created integration');
+
+  // Create tenant plan
+  const tenantPlan = await prisma.tenantPlan.create({
+    data: {
+      tenantId: tenant.id,
+      tier: 'GROWTH',
+      maxObligations: 50,
+      maxIntegrations: 3,
+      maxPacksPerMonth: 10,
+      maxStorageGB: 20,
+      maxRetentionDays: 1825, // 5 years
+      maxUsers: 20,
+      obligationsUsed: 2,
+      integrationsUsed: 1,
+      packsGeneratedThisMonth: 0,
+      storageUsedGB: 0.1,
+    },
+  });
+  console.log('✅ Created tenant plan:', tenantPlan.tier);
 
   console.log('\n🎉 Seeding complete!');
   console.log('\n📝 Login credentials:');

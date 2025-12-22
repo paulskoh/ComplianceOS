@@ -3,15 +3,19 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Req,
+  Ip,
+  Headers,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CreateArtifactDto, LinkArtifactDto } from '@complianceos/shared';
@@ -67,5 +71,64 @@ export class ArtifactsController {
   @Delete(':id')
   softDelete(@CurrentUser() user: any, @Param('id') id: string) {
     return this.artifactsService.softDelete(user.tenantId, user.userId, id);
+  }
+
+  @Post(':id/approve')
+  @ApiOperation({ summary: 'Approve artifact (makes it immutable)' })
+  approveArtifact(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Ip() ipAddress?: string,
+  ) {
+    return this.artifactsService.approveArtifact(
+      user.tenantId,
+      user.userId,
+      id,
+      ipAddress,
+    );
+  }
+
+  @Get(':id/chain-of-custody')
+  @ApiOperation({ summary: 'Get artifact with full chain of custody' })
+  getChainOfCustody(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.artifactsService.findOneWithChainOfCustody(user.tenantId, id);
+  }
+
+  @Get(':id/download-url-tracked')
+  @ApiOperation({ summary: 'Get download URL with audit logging' })
+  getDownloadUrlTracked(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Ip() ipAddress: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.artifactsService.getDownloadUrlWithTracking(
+      user.tenantId,
+      user.userId,
+      id,
+      ipAddress,
+      userAgent,
+    );
+  }
+
+  @Patch(':id/metadata')
+  @ApiOperation({ summary: 'Update artifact metadata (whitelisted fields only)' })
+  updateMetadata(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() updates: any,
+  ) {
+    return this.artifactsService.updateMetadata(
+      user.tenantId,
+      user.userId,
+      id,
+      updates,
+    );
+  }
+
+  @Get(':id/immutability-status')
+  @ApiOperation({ summary: 'Get immutability and approval status' })
+  getImmutabilityStatus(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.artifactsService.getImmutabilityStatus(user.tenantId, id);
   }
 }

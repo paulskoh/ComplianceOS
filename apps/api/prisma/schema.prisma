@@ -40,6 +40,10 @@ model Tenant {
   inspectionPacks   InspectionPack[]
   auditLogs         AuditLogEvent[]
   companyProfile    CompanyProfile?
+  plan              TenantPlan?
+  readinessSnapshots ReadinessSnapshot[]
+  supportTickets    SupportTicket[]
+  artifactEvents    ArtifactEvent[]
 
   @@map("tenants")
 }
@@ -156,10 +160,15 @@ enum EvidenceFrequency {
 model ObligationTemplate {
   id                String              @id @default(uuid())
   title             String
-  titleKo           String?
+  titleKo           String
   description       String              @db.Text
+  descriptionKo     String              @db.Text
+  inspectionQuestion String?            @db.Text  // 점검 시 확인 질문
+  evidenceDescription String?           @db.Text  // Required evidence description
   domain            ObligationDomain
   evidenceFrequency EvidenceFrequency
+  severity          RiskSeverity        @default(MEDIUM)
+  legalReference    String?             @db.Text  // 법적 근거
   isActive          Boolean             @default(true)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -212,9 +221,30 @@ enum AutomationLevel {
   FULLY_AUTOMATED
 }
 
+model ControlTemplate {
+  id                String          @id @default(uuid())
+  name              String
+  nameKo            String
+  description       String          @db.Text
+  descriptionKo     String          @db.Text
+  purposeKo         String          @db.Text  // Purpose in Korean
+  ownerRoleSuggested UserRole?                // Suggested owner role
+  type              ControlType
+  automationLevel   AutomationLevel
+  domain            ObligationDomain
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  controls          Control[]
+
+  @@map("control_templates")
+}
+
 model Control {
   id                String          @id @default(uuid())
   tenantId          String
+  templateId        String?
   name              String
   description       String          @db.Text
   type              ControlType
@@ -225,6 +255,7 @@ model Control {
   updatedAt         DateTime        @updatedAt
 
   tenant            Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  template          ControlTemplate? @relation(fields: [templateId], references: [id])
   owner             User?           @relation(fields: [ownerId], references: [id])
 
   obligations       ControlObligation[]
@@ -301,6 +332,11 @@ model Artifact {
   uploadedById         String
   isDeleted            Boolean               @default(false)
   deletedAt            DateTime?
+  // Immutability & approval tracking
+  isApproved           Boolean               @default(false)
+  approvedById         String?
+  approvedAt           DateTime?
+  isImmutable          Boolean               @default(false)  // Once true, binary cannot be modified
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
@@ -311,10 +347,13 @@ model Artifact {
   controls             ArtifactControl[]
   obligations          ArtifactObligation[]
   packArtifacts        PackArtifact[]
+  events               ArtifactEvent[]
 
   @@index([tenantId])
   @@index([source])
   @@index([isDeleted])
+  @@index([hash])
+  @@index([isApproved])
   @@map("artifacts")
 }
 
@@ -355,6 +394,43 @@ model ArtifactObligation {
 
   @@id([artifactId, obligationId])
   @@map("artifact_obligations")
+}
+
+// ============================================
+// Artifact Events (Chain of Custody)
+// ============================================
+
+enum ArtifactEventType {
+  CREATED
+  METADATA_EDITED
+  LINKED_TO_CONTROL
+  LINKED_TO_OBLIGATION
+  APPROVED
+  INCLUDED_IN_PACK
+  DOWNLOADED
+  TOMBSTONED
+  UNLINKED
+}
+
+model ArtifactEvent {
+  id                String            @id @default(uuid())
+  tenantId          String
+  artifactId        String
+  eventType         ArtifactEventType
+  userId            String?
+  ipAddress         String?
+  userAgent         String?
+  metadata          Json?              // Event-specific metadata
+  createdAt         DateTime          @default(now())
+
+  tenant            Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  artifact          Artifact          @relation(fields: [artifactId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([artifactId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("artifact_events")
 }
 
 // ============================================
@@ -764,6 +840,129 @@ model PackShareLink {
 }
 
 // ============================================
+// Tenant Plans & Limits
+// ============================================
+
+enum PlanTier {
+  STARTER
+  GROWTH
+  ADVANCED
+  ENTERPRISE
+}
+
+model TenantPlan {
+  id                        String    @id @default(uuid())
+  tenantId                  String    @unique
+  tier                      PlanTier  @default(STARTER)
+
+  // Limits
+  maxObligations            Int       @default(10)
+  maxIntegrations           Int       @default(1)
+  maxPacksPerMonth          Int       @default(3)
+  maxStorageGB              Int       @default(5)
+  maxRetentionDays          Int       @default(365)
+  maxUsers                  Int       @default(5)
+
+  // Usage tracking
+  obligationsUsed           Int       @default(0)
+  integrationsUsed          Int       @default(0)
+  packsGeneratedThisMonth   Int       @default(0)
+  storageUsedGB             Float     @default(0)
+
+  // Billing
+  billingPeriodStart        DateTime  @default(now())
+  billingPeriodEnd          DateTime?
+  isActive                  Boolean   @default(true)
+
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  tenant                    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_plans")
+}
+
+// ============================================
+// Readiness Snapshots (Historical Tracking)
+// ============================================
+
+model ReadinessSnapshot {
+  id                    String           @id @default(uuid())
+  tenantId              String
+  snapshotDate          DateTime         @default(now())
+
+  // Overall scores
+  overallScore          Float
+  readinessLevel        String           // EXCELLENT, GOOD, FAIR, POOR, CRITICAL
+
+  // Gap counts
+  totalGaps             Int
+  criticalGaps          Int
+  highGaps              Int
+  mediumGaps            Int
+  lowGaps               Int
+
+  // Domain scores (JSON array)
+  domainScores          Json             // [{domain, score, obligations, gaps}, ...]
+
+  // Stats
+  totalObligations      Int
+  totalControls         Int
+  totalArtifacts        Int
+  totalRisks            Int
+  openRisks             Int
+
+  createdAt             DateTime         @default(now())
+
+  tenant                Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([snapshotDate])
+  @@map("readiness_snapshots")
+}
+
+// ============================================
+// Support Tickets
+// ============================================
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model SupportTicket {
+  id                String          @id @default(uuid())
+  tenantId          String
+  userId            String?
+  subject           String
+  description       String          @db.Text
+  status            TicketStatus    @default(OPEN)
+  priority          TicketPriority  @default(MEDIUM)
+  category          String?
+  resolvedAt        DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  tenant            Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([priority])
+  @@map("support_tickets")
+}
+
+// ============================================
 // Audit Log
 // ============================================
 
@@ -778,6 +977,7 @@ enum AuditEventType {
   ARTIFACT_UPLOADED
   ARTIFACT_DELETED
   ARTIFACT_LINKED
+  ARTIFACT_APPROVED
   PACK_GENERATED
   PACK_DOWNLOADED
   EXCEPTION_REQUESTED
@@ -787,6 +987,7 @@ enum AuditEventType {
   CONTROL_UPDATED
   RISK_CREATED
   RISK_UPDATED
+  SIMULATION_RUN
 }
 
 model AuditLogEvent {
