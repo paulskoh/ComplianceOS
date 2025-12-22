@@ -77,6 +77,10 @@ export const risks = {
 export const readiness = {
   getScore: () => api.get('/readiness/score'),
   getGaps: () => api.get('/readiness/gaps'),
+  getSimulationPresets: () => api.get('/readiness/simulate/presets'),
+  simulate: (data: { preset: string; startDate: string; endDate: string }) =>
+    api.post('/readiness/simulate', data),
+  generateDraftPack: (data: any) => api.post('/readiness/simulate/draft-pack', data),
 }
 
 export const onboarding = {

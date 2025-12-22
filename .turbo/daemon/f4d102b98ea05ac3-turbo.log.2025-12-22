@@ -1,0 +1,343 @@
+2025-12-22T01:21:34.653667Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/.turbo-cookie")}
+2025-12-22T01:21:34.653681Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:21:34.754191Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo/cookies/1.cookie")}
+2025-12-22T01:21:34.754200Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:22:04.054169Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:22:04.054214Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:22:34.053541Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:22:34.053563Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:23:04.053697Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:23:04.053768Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:23:34.052668Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:23:34.052692Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:23:43.853246Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/workflows/workflows.module.ts"), AnchoredSystemPathBuf("apps/api/src/workflows/workflows.module.ts.tmp.42412.1766366623819")}
+2025-12-22T01:23:43.853258Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:24:04.053462Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:24:04.053513Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:24:34.051785Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:24:34.051796Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:25:04.051728Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:25:04.051742Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:25:34.051907Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:25:34.051924Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:26:04.051537Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:26:04.051606Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:26:34.051020Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:26:34.051044Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:26:55.850088Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366815775"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts")}
+2025-12-22T01:26:55.850114Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:55.950802Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366815870"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts")}
+2025-12-22T01:26:55.950813Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:56.049744Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366815995"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts")}
+2025-12-22T01:26:56.049809Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:56.650129Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366816576"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts")}
+2025-12-22T01:26:56.650139Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:57.450849Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366817371"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts")}
+2025-12-22T01:26:57.450863Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:58.050139Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366818022"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts")}
+2025-12-22T01:26:58.050155Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:58.750588Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/onboarding/onboarding.service.ts"), AnchoredSystemPathBuf("apps/api/src/onboarding/onboarding.service.ts.tmp.42412.1766366818689")}
+2025-12-22T01:26:58.750596Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:26:59.550068Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/onboarding/onboarding.service.ts"), AnchoredSystemPathBuf("apps/api/src/onboarding/onboarding.service.ts.tmp.42412.1766366819507")}
+2025-12-22T01:26:59.550080Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:27:04.051095Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:27:04.051126Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:27:34.050506Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:27:34.050573Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:28:04.049332Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:28:04.049350Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:28:34.049565Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:28:34.049586Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:28:51.049346Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("packages/shared/src/schemas/onboarding.schema.ts.tmp.42412.1766366930945"), AnchoredSystemPathBuf("packages/shared/src/schemas/onboarding.schema.ts")}
+2025-12-22T01:28:51.049356Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/shared"), path: AnchoredSystemPathBuf("packages/shared") }}))
+2025-12-22T01:28:57.348268Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/app/onboarding/page.tsx"), AnchoredSystemPathBuf("apps/web/src/app/onboarding/page.tsx.tmp.42412.1766366937266")}
+2025-12-22T01:28:57.348433Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T01:29:04.048983Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:29:04.048994Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:29:26.047406Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366965969"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts")}
+2025-12-22T01:29:26.047418Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:29:26.148350Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366966058"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts")}
+2025-12-22T01:29:26.148366Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:29:26.248902Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366966169")}
+2025-12-22T01:29:26.248913Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:29:26.348019Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766366966297"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts")}
+2025-12-22T01:29:26.348031Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:29:34.048120Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:29:34.048150Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:29:47.947698Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366987919"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366987845")}
+2025-12-22T01:29:47.947714Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:29:48.048651Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366988014"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts")}
+2025-12-22T01:29:48.048663Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:29:48.147389Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts.tmp.42412.1766366988138"), AnchoredSystemPathBuf("apps/api/src/integrations/sync.service.ts")}
+2025-12-22T01:29:48.147399Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:30:04.048155Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:30:04.048180Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:30:34.046775Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:30:34.046789Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:31:04.047120Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:31:04.047137Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:31:34.045642Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:31:34.045659Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:31:47.947125Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766367107843")}
+2025-12-22T01:31:47.947134Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:31:48.346384Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766367108281")}
+2025-12-22T01:31:48.346399Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:31:57.446855Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.service.ts.tmp.42412.1766367117414")}
+2025-12-22T01:31:57.446869Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:32:04.046900Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:32:04.046911Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:32:34.049602Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:32:34.049610Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:33:04.045375Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:33:04.045396Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:33:34.046051Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:33:34.046107Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:34:04.044804Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:34:04.044863Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:34:34.044237Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:34:34.044307Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:35:04.044030Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:35:04.044059Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:35:34.044008Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:35:34.044032Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:36:04.044093Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:36:04.044140Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:36:34.042136Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:36:34.042156Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:37:04.041592Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:37:04.041618Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:37:34.042203Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:37:34.042225Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:38:04.042375Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:38:04.042393Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:38:34.041933Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:38:34.041949Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:39:04.040946Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:39:04.040957Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:39:34.040751Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:39:34.040763Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:40:04.039971Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:40:04.039983Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:40:34.044984Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:40:34.045002Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:41:04.075800Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:41:04.075832Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:41:34.076848Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:41:34.076874Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:42:04.075804Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:42:04.075834Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:42:34.076054Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:42:34.076073Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:43:04.075429Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:43:04.075450Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:43:34.076504Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:43:34.076536Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:44:04.076064Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:44:04.076083Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:44:34.075736Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:44:34.075870Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:45:04.077856Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:45:04.077885Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:45:34.075989Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:45:34.076016Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:46:04.077425Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:46:04.077631Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:46:34.078615Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:46:34.078657Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:47:04.176560Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:47:04.176598Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:47:34.075822Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:47:34.075831Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:48:04.175826Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:48:04.175848Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:48:22.276499Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts.tmp.42412.1766368102194"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts")}
+2025-12-22T01:48:22.276515Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:48:34.075866Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:48:34.075896Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:48:36.176415Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.controller.ts"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.controller.ts.tmp.42412.1766368116087")}
+2025-12-22T01:48:36.176425Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:48:42.176796Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.module.ts"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.module.ts.tmp.42412.1766368122105")}
+2025-12-22T01:48:42.176805Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:48:48.676607Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts.tmp.42412.1766368128659"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts")}
+2025-12-22T01:48:48.676617Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:48:52.675856Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts.tmp.42412.1766368132617"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts")}
+2025-12-22T01:48:52.675870Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:48:57.175585Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts.tmp.42412.1766368137124")}
+2025-12-22T01:48:57.175595Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:49:04.075902Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:49:04.075914Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:49:12.476506Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts"), AnchoredSystemPathBuf("apps/api/src/exceptions/exceptions.service.ts.tmp.42412.1766368152428")}
+2025-12-22T01:49:12.476518Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T01:49:31.876442Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/lib/api.ts.tmp.42412.1766368171779"), AnchoredSystemPathBuf("apps/web/src/lib/api.ts")}
+2025-12-22T01:49:31.876461Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T01:49:34.075778Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:49:34.075791Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:50:04.175441Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:50:04.175518Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:50:22.376782Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/app/exceptions"), AnchoredSystemPathBuf("apps/web/src/app/exceptions/page.tsx.tmp.42412.1766368222269"), AnchoredSystemPathBuf("apps/web/src/app/exceptions/page.tsx")}
+2025-12-22T01:50:22.376801Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T01:50:34.075206Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:50:34.075241Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:51:04.075163Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:51:04.075176Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:51:34.075708Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:51:34.075729Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:52:04.276007Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:52:04.276026Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:52:34.176932Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:52:34.176982Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:53:04.191325Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:53:04.192372Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:53:34.175343Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:53:34.175415Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:54:04.176886Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:54:04.177182Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:54:34.177414Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:54:34.177431Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:55:04.177166Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:55:04.177418Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:55:34.175977Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:55:34.176012Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:56:04.176048Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:56:04.176120Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:56:34.177189Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:56:34.177298Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:57:04.177572Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:57:04.177747Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:57:34.175787Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:57:34.175813Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:58:04.176175Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:58:04.176200Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:58:34.174888Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:58:34.174909Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:59:04.177284Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:59:04.177388Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T01:59:34.175814Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T01:59:34.176392Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:00:04.180186Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:00:04.180218Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:00:34.175255Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:00:34.175287Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:01:04.174689Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:01:04.174716Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:01:34.179356Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:01:34.179374Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:02:04.174877Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:02:04.174911Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:02:34.175072Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:02:34.175099Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:03:04.175043Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:03:04.175069Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:03:34.175780Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:03:34.175800Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:04:04.175278Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:04:04.175296Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:04:11.475120Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/schema.prisma.tmp.42412.1766369051425"), AnchoredSystemPathBuf("apps/api/prisma/schema.prisma")}
+2025-12-22T02:04:11.475407Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:04:21.274982Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/schema.prisma"), AnchoredSystemPathBuf("apps/api/prisma/schema.prisma.tmp.42412.1766369061233")}
+2025-12-22T02:04:21.274992Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:04:34.175515Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:04:34.175532Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:04:42.374472Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/schema.prisma.tmp.42412.1766369082291"), AnchoredSystemPathBuf("apps/api/prisma/schema.prisma")}
+2025-12-22T02:04:42.374481Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:04:54.075592Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/schema.prisma.tmp.42412.1766369093977"), AnchoredSystemPathBuf("apps/api/prisma/schema.prisma")}
+2025-12-22T02:04:54.075613Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:05:04.175061Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:05:04.175082Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:05:05.974346Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/schema.prisma"), AnchoredSystemPathBuf("apps/api/prisma/schema.prisma.tmp.42412.1766369105881")}
+2025-12-22T02:05:05.974356Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:05:29.975112Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/schema.prisma.tmp.42412.1766369129875"), AnchoredSystemPathBuf("apps/api/prisma/schema.prisma")}
+2025-12-22T02:05:29.975126Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:05:34.174756Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:05:34.174781Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:06:04.174008Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:06:04.174017Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:06:34.174849Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:06:34.174872Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:07:04.176366Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:07:04.176392Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:07:34.174248Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:07:34.174270Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:07:52.673922Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/seed-korean-templates.ts.tmp.42412.1766369272597"), AnchoredSystemPathBuf("apps/api/prisma/seed-korean-templates.ts")}
+2025-12-22T02:07:52.673931Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:08:04.174918Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:08:04.174936Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:08:20.273547Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/seed.ts.tmp.42412.1766369300236"), AnchoredSystemPathBuf("apps/api/prisma/seed.ts")}
+2025-12-22T02:08:20.273556Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:08:30.674038Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/seed.ts"), AnchoredSystemPathBuf("apps/api/prisma/seed.ts.tmp.42412.1766369310664")}
+2025-12-22T02:08:30.674049Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:08:34.174754Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:08:34.174794Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:08:36.875082Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/seed.ts"), AnchoredSystemPathBuf("apps/api/prisma/seed.ts.tmp.42412.1766369316774")}
+2025-12-22T02:08:36.875092Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:08:42.774821Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/prisma/seed.ts.tmp.42412.1766369322665"), AnchoredSystemPathBuf("apps/api/prisma/seed.ts")}
+2025-12-22T02:08:42.774831Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:09:04.175290Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:09:04.175314Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:09:11.674125Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifact-events.service.ts.tmp.42412.1766369351606"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifact-events.service.ts")}
+2025-12-22T02:09:11.674135Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:09:34.974539Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts.tmp.42412.1766369374928"), AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:09:34.974549Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:09:44.874291Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts.tmp.42412.1766369384795")}
+2025-12-22T02:09:44.874301Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:09:53.874478Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts.tmp.42412.1766369393822")}
+2025-12-22T02:09:53.874487Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:10:04.173999Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:10:04.174012Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:10:16.274643Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts.tmp.42412.1766369416176"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.service.ts")}
+2025-12-22T02:10:16.274653Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:10:27.174208Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.module.ts.tmp.42412.1766369427108"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.module.ts")}
+2025-12-22T02:10:27.174221Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:10:34.174611Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:10:34.174623Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:10:41.573650Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.controller.ts"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.controller.ts.tmp.42412.1766369441538")}
+2025-12-22T02:10:41.573665Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:10:54.174782Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.controller.ts"), AnchoredSystemPathBuf("apps/api/src/artifacts/artifacts.controller.ts.tmp.42412.1766369454086")}
+2025-12-22T02:10:54.174791Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:11:04.174333Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:11:04.174352Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:11:34.374009Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:11:34.374040Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:12:04.273928Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:12:04.273953Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:12:34.888320Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:12:34.888352Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:12:42.975753Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("docs/implementation-guides"), AnchoredSystemPathBuf("docs/implementation-guides/PHASE-3-INSPECTION-SIMULATION.md"), AnchoredSystemPathBuf("docs/implementation-guides/PHASE-3-INSPECTION-SIMULATION.md.tmp.42412.1766369562874")}
+2025-12-22T02:12:42.975763Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:13:04.276232Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:13:04.276299Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:13:34.274411Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:13:34.274447Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:13:36.673578Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("docs/implementation-guides/PHASE-4-5-AUDITOR-MODE-AND-PLAN-ENFORCEMENT.md"), AnchoredSystemPathBuf("docs/implementation-guides/PHASE-4-5-AUDITOR-MODE-AND-PLAN-ENFORCEMENT.md.tmp.42412.1766369616665")}
+2025-12-22T02:13:36.673605Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:14:04.273703Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:14:04.273727Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:14:35.175367Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:14:35.175387Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:15:04.275608Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:15:04.275644Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:15:34.274057Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:15:34.274081Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:16:03.574517Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/simulation.service.ts.tmp.42412.1766369763505"), AnchoredSystemPathBuf("apps/api/src/readiness/simulation.service.ts")}
+2025-12-22T02:16:03.574529Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:16:04.173441Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:16:04.173452Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:16:21.274973Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.module.ts"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.module.ts.tmp.42412.1766369781213")}
+2025-12-22T02:16:21.274984Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:16:33.873722Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/readiness/readiness.controller.ts"), AnchoredSystemPathBuf("apps/api/src/readiness/readiness.controller.ts.tmp.42412.1766369793805")}
+2025-12-22T02:16:33.873732Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:16:34.174958Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:16:34.174967Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:16:56.974603Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/lib/api.ts.tmp.42412.1766369816904"), AnchoredSystemPathBuf("apps/web/src/lib/api.ts")}
+2025-12-22T02:16:56.974614Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T02:17:04.175367Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:17:04.175389Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:17:07.074679Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/app/dashboard/readiness/simulate")}
+2025-12-22T02:17:07.074688Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T02:17:07.075467Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2025-12-22T02:17:34.374751Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:17:34.374791Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:17:51.775119Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/app/dashboard/readiness/simulate/page.tsx"), AnchoredSystemPathBuf("apps/web/src/app/dashboard/readiness/simulate/page.tsx.tmp.42412.1766369871673")}
+2025-12-22T02:17:51.775135Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T02:18:04.173022Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:18:04.173035Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
