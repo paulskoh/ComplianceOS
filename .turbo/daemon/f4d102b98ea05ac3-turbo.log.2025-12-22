@@ -341,3 +341,56 @@
 2025-12-22T02:17:51.775135Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
 2025-12-22T02:18:04.173022Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
 2025-12-22T02:18:04.173035Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:18:34.173864Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:18:34.173934Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:18:55.574672Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/common/guards/auditor.guard.ts.tmp.42412.1766369935558")}
+2025-12-22T02:18:55.574682Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:18:55.674369Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/common/guards/auditor.guard.ts"), AnchoredSystemPathBuf("apps/api/src/common/guards/auditor.guard.ts.tmp.42412.1766369935558")}
+2025-12-22T02:18:55.674378Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:18:55.674402Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2025-12-22T02:19:04.258552Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:19:04.258592Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:19:12.458733Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/common/guards/plan-limits.guard.ts.tmp.42412.1766369952385"), AnchoredSystemPathBuf("apps/api/src/common/guards/plan-limits.guard.ts")}
+2025-12-22T02:19:12.458742Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:19:24.958631Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/plans")}
+2025-12-22T02:19:24.958641Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:19:24.997209Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2025-12-22T02:19:34.259074Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:19:34.259120Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:19:49.560027Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/plans/plans.service.ts.tmp.42412.1766369989461"), AnchoredSystemPathBuf("apps/api/src/plans/plans.service.ts")}
+2025-12-22T02:19:49.560036Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:20:04.560976Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/plans/plans.controller.ts"), AnchoredSystemPathBuf("apps/api/src/plans/plans.controller.ts.tmp.42412.1766370004492"), AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:20:04.560988Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:20:10.261356Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/plans/plans.module.ts.tmp.42412.1766370010235"), AnchoredSystemPathBuf("apps/api/src/plans/plans.module.ts")}
+2025-12-22T02:20:10.261371Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:20:19.761152Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts.tmp.42412.1766370019655"), AnchoredSystemPathBuf("apps/api/src/app.module.ts")}
+2025-12-22T02:20:19.761161Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:20:24.459948Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts.tmp.42412.1766370024389"), AnchoredSystemPathBuf("apps/api/src/app.module.ts")}
+2025-12-22T02:20:24.459958Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:20:34.261853Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:20:34.261896Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:20:51.261229Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/inspection")}
+2025-12-22T02:20:51.261238Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:20:51.272622Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2025-12-22T02:21:00.461467Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/inspection/inspection.controller.ts"), AnchoredSystemPathBuf("apps/api/src/inspection/inspection.controller.ts.tmp.42412.1766370060381")}
+2025-12-22T02:21:00.461478Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:21:04.260557Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:21:04.260626Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:21:20.962557Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/inspection/inspection.service.ts.tmp.42412.1766370080907"), AnchoredSystemPathBuf("apps/api/src/inspection/inspection.service.ts")}
+2025-12-22T02:21:20.962568Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:21:25.462169Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/inspection/inspection.module.ts.tmp.42412.1766370085410"), AnchoredSystemPathBuf("apps/api/src/inspection/inspection.module.ts")}
+2025-12-22T02:21:25.462178Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:21:30.960724Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts"), AnchoredSystemPathBuf("apps/api/src/app.module.ts.tmp.42412.1766370090928")}
+2025-12-22T02:21:30.960736Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:21:34.261197Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:21:34.261206Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:21:35.362309Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/api/src/app.module.ts"), AnchoredSystemPathBuf("apps/api/src/app.module.ts.tmp.42412.1766370095342")}
+2025-12-22T02:21:35.362321Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/api"), path: AnchoredSystemPathBuf("apps/api") }}))
+2025-12-22T02:21:57.060947Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/lib/api.ts"), AnchoredSystemPathBuf("apps/web/src/lib/api.ts.tmp.42412.1766370117041")}
+2025-12-22T02:21:57.060958Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T02:22:04.361996Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:22:04.362038Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2025-12-22T02:22:33.161267Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/web/src/components/PlanUsageMeter.tsx"), AnchoredSystemPathBuf("apps/web/src/components/PlanUsageMeter.tsx.tmp.42412.1766370153080")}
+2025-12-22T02:22:33.161277Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("@complianceos/web"), path: AnchoredSystemPathBuf("apps/web") }}))
+2025-12-22T02:22:34.262797Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".claude-flow/metrics/system-metrics.json")}
+2025-12-22T02:22:34.262842Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))

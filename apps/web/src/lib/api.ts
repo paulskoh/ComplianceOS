@@ -120,3 +120,13 @@ export const exceptions = {
   getPending: () => api.get('/exceptions/pending'),
   getActive: () => api.get('/exceptions/active'),
 }
+
+export const plans = {
+  getUsage: () => api.get('/plans/usage'),
+}
+
+export const inspection = {
+  getPackByToken: (token: string) => api.get(`/inspection/pack/${token}`),
+  createShareLink: (packId: string, expiresInDays: number) =>
+    api.post(`/inspection/pack/${packId}/share-link`, { expiresInDays }),
+}

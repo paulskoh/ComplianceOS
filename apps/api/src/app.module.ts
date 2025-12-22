@@ -22,6 +22,8 @@ import { AuditLogModule } from './audit-log/audit-log.module';
 import { ReadinessModule } from './readiness/readiness.module';
 import { S3Module } from './s3/s3.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { PlansModule } from './plans/plans.module';
+import { InspectionModule } from './inspection/inspection.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { OnboardingModule } from './onboarding/onboarding.module';
     AuditLogModule,
     ReadinessModule,
     OnboardingModule,
+    PlansModule,
+    InspectionModule,
   ],
 })
 export class AppModule {}
