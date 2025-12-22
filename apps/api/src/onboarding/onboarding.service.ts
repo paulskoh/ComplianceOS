@@ -237,10 +237,11 @@ export class OnboardingService {
     await this.auditLog.log({
       tenantId,
       userId,
-      eventType: 'ONBOARDING_COMPLETED',
+      eventType: 'USER_CREATED', // Using closest existing event type
       resourceType: 'Tenant',
       resourceId: tenantId,
       metadata: {
+        action: 'ONBOARDING_COMPLETED',
         obligationsActivated: activatedObligations.length,
         controlsCreated: controlsCreated.length,
       },
@@ -515,9 +516,12 @@ export class OnboardingService {
     await this.auditLog.log({
       tenantId,
       userId,
-      eventType: 'PROFILE_UPDATED',
+      eventType: 'USER_UPDATED', // Using closest existing event type
       resourceType: 'CompanyProfile',
       resourceId: updated.id,
+      metadata: {
+        action: 'PROFILE_UPDATED',
+      },
     });
 
     return updated;

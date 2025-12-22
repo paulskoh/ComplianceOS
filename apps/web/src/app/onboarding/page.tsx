@@ -27,8 +27,8 @@ const dataTypeOptions = [
 
 const revenueOptions = [
   { value: 'UNDER_1B', label: 'Under 1 Billion KRW' },
-  { value: '1B_TO_10B', label: '1-10 Billion KRW' },
-  { value: '10B_TO_100B', label: '10-100 Billion KRW' },
+  { value: 'ONE_B_TO_10B', label: '1-10 Billion KRW' },
+  { value: 'TEN_B_TO_100B', label: '10-100 Billion KRW' },
   { value: 'OVER_100B', label: 'Over 100 Billion KRW' },
 ]
 

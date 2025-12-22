@@ -28,7 +28,7 @@ export const CompanyProfileSchema = z.object({
     ]),
   ),
   hasInternationalTransfer: z.boolean(),
-  annualRevenue: z.enum(['UNDER_1B', '1B_TO_10B', '10B_TO_100B', 'OVER_100B']).optional(),
+  annualRevenue: z.enum(['UNDER_1B', 'ONE_B_TO_10B', 'TEN_B_TO_100B', 'OVER_100B']).optional(),
 });
 
 export type CompanyProfileDto = z.infer<typeof CompanyProfileSchema>;

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ObligationDomain, EvidenceFrequency, RiskSeverity } from '@prisma/client';
 
-interface GapItem {
+export interface GapItem {
   type: 'MISSING_EVIDENCE' | 'OUTDATED_EVIDENCE' | 'UNAPPROVED_EXCEPTION' | 'NO_CONTROL';
   severity: RiskSeverity;
   obligationId: string;
@@ -10,7 +10,6 @@ interface GapItem {
   controlId?: string;
   controlName?: string;
   description: string;
-  expectedFrequency?: EvidenceFrequency;
   lastEvidenceDate?: Date;
   daysSinceEvidence?: number;
 }
@@ -69,10 +68,7 @@ export class ReadinessService {
                 evidenceRequirements: true,
                 artifacts: {
                   include: {
-                    artifact: {
-                      where: { isDeleted: false },
-                      orderBy: { createdAt: 'desc' },
-                    },
+                    artifact: true,
                   },
                 },
               },
@@ -113,22 +109,25 @@ export class ReadinessService {
 
         // Check evidence freshness for each requirement
         for (const requirement of control.evidenceRequirements) {
-          const artifacts = control.artifacts.map((a) => a.artifact);
+          const artifacts = control.artifacts
+            .map((a) => a.artifact)
+            .filter((a) => !a.isDeleted)
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
           const relevantArtifacts = artifacts.filter(
             (a) => a.name.includes(requirement.name) || a.description?.includes(requirement.name),
           );
 
           // Gap 3: No evidence at all
           if (relevantArtifacts.length === 0) {
+            const severity = this.getSeverityByFreshnessDays(requirement.freshnessWindowDays);
             gaps.push({
               type: 'MISSING_EVIDENCE',
-              severity: this.getSeverityByFrequency(requirement.frequency),
+              severity,
               obligationId: obligation.id,
               obligationTitle: obligation.titleKo || obligation.title,
               controlId: control.id,
               controlName: control.name,
               description: `"${requirement.name}" 증빙이 없습니다.`,
-              expectedFrequency: requirement.frequency,
             });
             continue;
           }
@@ -136,18 +135,18 @@ export class ReadinessService {
           // Gap 4: Evidence is outdated
           const latestArtifact = relevantArtifacts[0];
           const daysSince = this.getDaysSince(latestArtifact.createdAt);
-          const maxDays = this.getMaxDaysForFrequency(requirement.frequency);
+          const maxDays = requirement.freshnessWindowDays;
 
           if (daysSince > maxDays) {
+            const severity = this.getSeverityByFreshnessDays(maxDays);
             gaps.push({
               type: 'OUTDATED_EVIDENCE',
-              severity: this.getSeverityByFrequency(requirement.frequency),
+              severity,
               obligationId: obligation.id,
               obligationTitle: obligation.titleKo || obligation.title,
               controlId: control.id,
               controlName: control.name,
-              description: `"${requirement.name}" 증빙이 ${daysSince}일 전 것입니다. (요구: ${requirement.frequency})`,
-              expectedFrequency: requirement.frequency,
+              description: `"${requirement.name}" 증빙이 ${daysSince}일 전 것입니다. (요구: ${maxDays}일 이내)`,
               lastEvidenceDate: latestArtifact.createdAt,
               daysSinceEvidence: daysSince,
             });
@@ -164,18 +163,26 @@ export class ReadinessService {
         expiresAt: { gt: new Date() },
       },
       include: {
-        obligation: true,
-        control: true,
+        control: {
+          include: {
+            obligations: {
+              include: {
+                obligation: true,
+              },
+            },
+          },
+        },
       },
     });
 
     for (const exception of unapprovedExceptions) {
+      const obligation = exception.control.obligations[0]?.obligation;
       gaps.push({
         type: 'UNAPPROVED_EXCEPTION',
         severity: 'MEDIUM',
-        obligationId: exception.obligationId || '',
-        obligationTitle: exception.obligation?.titleKo || 'Unknown',
-        controlId: exception.controlId || undefined,
+        obligationId: obligation?.id || '',
+        obligationTitle: obligation?.titleKo || 'Unknown',
+        controlId: exception.controlId,
         controlName: exception.control?.name,
         description: `미승인 예외 요청: ${exception.reason}`,
       });
@@ -204,7 +211,7 @@ export class ReadinessService {
           obligationId: gap.obligationId,
           controlId: gap.controlId,
           title: { contains: gap.description.substring(0, 50) },
-          status: { in: ['OPEN', 'IN_PROGRESS'] },
+          status: { in: ['OPEN', 'IN_REVIEW'] },
         },
       });
 
@@ -352,48 +359,13 @@ export class ReadinessService {
   }
 
   /**
-   * Helper: Get severity based on evidence frequency
+   * Helper: Get severity based on freshness window in days
    */
-  private getSeverityByFrequency(frequency: EvidenceFrequency): RiskSeverity {
-    switch (frequency) {
-      case 'CONTINUOUS':
-      case 'DAILY':
-        return 'CRITICAL';
-      case 'WEEKLY':
-      case 'MONTHLY':
-        return 'HIGH';
-      case 'QUARTERLY':
-        return 'MEDIUM';
-      case 'ANNUALLY':
-      case 'AS_NEEDED':
-        return 'LOW';
-      default:
-        return 'MEDIUM';
-    }
-  }
-
-  /**
-   * Helper: Get max days allowed for evidence frequency
-   */
-  private getMaxDaysForFrequency(frequency: EvidenceFrequency): number {
-    switch (frequency) {
-      case 'CONTINUOUS':
-        return 1;
-      case 'DAILY':
-        return 3;
-      case 'WEEKLY':
-        return 10;
-      case 'MONTHLY':
-        return 35;
-      case 'QUARTERLY':
-        return 100;
-      case 'ANNUALLY':
-        return 380;
-      case 'AS_NEEDED':
-        return 9999;
-      default:
-        return 35;
-    }
+  private getSeverityByFreshnessDays(days: number): RiskSeverity {
+    if (days <= 3) return 'CRITICAL'; // Daily/continuous
+    if (days <= 35) return 'HIGH'; // Weekly/monthly
+    if (days <= 100) return 'MEDIUM'; // Quarterly
+    return 'LOW'; // Annual or longer
   }
 
   /**

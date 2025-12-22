@@ -23,7 +23,7 @@ export class SyncService {
 
     const integrations = await this.prisma.integration.findMany({
       where: {
-        isActive: true,
+        status: 'ACTIVE',
         config: {
           path: ['autoSync'],
           equals: true,
@@ -79,11 +79,14 @@ export class SyncService {
       case 'GOOGLE_DRIVE':
         syncedCount = await this.syncGoogleDrive(tenantId, userId, integration);
         break;
-      case 'HR_SYSTEM':
-        syncedCount = await this.syncHRSystem(tenantId, userId, integration);
-        break;
-      case 'TIME_TRACKING':
-        syncedCount = await this.syncTimeTracking(tenantId, userId, integration);
+      case 'GENERIC_API':
+        // Handle HR_SYSTEM and TIME_TRACKING as GENERIC_API
+        const apiType = (integration.config as any)?.apiType;
+        if (apiType === 'HR_SYSTEM') {
+          syncedCount = await this.syncHRSystem(tenantId, userId, integration);
+        } else if (apiType === 'TIME_TRACKING') {
+          syncedCount = await this.syncTimeTracking(tenantId, userId, integration);
+        }
         break;
       case 'MANUAL_UPLOAD':
         // No auto-sync needed
@@ -151,7 +154,7 @@ export class SyncService {
             source: 'GOOGLE_DRIVE',
             syncedAt: new Date(),
           },
-        },
+        } as any,
       });
 
       syncedCount++;
@@ -205,7 +208,7 @@ export class SyncService {
           syncedAt: new Date(),
           recordType: 'PAYROLL',
         },
-      },
+      } as any,
     });
 
     // Create attendance artifact
@@ -222,7 +225,7 @@ export class SyncService {
           syncedAt: new Date(),
           recordType: 'ATTENDANCE',
         },
-      },
+      } as any,
     });
 
     return 2;
@@ -254,7 +257,7 @@ export class SyncService {
           syncedAt: new Date(),
           recordType: 'OVERTIME_APPROVAL',
         },
-      },
+      } as any,
     });
 
     return 1;
@@ -339,7 +342,7 @@ export class SyncService {
     return {
       integrationId,
       type: integration.type,
-      isActive: integration.isActive,
+      status: integration.status,
       lastSyncAt: integration.lastSyncAt,
       totalArtifactsSynced: artifactCount,
       lastSyncedArtifact: lastArtifact
@@ -348,7 +351,7 @@ export class SyncService {
             createdAt: lastArtifact.createdAt,
           }
         : null,
-      nextSyncScheduled: integration.isActive
+      nextSyncScheduled: integration.status === 'ACTIVE'
         ? new Date(Date.now() + 60 * 60 * 1000) // Next hour
         : null,
     };
