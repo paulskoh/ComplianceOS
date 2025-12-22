@@ -1,0 +1,37 @@
+version: 1
+sources:
+  - code: KR_LSA
+    titleKo: 근로기준법
+    titleEn: Labor Standards Act
+    issuer: 고용노동부
+    type: STATUTE
+    url: https://www.law.go.kr/법령/근로기준법
+    versionDate: 2024-01-01
+    notes: Korea Labor Standards Act (주요 근로 조건 관련 법령)
+
+  - code: KR_PIPA
+    titleKo: 개인정보 보호법
+    titleEn: Personal Information Protection Act
+    issuer: 개인정보보호위원회
+    type: STATUTE
+    url: https://www.law.go.kr/법령/개인정보보호법
+    versionDate: 2024-03-15
+    notes: Korea PIPA (개인정보 처리 및 보호 관련 법령)
+
+  - code: MOEL_INSPECTOR_RULES
+    titleKo: 근로감독관 집무규정
+    titleEn: Labor Inspector Inspection Rules
+    issuer: 고용노동부
+    type: MANUAL
+    url: https://www.moel.go.kr
+    versionDate: 2023-12-01
+    notes: Guideline for labor inspectors (근로감독관 실무 매뉴얼)
+
+  - code: PIPA_SELF_CHECKLIST
+    titleKo: 개인정보 자율점검 체크리스트
+    titleEn: PIPA Self-Assessment Checklist
+    issuer: 개인정보보호위원회
+    type: CHECKLIST
+    url: https://www.pipc.go.kr
+    versionDate: 2024-01-10
+    notes: PIPC recommended self-check items (PIPC 권고 자가점검 항목)

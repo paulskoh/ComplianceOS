@@ -172,21 +172,21 @@ model ObligationTemplate {
   code                 String?           @unique // Template code from YAML
   title                String
   titleKo              String
-  summaryKo            String?           @db.Text // Short summary in Korean
+  summaryKo            String?           @map("summary_ko") @db.Text // Short summary in Korean
   description          String            @db.Text
   descriptionKo        String            @db.Text
   inspectionQuestion   String?           @db.Text // 점검 시 확인 질문 (single)
-  inspectorQuestionsKo String[] // Multiple inspector questions (array)
+  inspectorQuestionsKo String[]          @map("inspector_questions_ko") // Multiple inspector questions (array)
   evidenceDescription  String?           @db.Text // Required evidence description
   domain               ObligationDomain
   evidenceFrequency    EvidenceFrequency
   severity             RiskSeverity      @default(MEDIUM)
-  severityDefault      RiskSeverity? // Default severity from template
+  severityDefault      RiskSeverity?     @map("severity_default") // Default severity from template
   legalReference       String?           @db.Text // 법적 근거
-  sourceRefs           String[] // References to LawSource codes
-  retentionRule        Json? // Retention requirements
-  applicabilityRule    Json? // Applicability rule DSL
-  contentVersion       Int               @default(1) // Version tracking
+  sourceRefs           String[]          @map("source_refs") // References to LawSource codes
+  retentionRule        Json?             @map("retention_rule") // Retention requirements
+  applicabilityRule    Json?             @map("applicability_rule") // Applicability rule DSL
+  contentVersion       Int               @default(1) @map("content_version") // Version tracking
   isActive             Boolean           @default(true)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
@@ -200,14 +200,14 @@ model Obligation {
   id                   String            @id @default(uuid())
   tenantId             String
   templateId           String?
-  fromTemplateCode     String? // Template code this was instantiated from
+  fromTemplateCode     String?           @map("from_template_code") // Template code this was instantiated from
   title                String
   titleKo              String?
   description          String            @db.Text
   domain               ObligationDomain
   evidenceFrequency    EvidenceFrequency
   ownerId              String?
-  applicabilityMatched Json? // Matched applicability conditions
+  applicabilityMatched Json?             @map("applicability_matched") // Matched applicability conditions
   isActive             Boolean           @default(true)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
@@ -245,10 +245,9 @@ enum AutomationLevel {
 model ControlTemplate {
   id                 String           @id @default(uuid())
   code               String?          @unique // Template code from YAML
-  obligationCode     String? // Reference to obligation template code
+  obligationCode     String?          @map("obligation_code") // Reference to obligation template code
   name               String
   nameKo             String
-  titleKo            String? // Alternative title field
   description        String           @db.Text
   descriptionKo      String           @db.Text
   purposeKo          String?          @db.Text // Purpose in Korean
@@ -256,7 +255,7 @@ model ControlTemplate {
   type               ControlType      @default(PREVENTIVE)
   automationLevel    AutomationLevel  @default(MANUAL)
   domain             ObligationDomain
-  contentVersion     Int              @default(1) // Version tracking
+  contentVersion     Int              @default(1) @map("content_version") // Version tracking
   isActive           Boolean          @default(true)
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
@@ -271,7 +270,7 @@ model Control {
   id                String          @id @default(uuid())
   tenantId          String
   templateId        String?
-  fromTemplateCode  String? // Template code this was instantiated from
+  fromTemplateCode  String?         @map("from_template_code") // Template code this was instantiated from
   name              String
   description       String          @db.Text
   type              ControlType
@@ -279,9 +278,9 @@ model Control {
   ownerId           String?
   isActive          Boolean         @default(true)
   // Evaluation tracking
-  lastEvaluatedAt   DateTime?
-  evaluationStatus  String? // PASS/FAIL/WARN
-  evaluationDetails Json?
+  lastEvaluatedAt   DateTime?       @map("last_evaluated_at")
+  evaluationStatus  String?         @map("evaluation_status") // PASS/FAIL/WARN
+  evaluationDetails Json?           @map("evaluation_details")
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
@@ -316,14 +315,14 @@ model ControlObligation {
 model ControlEvidenceRequirement {
   id                  String   @id @default(uuid())
   controlId           String
-  fromTemplateCode    String? // Template code this was instantiated from
+  fromTemplateCode    String?  @map("from_template_code") // Template code this was instantiated from
   name                String
   description         String   @db.Text
   freshnessWindowDays Int
   required            Boolean  @default(true)
-  cadenceRule         Json? // Cadence rule from template
-  requiredFields      String[] // Required fields from template
-  acceptanceCriteria  String[] // Acceptance criteria from template
+  cadenceRule         Json?    @map("cadence_rule") // Cadence rule from template
+  requiredFields      String[] @map("required_fields") // Required fields from template
+  acceptanceCriteria  String[] @map("acceptance_criteria") // Acceptance criteria from template
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -836,9 +835,9 @@ model InspectionPack {
   manifestS3Key String?
   bundleS3Key   String?
   summaryS3Key  String?
-  manifestJson  Json? // Embedded manifest with hashes/timestamps
-  isImmutable   Boolean              @default(false) // Once true, cannot be modified
-  presetCode    String? // Inspection preset used
+  manifestJson  Json?                @map("manifest_json") // Embedded manifest with hashes/timestamps
+  isImmutable   Boolean              @default(false) @map("is_immutable") // Once true, cannot be modified
+  presetCode    String?              @map("preset_code") // Inspection preset used
   metadata      Json? // Watermark, draft status, etc
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt

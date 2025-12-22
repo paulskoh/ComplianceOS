@@ -1,0 +1,57 @@
+version: 1
+controls:
+  - code: CTL_LSA_CONTRACT_TEMPLATE
+    obligationCode: OB_LSA_LABOR_CONTRACT
+    titleKo: 근로계약서 템플릿 관리
+    title: Labor Contract Template Management
+    descriptionKo: 법정 필수 기재사항을 포함한 근로계약서 템플릿을 유지하고, 모든 근로자에게 계약서를 교부합니다.
+    description: Maintain a labor contract template with all legally required items and issue contracts to all employees.
+    implementationGuidance: Use a standardized template that includes wage, working hours, holidays, and leave policies. Obtain signed acknowledgment from employees.
+
+  - code: CTL_LSA_WAGE_LEDGER_SYSTEM
+    obligationCode: OB_LSA_WAGE_LEDGER
+    titleKo: 임금대장 시스템 운영
+    title: Wage Ledger System Operation
+    descriptionKo: 임금대장을 작성하고 최신 상태로 유지하며, 법정 보존기간(3년) 동안 보관합니다.
+    description: Maintain an up-to-date wage ledger and preserve it for the statutory retention period (3 years).
+    implementationGuidance: Use HR or payroll software to automatically generate and archive wage ledgers. Include all required fields such as employee name, wage components, and payment dates.
+
+  - code: CTL_LSA_ATTENDANCE_TRACKING
+    obligationCode: OB_LSA_ATTENDANCE_RECORD
+    titleKo: 근태 관리 시스템 운영
+    title: Attendance Tracking System Operation
+    descriptionKo: 근로자의 출퇴근 시각과 근로시간을 정확히 기록하고 3년간 보관합니다.
+    description: Accurately record employees' clock-in/out times and working hours, and preserve records for 3 years.
+    implementationGuidance: Deploy an electronic attendance system (e.g., card reader, mobile app, or biometric) to capture accurate timestamps. Ensure overtime hours are clearly logged.
+
+  - code: CTL_PIPA_PRIVACY_POLICY_DOC
+    obligationCode: OB_PIPA_PRIVACY_POLICY
+    titleKo: 개인정보 처리방침 문서화
+    title: Privacy Policy Documentation
+    descriptionKo: 개인정보 처리 목적, 항목, 보유기간 등을 명시한 처리방침을 작성하고 홈페이지 등에 게시합니다.
+    description: Create a privacy policy document specifying processing purposes, data items, and retention periods, and publish it on the website.
+    implementationGuidance: Use the PIPC privacy policy template. Include all mandatory items and ensure it is easily accessible on the company website or app.
+
+  - code: CTL_PIPA_CONSENT_MANAGEMENT
+    obligationCode: OB_PIPA_CONSENT_RECORD
+    titleKo: 동의 관리 프로세스
+    title: Consent Management Process
+    descriptionKo: 개인정보 수집 시 정보주체로부터 명시적 동의를 받고, 동의 기록을 보관합니다.
+    description: Obtain explicit consent from data subjects when collecting personal information and maintain consent records.
+    implementationGuidance: Implement a consent form (digital or paper) that clearly explains what data is collected and why. Store consent records with timestamps.
+
+  - code: CTL_PIPA_BREACH_PROCEDURE
+    obligationCode: OB_PIPA_DATA_BREACH_RESPONSE
+    titleKo: 유출 대응 절차 수립
+    title: Data Breach Response Procedure
+    descriptionKo: 개인정보 유출 사고 발생 시 통지 및 신고 절차를 수립하고, 담당자를 지정합니다.
+    description: Establish a data breach response procedure including notification and reporting steps, and designate responsible personnel.
+    implementationGuidance: Create a written incident response plan. Train staff on breach detection and response. Maintain contact information for PIPC or relevant agencies.
+
+  - code: CTL_PIPA_VENDOR_CONTRACT
+    obligationCode: OB_PIPA_VENDOR_MGMT
+    titleKo: 위탁 계약서 관리
+    title: Vendor Contract Management
+    descriptionKo: 개인정보 처리 위탁 시 법정 필수사항을 포함한 계약서를 체결하고, 수탁자를 정기적으로 점검합니다.
+    description: When outsourcing personal data processing, execute contracts with all mandatory clauses and conduct regular vendor audits.
+    implementationGuidance: Use a standard data processing agreement (DPA) template. Include clauses on security measures, sub-processing, and liability. Schedule annual vendor reviews.

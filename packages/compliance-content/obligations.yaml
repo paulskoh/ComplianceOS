@@ -1,0 +1,165 @@
+version: 1
+obligations:
+  - code: OB_LSA_LABOR_CONTRACT
+    titleKo: 근로계약서 교부 의무
+    title: Labor Contract Issuance Obligation
+    summaryKo: 임금, 근로시간, 휴일 등을 명시한 근로계약서를 근로자에게 서면으로 교부해야 합니다.
+    descriptionKo: 사용자는 근로계약 체결 시 임금, 소정근로시간, 휴일, 연차유급휴가 등을 명시한 서면을 근로자에게 교부해야 합니다.
+    description: Employers must provide a written labor contract to employees specifying wages, working hours, holidays, and paid leave.
+    inspectorQuestionsKo:
+      - 근로계약서에 필수 기재사항이 모두 포함되어 있는가?
+      - 근로자가 근로계약서를 서면으로 교부받았는가?
+    domain: LABOR
+    evidenceFrequency: CONTINUOUS
+    severityDefault: HIGH
+    sourceRefs:
+      - KR_LSA
+      - MOEL_INSPECTOR_RULES
+    retentionRule:
+      minYears: 3
+      triggerEvent: contract_end
+    applicabilityRule:
+      all:
+        - field: headcount_band
+          in: ["1-9", "10-29", "30-99", "100-299", "300+"]
+
+  - code: OB_LSA_WAGE_LEDGER
+    titleKo: 임금대장 작성·보존 의무
+    title: Wage Ledger Maintenance Obligation
+    summaryKo: 근로자별 임금 지급 내역을 기록한 임금대장을 작성하고 3년간 보존해야 합니다.
+    descriptionKo: 사용자는 각 근로자에 대하여 임금대장을 작성하고 3년간 보존하여야 합니다.
+    description: Employers must maintain a wage ledger for each employee and preserve it for 3 years.
+    inspectorQuestionsKo:
+      - 임금대장이 최신 상태로 유지되고 있는가?
+      - 임금대장이 근로기준법 시행령에서 정한 필수 항목을 모두 포함하는가?
+    domain: LABOR
+    evidenceFrequency: CONTINUOUS
+    severityDefault: MEDIUM
+    sourceRefs:
+      - KR_LSA
+    retentionRule:
+      minYears: 3
+      triggerEvent: ledger_date
+    applicabilityRule:
+      all:
+        - field: headcount_band
+          in: ["1-9", "10-29", "30-99", "100-299", "300+"]
+
+  - code: OB_LSA_ATTENDANCE_RECORD
+    titleKo: 근로시간 기록 의무
+    title: Working Hours Record Obligation
+    summaryKo: 근로자의 출퇴근 시각 및 근로시간을 기록하고 3년간 보존해야 합니다.
+    descriptionKo: 사용자는 근로시간을 적정하게 관리하기 위하여 근로자의 근로 시간을 기록·관리해야 합니다.
+    description: Employers must record and manage working hours of employees.
+    inspectorQuestionsKo:
+      - 근로시간 기록이 정확하게 유지되고 있는가?
+      - 연장근로에 대한 기록이 명확한가?
+    domain: LABOR
+    evidenceFrequency: CONTINUOUS
+    severityDefault: MEDIUM
+    sourceRefs:
+      - KR_LSA
+      - MOEL_INSPECTOR_RULES
+    retentionRule:
+      minYears: 3
+      triggerEvent: record_date
+    applicabilityRule:
+      all:
+        - field: headcount_band
+          in: ["10-29", "30-99", "100-299", "300+"]
+
+  - code: OB_PIPA_PRIVACY_POLICY
+    titleKo: 개인정보 처리방침 공개 의무
+    title: Privacy Policy Publication Obligation
+    summaryKo: 개인정보 처리 목적, 항목, 보유기간 등을 명시한 처리방침을 공개해야 합니다.
+    descriptionKo: 개인정보처리자는 개인정보의 처리 목적, 항목, 보유 및 이용기간, 제3자 제공 등에 관한 사항을 처리방침에 포함하여 공개하여야 합니다.
+    description: Personal information controllers must publish a privacy policy including processing purposes, data items, retention periods, and third-party disclosures.
+    inspectorQuestionsKo:
+      - 개인정보 처리방침이 홈페이지 등에 공개되어 있는가?
+      - 처리방침에 법정 필수 기재사항이 모두 포함되어 있는가?
+    domain: PRIVACY
+    evidenceFrequency: CONTINUOUS
+    severityDefault: HIGH
+    sourceRefs:
+      - KR_PIPA
+      - PIPA_SELF_CHECKLIST
+    applicabilityRule:
+      any:
+        - field: data_types.customer_pii
+          eq: true
+        - field: data_types.employee_pii
+          eq: true
+
+  - code: OB_PIPA_CONSENT_RECORD
+    titleKo: 개인정보 수집·이용 동의 기록 의무
+    title: Consent Record Obligation
+    summaryKo: 개인정보 수집 시 정보주체의 동의를 받고 그 기록을 보관해야 합니다.
+    descriptionKo: 개인정보처리자는 정보주체의 동의를 받아 개인정보를 수집하는 경우 동의 내용과 시점을 기록·관리하여야 합니다.
+    description: Personal information controllers must obtain and record consent from data subjects when collecting personal information.
+    inspectorQuestionsKo:
+      - 동의서에 수집 목적, 항목, 보유기간이 명시되어 있는가?
+      - 정보주체가 동의한 기록이 보관되어 있는가?
+    domain: PRIVACY
+    evidenceFrequency: CONTINUOUS
+    severityDefault: HIGH
+    sourceRefs:
+      - KR_PIPA
+    retentionRule:
+      minYears: 3
+      triggerEvent: consent_date
+    applicabilityRule:
+      any:
+        - field: data_types.customer_pii
+          eq: true
+
+  - code: OB_PIPA_DATA_BREACH_RESPONSE
+    titleKo: 개인정보 유출 대응 및 통지 의무
+    title: Data Breach Response and Notification Obligation
+    summaryKo: 개인정보 유출 발생 시 정보주체 및 당국에 통지하고 필요한 조치를 취해야 합니다.
+    descriptionKo: 개인정보 유출 사고 발생 시 지체 없이 해당 정보주체에게 통지하고 개인정보보호위원회 또는 전문기관에 신고하여야 합니다.
+    description: In case of a personal data breach, controllers must notify affected data subjects and report to the relevant authorities without delay.
+    inspectorQuestionsKo:
+      - 유출 사고 발생 시 대응 절차가 수립되어 있는가?
+      - 유출 통지 및 신고 이력이 있는 경우 적법하게 처리되었는가?
+    domain: PRIVACY
+    evidenceFrequency: ON_CHANGE
+    severityDefault: CRITICAL
+    sourceRefs:
+      - KR_PIPA
+      - PIPA_SELF_CHECKLIST
+    applicabilityRule:
+      any:
+        - field: data_types.customer_pii
+          eq: true
+        - field: data_types.employee_pii
+          eq: true
+        - field: data_types.resident_id
+          eq: true
+        - field: data_types.health_data
+          eq: true
+        - field: data_types.payment_data
+          eq: true
+
+  - code: OB_PIPA_VENDOR_MGMT
+    titleKo: 개인정보 처리 위탁 관리 의무
+    title: Data Processing Vendor Management Obligation
+    summaryKo: 개인정보 처리를 위탁하는 경우 위탁 계약서를 작성하고 수탁자를 관리·감독해야 합니다.
+    descriptionKo: 개인정보처리자가 개인정보 처리업무를 위탁하는 경우 위탁 계약서를 서면으로 작성하고, 수탁자가 개인정보를 안전하게 처리하는지 관리·감독하여야 합니다.
+    description: When outsourcing personal data processing, controllers must establish written contracts and supervise processors.
+    inspectorQuestionsKo:
+      - 위탁 계약서에 법정 필수사항이 포함되어 있는가?
+      - 수탁자에 대한 관리·감독이 정기적으로 이루어지는가?
+    domain: PRIVACY
+    evidenceFrequency: CONTINUOUS
+    severityDefault: HIGH
+    sourceRefs:
+      - KR_PIPA
+    applicabilityRule:
+      all:
+        - field: uses_vendors_for_data
+          eq: true
+        - any:
+            - field: data_types.customer_pii
+              eq: true
+            - field: data_types.employee_pii
+              eq: true
