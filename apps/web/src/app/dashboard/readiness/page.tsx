@@ -1,42 +1,59 @@
 'use client'
 
-import { useState } from 'react'
-import { FunnelIcon, ArrowsUpDownIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { useEffect, useState } from 'react'
+import { FunnelIcon, ArrowsUpDownIcon, MagnifyingGlassIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { readiness } from '@/lib/api'
 
 const tabs = [
-  { name: 'Overview', current: false },
-  { name: 'Risk Register', current: true }, // Default for demo
+  { name: 'Gap Analysis', current: true },
+  { name: 'Risk Register', current: false },
   { name: 'Control Coverage', current: false },
-  { name: 'Scenario Analysis', current: false },
-]
-
-const risks = [
-  { id: 'RSK-001', domain: 'InfoSec', risk: 'Unauth Access to Customer Data', owner: 'J. Doe', impact: 'High', likelihood: 'Low', status: 'Mitigated' },
-  { id: 'RSK-002', domain: 'Privacy', risk: 'GDPR Data Subject Request Failure', owner: 'Legal Team', impact: 'High', likelihood: 'Medium', status: 'Open' },
-  { id: 'RSK-003', domain: 'TPRM', risk: 'Vendor Supply Chain Disruption', owner: 'Procurement', impact: 'Medium', likelihood: 'Medium', status: 'Accepted' },
-  { id: 'RSK-004', domain: 'InfoSec', risk: 'Phishing Attack Success', owner: 'SecOps', impact: 'High', likelihood: 'High', status: 'mitigating' },
-  { id: 'RSK-005', domain: 'Infra', risk: 'Cloud Misconfiguration', owner: 'DevOps', impact: 'Critical', likelihood: 'Low', status: 'Mitigated' },
-  { id: 'RSK-006', domain: 'HR', risk: 'Key Person Dependency', owner: 'HR Director', impact: 'Medium', likelihood: 'Low', status: 'Accepted' },
-  { id: 'RSK-007', domain: 'Legal', risk: 'License Compliance Violation', owner: 'Legal Team', impact: 'Low', likelihood: 'Low', status: 'Mitigated' },
-  { id: 'RSK-008', domain: 'InfoSec', risk: 'Ransomware Infection', owner: 'CISO', impact: 'Critical', likelihood: 'Medium', status: 'Open' },
-  { id: 'RSK-009', domain: 'Fin', risk: 'Payment Gateway Failure', owner: 'Eng Lead', impact: 'High', likelihood: 'Low', status: 'Mitigated' },
-  { id: 'RSK-010', domain: 'Privacy', risk: 'Cookie Consent Violation', owner: 'Marketing', impact: 'Low', likelihood: 'Medium', status: 'Open' },
 ]
 
 export default function ReadinessPage() {
+  const [gapData, setGapData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<string>('all')
+
+  useEffect(() => {
+    async function fetchGaps() {
+      try {
+        const response = await readiness.getGaps()
+        setGapData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch gaps:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchGaps()
+  }, [])
+
+  const gaps = gapData?.gaps || []
+  const filteredGaps = filter === 'all'
+    ? gaps
+    : gaps.filter((gap: any) => gap.severity === filter)
+
+  const gapStats = {
+    critical: gaps.filter((g: any) => g.severity === 'CRITICAL').length,
+    high: gaps.filter((g: any) => g.severity === 'HIGH').length,
+    medium: gaps.filter((g: any) => g.severity === 'MEDIUM').length,
+    low: gaps.filter((g: any) => g.severity === 'LOW').length,
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">Readiness & Risk</h2>
-          <p className="mt-1 text-sm text-gray-500">Central control room for risk identification and mitigation.</p>
+          <p className="mt-1 text-sm text-gray-500">Compliance gaps and action items.</p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <button className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
             Export Report
           </button>
           <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
-            Add New Risk
+            Generate Evidence Pack
           </button>
         </div>
       </div>
@@ -60,6 +77,14 @@ export default function ReadinessPage() {
         </nav>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-4">
+        <StatCard label="Critical" count={gapStats.critical} color="red" />
+        <StatCard label="High" count={gapStats.high} color="orange" />
+        <StatCard label="Medium" count={gapStats.medium} color="yellow" />
+        <StatCard label="Low" count={gapStats.low} color="gray" />
+      </div>
+
       {/* Toolbar */}
       <div className="bg-white p-4 rounded-t-lg border border-b-0 border-gray-200 flex items-center justify-between">
         <div className="relative rounded-md shadow-sm max-w-sm w-full">
@@ -68,112 +93,135 @@ export default function ReadinessPage() {
           </div>
           <input
             type="text"
-            name="search"
-            id="search"
             className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
-            placeholder="Search risks, owners, or IDs..."
+            placeholder="Search gaps..."
           />
         </div>
 
         <div className="flex items-center space-x-2">
-          <button className="flex items-center text-gray-600 hover:text-gray-900 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
-            <FunnelIcon className="h-4 w-4 mr-2 text-gray-500" />
-            Filters
-          </button>
-          <button className="flex items-center text-gray-600 hover:text-gray-900 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
-            <ArrowsUpDownIcon className="h-4 w-4 mr-2 text-gray-500" />
-            Sort
-          </button>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="text-sm border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="all">All Severities</option>
+            <option value="CRITICAL">Critical Only</option>
+            <option value="HIGH">High Only</option>
+            <option value="MEDIUM">Medium Only</option>
+            <option value="LOW">Low Only</option>
+          </select>
         </div>
       </div>
 
-      {/* Risk Register Table */}
+      {/* Gaps Table */}
       <div className="bg-white shadow-subtle border border-gray-200 rounded-b-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk ID</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domain</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Risk Description</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impact</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {risks.map((risk) => (
-                <tr key={risk.id} className="hover:bg-gray-50 transition-colors cursor-pointer group">
-                  <td className="px-6 py-3 whitespace-nowrap text-xs font-mono text-gray-500 group-hover:text-gray-900">
-                    {risk.id}
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-xs text-gray-500">
-                    {risk.domain}
-                  </td>
-                  <td className="px-6 py-3 text-sm text-gray-900 font-medium">
-                    {risk.risk}
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap text-xs text-gray-500">
-                    {risk.owner}
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap">
-                    <ImpactBadge impact={risk.impact} />
-                  </td>
-                  <td className="px-6 py-3 whitespace-nowrap">
-                    <StatusChip status={risk.status} />
-                  </td>
+        {loading ? (
+          <div className="p-12 text-center">
+            <div className="animate-pulse space-y-4">
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        ) : filteredGaps.length === 0 ? (
+          <div className="p-12 text-center">
+            <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No gaps found</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {filter === 'all'
+                ? 'All compliance requirements are met!'
+                : 'No gaps found for this severity level.'}
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Description</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Obligation</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
-          <div className="text-xs text-gray-500">
-            Showing <span className="font-medium">1</span> to <span className="font-medium">10</span> of <span className="font-medium">42</span> results
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredGaps.map((gap: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-gray-50 transition-colors cursor-pointer group">
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <GapTypeBadge type={gap.type} />
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap">
+                      <SeverityBadge severity={gap.severity} />
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-900">
+                      {gap.description}
+                      {gap.daysSinceEvidence && (
+                        <span className="block text-xs text-gray-500 mt-1">
+                          Last evidence: {gap.daysSinceEvidence} days ago
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-700">
+                      {gap.obligationTitle}
+                    </td>
+                    <td className="px-6 py-3 whitespace-nowrap text-sm">
+                      <button className="text-primary-600 hover:text-primary-900 font-medium">
+                        Fix →
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="flex-1 flex justify-end">
-            <a href="#" className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-              Previous
-            </a>
-            <a href="#" className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-              Next
-            </a>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )
 }
 
-function ImpactBadge({ impact }: { impact: string }) {
+function StatCard({ label, count, color }: { label: string; count: number; color: string }) {
+  const colorClasses: Record<string, string> = {
+    red: 'bg-red-50 text-red-700 border-red-200',
+    orange: 'bg-orange-50 text-orange-700 border-orange-200',
+    yellow: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    gray: 'bg-gray-50 text-gray-700 border-gray-200',
+  }
+
+  return (
+    <div className={`overflow-hidden rounded-lg border ${colorClasses[color]} px-4 py-5 sm:p-6`}>
+      <dt className="truncate text-sm font-medium">{label}</dt>
+      <dd className="mt-1 text-3xl font-semibold tracking-tight">{count}</dd>
+    </div>
+  )
+}
+
+function SeverityBadge({ severity }: { severity: string }) {
   let classes = "bg-gray-100 text-gray-800";
-  if (impact === 'Critical') classes = "bg-status-errorBg text-status-error border border-status-error/20";
-  if (impact === 'High') classes = "bg-orange-50 text-orange-700 border border-orange-200";
-  if (impact === 'Medium') classes = "bg-yellow-50 text-yellow-700 border border-yellow-200";
-  if (impact === 'Low') classes = "bg-gray-100 text-gray-600 border border-gray-200";
+  if (severity === 'CRITICAL') classes = "bg-status-errorBg text-status-error border border-status-error/20";
+  if (severity === 'HIGH') classes = "bg-orange-50 text-orange-700 border border-orange-200";
+  if (severity === 'MEDIUM') classes = "bg-yellow-50 text-yellow-700 border border-yellow-200";
+  if (severity === 'LOW') classes = "bg-gray-100 text-gray-600 border border-gray-200";
 
   return (
     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${classes}`}>
-      {impact}
+      {severity}
     </span>
   )
 }
 
-function StatusChip({ status }: { status: string }) {
-  let classes = "bg-gray-100 text-gray-800";
-  // Normalize status text
-  const s = status.toLowerCase();
-
-  if (s === 'mitigated') classes = "bg-status-successBg text-status-success ring-1 ring-inset ring-status-success/20";
-  if (s === 'open') classes = "bg-white text-gray-700 ring-1 ring-inset ring-gray-300";
-  if (s === 'accepted') classes = "bg-gray-100 text-gray-600 ring-1 ring-inset ring-gray-200";
-  if (s === 'mitigating') classes = "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200";
+function GapTypeBadge({ type }: { type: string }) {
+  const typeLabels: Record<string, string> = {
+    MISSING_EVIDENCE: 'Missing Evidence',
+    OUTDATED_EVIDENCE: 'Outdated Evidence',
+    NO_CONTROL: 'No Control',
+    UNAPPROVED_EXCEPTION: 'Unapproved Exception',
+  }
 
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${classes}`}>
-      {s === 'mitigated' && <span className="w-1.5 h-1.5 bg-status-success rounded-full mr-1.5"></span>}
-      {s === 'open' && <span className="w-1.5 h-1.5 bg-status-error rounded-full mr-1.5"></span>}
-      {status}
+    <span className="text-xs font-mono text-gray-600">
+      {typeLabels[type] || type}
     </span>
   )
 }

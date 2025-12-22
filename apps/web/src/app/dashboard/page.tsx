@@ -1,9 +1,51 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { ArrowRightIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/solid'
 import { ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { readiness } from '@/lib/api'
 
 export default function Home() {
+  const [scoreData, setScoreData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchScore() {
+      try {
+        const response = await readiness.getScore()
+        setScoreData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch readiness score:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchScore()
+  }, [])
+
+  const score = scoreData?.score?.overall || 0
+  const level = scoreData?.score?.level || 'UNKNOWN'
+  const domains = scoreData?.breakdown || []
+
+  const getLevelBadge = (level: string) => {
+    switch (level) {
+      case 'EXCELLENT':
+        return { bg: 'bg-status-successBg', text: 'text-status-success', label: 'Audit Ready' }
+      case 'GOOD':
+        return { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Good Standing' }
+      case 'FAIR':
+        return { bg: 'bg-status-warningBg', text: 'text-status-warning', label: 'Needs Attention' }
+      case 'POOR':
+        return { bg: 'bg-orange-50', text: 'text-orange-700', label: 'Action Required' }
+      case 'CRITICAL':
+        return { bg: 'bg-status-errorBg', text: 'text-status-error', label: 'Critical Issues' }
+      default:
+        return { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Loading...' }
+    }
+  }
+
+  const badge = getLevelBadge(level)
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -22,12 +64,20 @@ export default function Home() {
             <div className="text-center space-y-2 z-10">
               <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">Current Readiness Score</span>
               <div className="flex items-baseline justify-center space-x-2">
-                <span className="text-6xl font-bold text-gray-900 tracking-tighter">84</span>
-                <span className="text-2xl text-gray-400 font-light">/ 100</span>
+                {loading ? (
+                  <div className="animate-pulse">
+                    <div className="h-16 w-32 bg-gray-200 rounded"></div>
+                  </div>
+                ) : (
+                  <>
+                    <span className="text-6xl font-bold text-gray-900 tracking-tighter">{score}</span>
+                    <span className="text-2xl text-gray-400 font-light">/ 100</span>
+                  </>
+                )}
               </div>
-              <div className="flex items-center justify-center space-x-2 mt-4 bg-status-successBg px-3 py-1 rounded-full border border-status-success/10">
-                <CheckCircleIcon className="w-4 h-4 text-status-success" />
-                <span className="text-sm font-medium text-status-success">Audit Ready</span>
+              <div className={`flex items-center justify-center space-x-2 mt-4 ${badge.bg} px-3 py-1 rounded-full border border-${badge.text.replace('text-', '')}/10`}>
+                <CheckCircleIcon className={`w-4 h-4 ${badge.text}`} />
+                <span className={`text-sm font-medium ${badge.text}`}>{badge.label}</span>
               </div>
             </div>
 
@@ -43,10 +93,24 @@ export default function Home() {
               <h3 className="text-base font-medium text-gray-900">Domain Performance</h3>
             </div>
             <div className="p-6 space-y-6">
-              <DomainRow name="Information Security" score={92} status="good" />
-              <DomainRow name="Personal Data Protection" score={78} status="warning" />
-              <DomainRow name="Third Party Risk" score={65} status="attention" />
-              <DomainRow name="Business Continuity" score={88} status="good" />
+              {loading ? (
+                <div className="animate-pulse space-y-4">
+                  <div className="h-8 bg-gray-200 rounded"></div>
+                  <div className="h-8 bg-gray-200 rounded"></div>
+                  <div className="h-8 bg-gray-200 rounded"></div>
+                </div>
+              ) : domains.length > 0 ? (
+                domains.map((domain: any) => (
+                  <DomainRow
+                    key={domain.domain}
+                    name={domain.domain}
+                    score={domain.score}
+                    status={domain.score >= 75 ? 'good' : domain.score >= 60 ? 'warning' : 'attention'}
+                  />
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">No domain data available</p>
+              )}
             </div>
           </div>
 

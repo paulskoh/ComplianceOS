@@ -1,66 +1,39 @@
 'use client'
 
-import { useState } from 'react'
-import { CheckCircleIcon, BookOpenIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-
-const obligations = [
-  {
-    id: 'OBL-001',
-    title: 'Personal Information Encryption',
-    domain: 'Data Protection',
-    law: 'PIPA Art. 29',
-    status: 'Compliant',
-    description: 'Personal information processors must take necessary measures to ensure safety, such as encrypting personal information to prevent loss, theft, leakage, forgery, or alteration.',
-    inspectorQueries: [
-      'Is the encryption algorithm used standard and up-to-date (e.g., AES-256)?',
-      'Are encryption keys managed separately from the data?',
-      'Is data encrypted in transit and at rest?'
-    ],
-    evidenceRequired: [
-      'Encryption Policy Document',
-      'Key Management Log',
-      'Screenshot of DB configuration'
-    ]
-  },
-  {
-    id: 'OBL-002',
-    title: 'Access Control System',
-    domain: 'Access Control',
-    law: 'ISMS-P 2.5.1',
-    status: 'Partial',
-    description: 'Establish and operate a system to control access to the information processing system.',
-    inspectorQueries: [
-      'Is MFA enforced for all administrative access?',
-      'Are user access rights reviewed periodically?',
-      'Is there an automated process for revoking access upon termination?'
-    ],
-    evidenceRequired: [
-      'Access Control Policy',
-      'User Access Review Report (Q3)',
-      'MFA Configuration Evidence'
-    ]
-  },
-  {
-    id: 'OBL-003',
-    title: 'Disaster Recovery Plan',
-    domain: 'BCP',
-    law: 'E-Transaction Act',
-    status: 'Compliant',
-    description: 'Establish a disaster recovery plan to ensure continuity of electronic financial transactions.',
-    inspectorQueries: [
-      'When was the last DR drill conducted?',
-      'Is the RTO/RPO defined and met?',
-      'Are backup integrity checks performed?'
-    ],
-    evidenceRequired: [
-      'BCP/DR Plan Document',
-      '2024 DR Drill Result Report'
-    ]
-  },
-]
+import { useEffect, useState } from 'react'
+import { CheckCircleIcon, BookOpenIcon, ChevronRightIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { obligations as obligationsApi } from '@/lib/api'
 
 export default function ObligationsPage() {
-  const [selectedObligation, setSelectedObligation] = useState(obligations[0])
+  const [obligations, setObligations] = useState<any[]>([])
+  const [selectedObligation, setSelectedObligation] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchObligations() {
+      try {
+        const response = await obligationsApi.getAll()
+        const data = response.data || []
+        setObligations(data)
+        if (data.length > 0) {
+          setSelectedObligation(data[0])
+        }
+      } catch (error) {
+        console.error('Failed to fetch obligations:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchObligations()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="animate-pulse text-gray-400">Loading obligations...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col">
@@ -73,27 +46,54 @@ export default function ObligationsPage() {
         {/* List Pane */}
         <div className="w-1/3 bg-white border border-gray-200 rounded-lg shadow-subtle flex flex-col">
           <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Requirement List ({obligations.length})</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Active Requirements ({obligations.length})
+            </span>
           </div>
           <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
-            {obligations.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setSelectedObligation(item)}
-                className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 ${selectedObligation.id === item.id ? 'bg-primary-50 border-l-4 border-primary-500' : 'border-l-4 border-transparent'}`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <span className="text-xs font-mono text-gray-500">{item.id}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${item.status === 'Compliant' ? 'bg-status-successBg text-status-success' : 'bg-status-warningBg text-status-warning'}`}>
-                    {item.status}
-                  </span>
-                </div>
-                <h4 className={`text-sm font-medium ${selectedObligation.id === item.id ? 'text-primary-900' : 'text-gray-900'}`}>
-                  {item.title}
-                </h4>
-                <p className="text-xs text-gray-500 mt-1">{item.law}</p>
+            {obligations.length === 0 ? (
+              <div className="p-8 text-center text-gray-500 text-sm">
+                <p>No obligations activated yet.</p>
+                <p className="mt-2 text-xs">Complete onboarding to activate obligations.</p>
               </div>
-            ))}
+            ) : (
+              obligations.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedObligation(item)}
+                  className={`p-4 cursor-pointer transition-colors hover:bg-gray-50 ${
+                    selectedObligation?.id === item.id
+                      ? 'bg-primary-50 border-l-4 border-primary-500'
+                      : 'border-l-4 border-transparent'
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <span className="text-xs font-mono text-gray-500">
+                      {item.domain}
+                    </span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                        item.isActive
+                          ? 'bg-status-successBg text-status-success'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {item.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                  <h4
+                    className={`text-sm font-medium ${
+                      selectedObligation?.id === item.id ? 'text-primary-900' : 'text-gray-900'
+                    }`}
+                  >
+                    {item.titleKo || item.title}
+                  </h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {item.evidenceFrequency}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -107,9 +107,14 @@ export default function ObligationsPage() {
                   <div className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
                     <span>{selectedObligation.domain}</span>
                     <ChevronRightIcon className="w-4 h-4" />
-                    <span>{selectedObligation.law}</span>
+                    <span>{selectedObligation.evidenceFrequency}</span>
                   </div>
-                  <h1 className="text-2xl font-bold text-gray-900">{selectedObligation.title}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {selectedObligation.titleKo || selectedObligation.title}
+                  </h1>
+                  <p className="text-sm text-gray-600 mt-2">
+                    {selectedObligation.title}
+                  </p>
                 </div>
 
                 {/* Section: What this means */}
@@ -119,40 +124,80 @@ export default function ObligationsPage() {
                     What this means
                   </h3>
                   <div className="bg-gray-50 p-4 rounded-md border border-gray-200 text-sm text-gray-700 leading-relaxed">
-                    {selectedObligation.description}
+                    {selectedObligation.description || 'No description available.'}
                   </div>
                 </section>
 
-                {/* Section: Inspector Queries */}
-                <section>
-                  <h3 className="flex items-center text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
-                    What Inspectors Ask
-                  </h3>
-                  <ul className="space-y-3">
-                    {selectedObligation.inspectorQueries.map((query, idx) => (
-                      <li key={idx} className="flex items-start bg-white p-3 rounded border border-gray-100 shadow-sm">
-                        <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary-100 text-primary-600 font-bold text-xs mr-3">Q</span>
-                        <span className="text-sm text-gray-800">{query}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
-                {/* Section: Evidence */}
-                <section>
-                  <h3 className="flex items-center text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
-                    Required Evidence
-                  </h3>
-                  <div className="border border-gray-200 rounded-md divide-y divide-gray-100">
-                    {selectedObligation.evidenceRequired.map((evidence, idx) => (
-                      <div key={idx} className="p-3 flex items-center justify-between hover:bg-gray-50">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
-                          <span className="text-sm text-gray-700">{evidence}</span>
+                {/* Section: Controls */}
+                {selectedObligation.controls && selectedObligation.controls.length > 0 ? (
+                  <section>
+                    <h3 className="flex items-center text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                      Controls ({selectedObligation.controls.length})
+                    </h3>
+                    <div className="space-y-3">
+                      {selectedObligation.controls.map((control: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="bg-white p-4 rounded border border-gray-200 shadow-sm"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium text-gray-900">
+                                {control.control?.name || 'Unnamed Control'}
+                              </h4>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {control.control?.description}
+                              </p>
+                            </div>
+                            {control.control?.isEffective ? (
+                              <CheckCircleIcon className="w-5 h-5 text-status-success flex-shrink-0 ml-3" />
+                            ) : (
+                              <XCircleIcon className="w-5 h-5 text-status-error flex-shrink-0 ml-3" />
+                            )}
+                          </div>
                         </div>
-                        <span className="text-xs text-gray-400">Required</span>
+                      ))}
+                    </div>
+                  </section>
+                ) : (
+                  <section>
+                    <h3 className="flex items-center text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                      Controls
+                    </h3>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                      <p className="text-sm text-yellow-800">
+                        No controls defined for this obligation yet. This represents a compliance gap.
+                      </p>
+                    </div>
+                  </section>
+                )}
+
+                {/* Activation Details */}
+                <section>
+                  <h3 className="flex items-center text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">
+                    Activation Details
+                  </h3>
+                  <div className="bg-gray-50 rounded-md p-4 space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Status:</span>
+                      <span className={selectedObligation.isActive ? 'text-status-success font-medium' : 'text-gray-500'}>
+                        {selectedObligation.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Evidence Frequency:</span>
+                      <span className="text-gray-900 font-medium">
+                        {selectedObligation.evidenceFrequency}
+                      </span>
+                    </div>
+                    {selectedObligation.activatedAt && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Activated:</span>
+                        <span className="text-gray-900">
+                          {new Date(selectedObligation.activatedAt).toLocaleDateString()}
+                        </span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </section>
               </div>

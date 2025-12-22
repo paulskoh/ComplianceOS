@@ -76,6 +76,26 @@ export const risks = {
 
 export const readiness = {
   getScore: () => api.get('/readiness/score'),
+  getGaps: () => api.get('/readiness/gaps'),
+}
+
+export const onboarding = {
+  completeOnboarding: (data: any) => api.post('/onboarding/complete', data),
+  getProfile: () => api.get('/onboarding/profile'),
+}
+
+export const workflows = {
+  getAll: () => api.get('/workflows'),
+  start: (workflowId: string, context: any) => api.post(`/workflows/${workflowId}/start`, { context }),
+  getExecutions: () => api.get('/workflows/executions'),
+  processApproval: (executionId: string, data: any) => api.post(`/workflows/executions/${executionId}/approve`, data),
+}
+
+export const integrations = {
+  getAll: () => api.get('/integrations'),
+  connect: (data: any) => api.post('/integrations', data),
+  sync: (id: string) => api.post(`/integrations/${id}/sync`),
+  getSyncStatus: (id: string) => api.get(`/integrations/${id}/sync-status`),
 }
 
 export const inspectionPacks = {

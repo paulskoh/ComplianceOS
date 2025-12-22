@@ -87,7 +87,7 @@ export async function seedObligationTemplates() {
       titleKo: '개인정보 국외이전',
       description: '개인정보 국외이전 시 동의 및 고지 의무',
       domain: ObligationDomain.PRIVACY,
-      evidenceFrequency: 'AS_NEEDED' as EvidenceFrequency,
+      evidenceFrequency: 'ON_CHANGE' as EvidenceFrequency,
     },
 
     // CONTRACTS
@@ -97,7 +97,7 @@ export async function seedObligationTemplates() {
       titleKo: '위수탁 계약',
       description: '개인정보 처리 위탁 계약 체결 및 관리 의무',
       domain: ObligationDomain.CONTRACTS,
-      evidenceFrequency: 'ANNUALLY' as EvidenceFrequency,
+      evidenceFrequency: 'ANNUAL' as EvidenceFrequency,
     },
     {
       id: 'vendor_supervision',
@@ -141,7 +141,7 @@ export async function seedObligationTemplates() {
       titleKo: '개인정보보호 교육',
       description: '개인정보 처리자 대상 연 1회 교육 실시 의무',
       domain: ObligationDomain.TRAINING,
-      evidenceFrequency: 'ANNUALLY' as EvidenceFrequency,
+      evidenceFrequency: 'ANNUAL' as EvidenceFrequency,
     },
     {
       id: 'sexual_harassment_training',
@@ -149,7 +149,7 @@ export async function seedObligationTemplates() {
       titleKo: '성희롱 예방교육',
       description: '근로자 대상 연 1회 성희롱 예방교육 실시 의무',
       domain: ObligationDomain.TRAINING,
-      evidenceFrequency: 'ANNUALLY' as EvidenceFrequency,
+      evidenceFrequency: 'ANNUAL' as EvidenceFrequency,
     },
     {
       id: 'safety_training',
