@@ -131,15 +131,16 @@ model User {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  ownedObligations     Obligation[]
-  ownedControls        Control[]
-  ownedRisks           RiskItem[]
-  assignedTasks        Task[]
-  createdArtifacts     Artifact[]
-  policyAcks           PolicyAcknowledgment[]
-  trainingAssignments  TrainingAssignment[]
-  createdPacks         InspectionPack[]
-  startedWorkflows     WorkflowInstance[]
+  ownedObligations              Obligation[]
+  ownedControls                 Control[]
+  ownedRisks                    RiskItem[]
+  assignedTasks                 Task[]
+  createdArtifacts              Artifact[]
+  policyAcks                    PolicyAcknowledgment[]
+  trainingAssignments           TrainingAssignment[]
+  createdPacks                  InspectionPack[]
+  startedWorkflows              WorkflowInstance[]
+  createdEvidenceRequirementLinks ArtifactEvidenceRequirement[]
 
   @@index([tenantId])
   @@index([email])
@@ -347,7 +348,8 @@ model ControlEvidenceRequirement {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  control Control @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  control              Control                       @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  artifactLinks        ArtifactEvidenceRequirement[]
 
   @@index([controlId])
   @@index([fromTemplateCode])
@@ -408,11 +410,12 @@ model Artifact {
   tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   uploadedBy User   @relation(fields: [uploadedById], references: [id])
 
-  binary        ArtifactBinary?
-  controls      ArtifactControl[]
-  obligations   ArtifactObligation[]
-  packArtifacts PackArtifact[]
-  events        ArtifactEvent[]
+  binary               ArtifactBinary?
+  controls             ArtifactControl[]
+  obligations          ArtifactObligation[]
+  evidenceRequirements ArtifactEvidenceRequirement[]
+  packArtifacts        PackArtifact[]
+  events               ArtifactEvent[]
 
   @@index([tenantId])
   @@index([source])
@@ -463,6 +466,24 @@ model ArtifactObligation {
   @@map("artifact_obligations")
 }
 
+// Explicit many-to-many link between Artifacts and Evidence Requirements
+model ArtifactEvidenceRequirement {
+  id                    String   @id @default(uuid())
+  artifactId            String
+  evidenceRequirementId String
+  createdAt             DateTime @default(now())
+  createdByUserId       String?
+
+  artifact            Artifact                     @relation(fields: [artifactId], references: [id], onDelete: Cascade)
+  evidenceRequirement ControlEvidenceRequirement   @relation(fields: [evidenceRequirementId], references: [id], onDelete: Cascade)
+  createdBy           User?                        @relation(fields: [createdByUserId], references: [id])
+
+  @@unique([artifactId, evidenceRequirementId])
+  @@index([artifactId])
+  @@index([evidenceRequirementId])
+  @@map("artifact_evidence_requirements")
+}
+
 // ============================================
 // Artifact Events (Chain of Custody)
 // ============================================
@@ -472,6 +493,8 @@ enum ArtifactEventType {
   METADATA_EDITED
   LINKED_TO_CONTROL
   LINKED_TO_OBLIGATION
+  LINKED_EVIDENCE_REQUIREMENT
+  UNLINKED_EVIDENCE_REQUIREMENT
   APPROVED
   INCLUDED_IN_PACK
   DOWNLOADED

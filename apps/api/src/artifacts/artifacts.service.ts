@@ -28,17 +28,23 @@ export class ArtifactsService {
       file.mimetype,
     );
 
-    const { controlIds, obligationIds, ...artifactData } = dto;
+    const { controlIds, obligationIds, evidenceRequirementIds, ...artifactData } = dto;
 
     const data: any = {
       ...artifactData,
       tenantId,
       uploadedById: userId,
       hash,
+      sha256Hash: hash, // Store SHA-256 for manifest verification
+      fileName: file.originalname,
+      fileSize: file.size,
+      mimeType: file.mimetype,
+      s3Key,
+      uploadedAt: new Date(),
       binary: {
         create: {
           s3Key,
-          s3Bucket: process.env.S3_BUCKET_ARTIFACTS,
+          s3Bucket: process.env.S3_BUCKET_ARTIFACTS || 'artifacts',
           fileName: file.originalname,
           fileSize: file.size,
           mimeType: file.mimetype,
@@ -50,6 +56,12 @@ export class ArtifactsService {
       obligations: {
         create: obligationIds.map((obligationId) => ({ obligationId })),
       },
+      evidenceRequirements: {
+        create: evidenceRequirementIds.map((evidenceRequirementId) => ({
+          evidenceRequirementId,
+          createdByUserId: userId,
+        })),
+      },
     };
 
     const artifact = await this.prisma.artifact.create({
@@ -58,6 +70,7 @@ export class ArtifactsService {
         binary: true,
         controls: { include: { control: true } },
         obligations: { include: { obligation: true } },
+        evidenceRequirements: { include: { evidenceRequirement: true } },
       },
     });
 
@@ -73,6 +86,18 @@ export class ArtifactsService {
         hash,
       },
     });
+
+    // Record evidence requirement linking events
+    for (const evidenceRequirementId of evidenceRequirementIds) {
+      await this.artifactEvents.recordEvent(tenantId, {
+        artifactId: artifact.id,
+        eventType: ArtifactEventType.LINKED_EVIDENCE_REQUIREMENT,
+        userId,
+        metadata: {
+          evidenceRequirementId,
+        },
+      });
+    }
 
     await this.auditLog.log({
       tenantId,
@@ -93,6 +118,11 @@ export class ArtifactsService {
         uploadedBy: { select: { id: true, firstName: true, lastName: true } },
         controls: { include: { control: { select: { id: true, name: true } } } },
         obligations: { include: { obligation: { select: { id: true, title: true } } } },
+        evidenceRequirements: {
+          include: {
+            evidenceRequirement: { select: { id: true, name: true, controlId: true } },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -106,6 +136,12 @@ export class ArtifactsService {
         uploadedBy: true,
         controls: { include: { control: true } },
         obligations: { include: { obligation: true } },
+        evidenceRequirements: {
+          include: {
+            evidenceRequirement: true,
+            createdBy: { select: { id: true, firstName: true, lastName: true } },
+          },
+        },
         events: {
           orderBy: { createdAt: 'desc' },
           take: 50, // Last 50 events
@@ -146,6 +182,12 @@ export class ArtifactsService {
     id: string,
     dto: LinkArtifactDto,
   ) {
+    // Verify artifact exists and belongs to tenant
+    const artifact = await this.findOne(tenantId, id);
+    if (!artifact) {
+      throw new BadRequestException('Artifact not found');
+    }
+
     if (dto.controlIds) {
       await this.prisma.artifactControl.deleteMany({
         where: { artifactId: id },
@@ -168,6 +210,62 @@ export class ArtifactsService {
           obligationId,
         })),
       });
+    }
+
+    // Handle evidence requirement linking with diff logic
+    if (dto.evidenceRequirementIds !== undefined) {
+      // Get existing links
+      const existing = await this.prisma.artifactEvidenceRequirement.findMany({
+        where: { artifactId: id },
+        select: { evidenceRequirementId: true },
+      });
+      const existingIds = new Set(existing.map(e => e.evidenceRequirementId));
+      const newIds = new Set(dto.evidenceRequirementIds);
+
+      // Determine added and removed
+      const added = dto.evidenceRequirementIds.filter(id => !existingIds.has(id));
+      const removed = Array.from(existingIds).filter(id => !newIds.has(id));
+
+      // Remove unlinked
+      if (removed.length > 0) {
+        await this.prisma.artifactEvidenceRequirement.deleteMany({
+          where: {
+            artifactId: id,
+            evidenceRequirementId: { in: removed },
+          },
+        });
+
+        // Emit unlink events
+        for (const evidenceRequirementId of removed) {
+          await this.artifactEvents.recordEvent(tenantId, {
+            artifactId: id,
+            eventType: ArtifactEventType.UNLINKED_EVIDENCE_REQUIREMENT,
+            userId,
+            metadata: { evidenceRequirementId },
+          });
+        }
+      }
+
+      // Add new links
+      if (added.length > 0) {
+        await this.prisma.artifactEvidenceRequirement.createMany({
+          data: added.map((evidenceRequirementId) => ({
+            artifactId: id,
+            evidenceRequirementId,
+            createdByUserId: userId,
+          })),
+        });
+
+        // Emit link events
+        for (const evidenceRequirementId of added) {
+          await this.artifactEvents.recordEvent(tenantId, {
+            artifactId: id,
+            eventType: ArtifactEventType.LINKED_EVIDENCE_REQUIREMENT,
+            userId,
+            metadata: { evidenceRequirementId },
+          });
+        }
+      }
     }
 
     await this.auditLog.log({

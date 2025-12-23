@@ -28,6 +28,7 @@ export const createArtifactSchema = z.object({
   metadata: z.record(z.any()).optional(),
   controlIds: z.array(z.string().uuid()).default([]),
   obligationIds: z.array(z.string().uuid()).default([]),
+  evidenceRequirementIds: z.array(z.string().uuid()).default([]),
 });
 
 export const updateArtifactSchema = z.object({
@@ -40,6 +41,7 @@ export const updateArtifactSchema = z.object({
 export const linkArtifactSchema = z.object({
   controlIds: z.array(z.string().uuid()).optional(),
   obligationIds: z.array(z.string().uuid()).optional(),
+  evidenceRequirementIds: z.array(z.string().uuid()).optional(),
 });
 
 export type CreateArtifactDto = z.infer<typeof createArtifactSchema>;
