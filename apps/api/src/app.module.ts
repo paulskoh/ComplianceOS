@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 // Core modules
 import { PrismaModule } from './prisma/prisma.module';
@@ -26,6 +27,10 @@ import { PlansModule } from './plans/plans.module';
 import { InspectionModule } from './inspection/inspection.module';
 import { ApplicabilityModule } from './applicability/applicability.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
+import { HealthModule } from './health/health.module';
+import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { StructuredLogger } from './common/services/structured-logger.service';
 
 @Module({
   imports: [
@@ -39,6 +44,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
     ScheduleModule.forRoot(),
     PrismaModule,
     S3Module,
+    HealthModule,
     AuthModule,
     UsersModule,
     ObligationsModule,
@@ -60,5 +66,16 @@ import { EvaluationModule } from './evaluation/evaluation.module';
     ApplicabilityModule,
     EvaluationModule,
   ],
+  providers: [
+    StructuredLogger,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}

@@ -12,9 +12,10 @@ import { InspectorAuthGuard } from './guards/inspector-auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 import { S3Module } from '../s3/s3.module';
 import { AuditLogModule } from '../audit-log/audit-log.module';
+import { ArtifactsModule } from '../artifacts/artifacts.module';
 
 @Module({
-  imports: [PrismaModule, S3Module, AuditLogModule],
+  imports: [PrismaModule, S3Module, AuditLogModule, ArtifactsModule],
   controllers: [
     InspectionPacksController,
     InspectorController,

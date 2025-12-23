@@ -3,9 +3,10 @@ import { ReadinessService } from './readiness.service';
 import { ReadinessController } from './readiness.controller';
 import { SimulationService } from './simulation.service';
 import { AuditLogModule } from '../audit-log/audit-log.module';
+import { EvaluationModule } from '../evaluation/evaluation.module';
 
 @Module({
-  imports: [AuditLogModule],
+  imports: [AuditLogModule, EvaluationModule],
   providers: [ReadinessService, SimulationService],
   controllers: [ReadinessController],
   exports: [ReadinessService, SimulationService],

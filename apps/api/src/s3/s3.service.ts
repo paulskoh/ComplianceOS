@@ -90,6 +90,27 @@ export class S3Service {
     return getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
+  /**
+   * Get artifact as a readable stream (for streaming into ZIP archives)
+   * CRITICAL: This streams files without buffering in memory
+   */
+  async getArtifactStream(key: string): Promise<Readable> {
+    const command = new GetObjectCommand({
+      Bucket: this.artifactsBucket,
+      Key: key,
+    });
+
+    const response = await this.s3Client.send(command);
+
+    // AWS SDK v3 returns the body as a stream
+    if (response.Body instanceof Readable) {
+      return response.Body;
+    }
+
+    // Handle edge case where Body might not be a stream
+    throw new Error('S3 response body is not a readable stream');
+  }
+
   async getPackUrl(key: string, expiresIn = 3600): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: this.packsBucket,

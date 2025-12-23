@@ -16,13 +16,15 @@ export enum EvidenceFreshness {
 }
 
 export interface EvidenceEvaluation {
-  evidenceId: string;
+  evidenceRequirementId: string;
+  evidenceName: string;
+  status: 'PASS' | 'WARN' | 'FAIL';
   freshness: EvidenceFreshness;
-  uploadedAt: Date | null;
-  expiresAt: Date | null;
-  daysUntilExpiry: number | null;
-  cadenceType: string;
-  cadenceMonths: number | null;
+  uploadedAt?: Date;
+  expiresAt?: Date;
+  daysUntilExpiry?: number;
+  artifactId?: string;
+  reason: string;
 }
 
 export interface ControlEvaluation {
@@ -158,80 +160,161 @@ export class EvaluationService {
   }
 
   /**
+   * Evaluate a single evidence requirement
+   * CRITICAL FIX: Uses explicit artifact links, not string matching
+   */
+  private async evaluateRequirement(
+    companyId: string,
+    requirement: any,
+  ): Promise<{
+    status: 'PASS' | 'WARN' | 'FAIL';
+    reason: string;
+    artifactId?: string;
+    uploadedAt?: Date;
+    expiresAt?: Date;
+    daysUntilExpiry?: number;
+  }> {
+    // Query the latest artifact explicitly linked to THIS requirement
+    const latestArtifactLink = await this.prisma.artifactEvidenceRequirement.findFirst({
+      where: {
+        evidenceRequirementId: requirement.id,
+        artifact: {
+          tenantId: companyId,
+          isDeleted: false,
+        },
+      },
+      include: {
+        artifact: true,
+      },
+      orderBy: {
+        artifact: {
+          uploadedAt: 'desc',
+        },
+      },
+    });
+
+    const artifact = latestArtifactLink?.artifact;
+
+    // No artifact linked => FAIL
+    if (!artifact) {
+      return {
+        status: 'FAIL',
+        reason: `Missing evidence: No artifact linked to requirement "${requirement.name}"`,
+      };
+    }
+
+    // Check if approval is required but not granted
+    if (requirement.isMandatory && !artifact.isApproved) {
+      return {
+        status: 'WARN',
+        reason: `Evidence not approved: "${artifact.name}" must be approved for requirement "${requirement.name}"`,
+        artifactId: artifact.id,
+        uploadedAt: artifact.uploadedAt,
+      };
+    }
+
+    // Evaluate freshness
+    const cadenceRule = requirement.cadenceRule as any;
+    const { freshness, expiresAt, daysUntilExpiry } = this.calculateEvidenceFreshness(
+      artifact.uploadedAt,
+      cadenceRule?.type || 'MONTHLY',
+      cadenceRule?.reviewMonths || null,
+    );
+
+    if (freshness === EvidenceFreshness.STALE) {
+      return {
+        status: 'FAIL',
+        reason: `Stale evidence: "${artifact.name}" expired ${Math.abs(daysUntilExpiry || 0)} days ago`,
+        artifactId: artifact.id,
+        uploadedAt: artifact.uploadedAt,
+        expiresAt,
+        daysUntilExpiry,
+      };
+    } else if (freshness === EvidenceFreshness.EXPIRING_SOON) {
+      return {
+        status: 'WARN',
+        reason: `Evidence expiring: "${artifact.name}" expires in ${daysUntilExpiry} days`,
+        artifactId: artifact.id,
+        uploadedAt: artifact.uploadedAt,
+        expiresAt,
+        daysUntilExpiry,
+      };
+    } else {
+      return {
+        status: 'PASS',
+        reason: `Fresh evidence: "${artifact.name}" is up to date`,
+        artifactId: artifact.id,
+        uploadedAt: artifact.uploadedAt,
+        expiresAt,
+        daysUntilExpiry,
+      };
+    }
+  }
+
+  /**
    * Evaluate a single control's status based on its evidence
+   * CRITICAL FIX: Evaluates EACH requirement separately using explicit links
    */
   async evaluateControl(
     companyId: string,
     controlId: string,
   ): Promise<ControlEvaluation> {
-    // Fetch control with evidence requirements
-    const control = await this.prisma.control.findUnique({
-      where: { id: controlId },
+    // SECURITY: Fetch control with tenantId check to prevent cross-tenant access
+    const control = await this.prisma.control.findFirst({
+      where: {
+        id: controlId,
+        tenantId: companyId,
+      },
       include: {
         evidenceRequirements: true,
       },
     });
 
     if (!control) {
-      throw new Error(`Control ${controlId} not found`);
+      throw new Error(`Control ${controlId} not found or access denied`);
     }
 
-    // Fetch latest artifact for this control
-    const latestArtifacts = await this.prisma.artifact.findMany({
-      where: {
-        tenantId: companyId,
-        controls: {
-          some: {
-            controlId: controlId,
-          },
-        },
-      },
-      orderBy: { uploadedAt: 'desc' },
-      take: control.evidenceRequirements.length,
-    });
-
     const evidenceEvaluations: EvidenceEvaluation[] = [];
-    let freshCount = 0;
-    let totalRequired = control.evidenceRequirements.length;
+    let passCount = 0;
+    let warnCount = 0;
+    let failCount = 0;
+    const totalRequired = control.evidenceRequirements.length;
 
+    // Evaluate EACH requirement separately
     for (const evidenceReq of control.evidenceRequirements) {
-      const latestArtifact = latestArtifacts[0]; // Simplified: use first artifact
-      const cadenceRule = evidenceReq.cadenceRule as any;
-
-      const { freshness, expiresAt, daysUntilExpiry } =
-        this.calculateEvidenceFreshness(
-          latestArtifact?.uploadedAt || null,
-          cadenceRule?.type || 'MONTHLY',
-          cadenceRule?.reviewMonths || null,
-        );
+      const evaluation = await this.evaluateRequirement(companyId, evidenceReq);
 
       evidenceEvaluations.push({
-        evidenceId: evidenceReq.id,
-        freshness,
-        uploadedAt: latestArtifact?.uploadedAt || null,
-        expiresAt,
-        daysUntilExpiry,
-        cadenceType: cadenceRule?.type || 'MONTHLY',
-        cadenceMonths: cadenceRule?.reviewMonths || null,
+        evidenceRequirementId: evidenceReq.id,
+        evidenceName: evidenceReq.name,
+        status: evaluation.status,
+        freshness: evaluation.status === 'PASS' ? EvidenceFreshness.FRESH :
+                   evaluation.status === 'WARN' ? EvidenceFreshness.EXPIRING_SOON :
+                   evaluation.artifactId ? EvidenceFreshness.STALE : EvidenceFreshness.MISSING,
+        uploadedAt: evaluation.uploadedAt,
+        expiresAt: evaluation.expiresAt,
+        daysUntilExpiry: evaluation.daysUntilExpiry,
+        artifactId: evaluation.artifactId,
+        reason: evaluation.reason,
       });
 
-      if (freshness === EvidenceFreshness.FRESH) {
-        freshCount++;
-      }
+      if (evaluation.status === 'PASS') passCount++;
+      else if (evaluation.status === 'WARN') warnCount++;
+      else failCount++;
     }
 
     // Determine overall control status
     let status: ControlStatus;
-    const passRate = totalRequired > 0 ? (freshCount / totalRequired) * 100 : 0;
+    const passRate = totalRequired > 0 ? (passCount / totalRequired) * 100 : 0;
 
     if (totalRequired === 0) {
       status = ControlStatus.NOT_EVALUATED;
-    } else if (freshCount === totalRequired) {
+    } else if (passCount === totalRequired) {
       status = ControlStatus.PASS;
-    } else if (freshCount === 0) {
+    } else if (failCount > 0) {
       status = ControlStatus.FAIL;
     } else {
-      status = ControlStatus.PARTIAL;
+      status = ControlStatus.PARTIAL; // Some warnings
     }
 
     return {
@@ -251,9 +334,12 @@ export class EvaluationService {
     companyId: string,
     obligationId: string,
   ): Promise<ObligationEvaluation> {
-    // Fetch obligation with controls
-    const obligation = await this.prisma.obligation.findUnique({
-      where: { id: obligationId },
+    // SECURITY: Fetch obligation with tenantId check to prevent cross-tenant access
+    const obligation = await this.prisma.obligation.findFirst({
+      where: {
+        id: obligationId,
+        tenantId: companyId,
+      },
       include: {
         controls: {
           include: {
@@ -264,7 +350,7 @@ export class EvaluationService {
     });
 
     if (!obligation) {
-      throw new Error(`Obligation ${obligationId} not found`);
+      throw new Error(`Obligation ${obligationId} not found or access denied`);
     }
 
     const controlEvaluations: ControlEvaluation[] = [];
@@ -423,7 +509,7 @@ export class EvaluationService {
           // Generate risk for missing evidence
           if (evidenceEval.freshness === EvidenceFreshness.MISSING) {
             risks.push({
-              id: `risk-missing-${evidenceEval.evidenceId}`,
+              id: `risk-missing-${evidenceEval.evidenceRequirementId}`,
               obligationCode: obligation.code || '',
               controlCode: control.code || '',
               riskType: 'MISSING_EVIDENCE',
@@ -436,7 +522,7 @@ export class EvaluationService {
           // Generate risk for stale evidence
           if (evidenceEval.freshness === EvidenceFreshness.STALE) {
             risks.push({
-              id: `risk-stale-${evidenceEval.evidenceId}`,
+              id: `risk-stale-${evidenceEval.evidenceRequirementId}`,
               obligationCode: obligation.code || '',
               controlCode: control.code || '',
               riskType: 'STALE_EVIDENCE',
@@ -488,37 +574,46 @@ export class EvaluationService {
 
   /**
    * Persist risks to database
+   * FIXED: Now uses RiskItem model with tenantId (not old Risk model with companyId)
    */
   async persistRisks(companyId: string, risks: RiskItem[]): Promise<void> {
-    // Delete old auto-generated risks
-    await this.prisma.risk.deleteMany({
+    const tenantId = companyId; // Rename for clarity
+
+    // Delete old auto-generated risk items
+    await this.prisma.riskItem.deleteMany({
       where: {
-        companyId,
-        source: 'AUTO_EVALUATION',
+        tenantId,
+        title: { startsWith: '[자동감지]' }, // Auto-detected risks have this prefix
       },
     });
 
-    // Create new risks
+    // Create new risk items with proper relationships
     for (const risk of risks) {
-      await this.prisma.risk.create({
+      // Find obligation and control IDs from codes
+      const obligation = await this.prisma.obligation.findFirst({
+        where: { code: risk.obligationCode, tenantId },
+        select: { id: true },
+      });
+
+      const control = await this.prisma.control.findFirst({
+        where: { code: risk.controlCode, tenantId },
+        select: { id: true },
+      });
+
+      await this.prisma.riskItem.create({
         data: {
-          companyId,
+          tenantId,
           title: risk.description,
-          description: `${risk.riskType}: ${risk.description}`,
+          description: `자동 평가로 감지된 리스크: ${risk.riskType}\n\n${risk.description}`,
           severity: risk.severity,
           status: 'OPEN',
-          source: 'AUTO_EVALUATION',
-          metadata: {
-            obligationCode: risk.obligationCode,
-            controlCode: risk.controlCode,
-            riskType: risk.riskType,
-            detectedAt: risk.detectedAt,
-          },
+          obligationId: obligation?.id,
+          controlId: control?.id,
         },
       });
     }
 
-    this.logger.log(`Persisted ${risks.length} risks to database`);
+    this.logger.log(`Persisted ${risks.length} risk items to database`);
   }
 
   /**

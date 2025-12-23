@@ -50,6 +50,7 @@ services:
       retries: 3
 
   # MinIO bucket initialization
+  # SECURITY: Buckets are private by default - access controlled via presigned URLs
   minio-init:
     image: minio/mc:latest
     container_name: complianceos-minio-init
@@ -61,8 +62,6 @@ services:
       /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
       /usr/bin/mc mb myminio/evidence-artifacts --ignore-existing;
       /usr/bin/mc mb myminio/inspection-packs --ignore-existing;
-      /usr/bin/mc anonymous set download myminio/evidence-artifacts;
-      /usr/bin/mc anonymous set download myminio/inspection-packs;
       exit 0;
       "
 

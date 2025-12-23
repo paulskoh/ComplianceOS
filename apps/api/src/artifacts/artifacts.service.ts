@@ -21,7 +21,13 @@ export class ArtifactsService {
     file: Express.Multer.File,
     dto: CreateArtifactDto,
   ) {
-    const s3Key = this.s3.generateKey(tenantId, file.originalname);
+    // SECURITY: Validate file upload
+    this.validateFileUpload(file);
+
+    // SECURITY: Sanitize filename to prevent path traversal
+    const sanitizedFilename = this.sanitizeFilename(file.originalname);
+
+    const s3Key = this.s3.generateKey(tenantId, sanitizedFilename);
     const { hash } = await this.s3.uploadArtifact(
       s3Key,
       file.buffer,
@@ -36,7 +42,7 @@ export class ArtifactsService {
       uploadedById: userId,
       hash,
       sha256Hash: hash, // Store SHA-256 for manifest verification
-      fileName: file.originalname,
+      fileName: sanitizedFilename,
       fileSize: file.size,
       mimeType: file.mimetype,
       s3Key,
@@ -45,7 +51,7 @@ export class ArtifactsService {
         create: {
           s3Key,
           s3Bucket: process.env.S3_BUCKET_ARTIFACTS || 'artifacts',
-          fileName: file.originalname,
+          fileName: sanitizedFilename,
           fileSize: file.size,
           mimeType: file.mimetype,
         },
@@ -286,13 +292,17 @@ export class ArtifactsService {
       throw new ForbiddenException('Cannot delete immutable artifact. Artifact has been approved and is part of the compliance record.');
     }
 
-    const updated = await this.prisma.artifact.update({
-      where: { id },
+    // SECURITY: Use updateMany with tenantId for defense in depth
+    await this.prisma.artifact.updateMany({
+      where: { id, tenantId },
       data: {
         isDeleted: true,
         deletedAt: new Date(),
       },
     });
+
+    // Re-fetch to return the updated artifact
+    const updated = await this.findOne(tenantId, id);
 
     // Record tombstone event
     await this.artifactEvents.recordEvent(tenantId, {
@@ -331,15 +341,20 @@ export class ArtifactsService {
       throw new BadRequestException('Artifact is already approved');
     }
 
-    // Mark as approved and immutable
-    const approved = await this.prisma.artifact.update({
-      where: { id },
+    // SECURITY: Mark as approved with tenantId check
+    await this.prisma.artifact.updateMany({
+      where: { id, tenantId },
       data: {
         isApproved: true,
         approvedById: userId,
         approvedAt: new Date(),
         isImmutable: true, // Once approved, binary is locked
       },
+    });
+
+    // Re-fetch with includes
+    const approved = await this.prisma.artifact.findFirst({
+      where: { id, tenantId },
       include: {
         binary: true,
         uploadedBy: true,
@@ -425,9 +440,15 @@ export class ArtifactsService {
       changes.retentionDays = { from: artifact.retentionDays, to: updates.retentionDays };
     }
 
-    const updated = await this.prisma.artifact.update({
-      where: { id },
+    // SECURITY: Update with tenantId check
+    await this.prisma.artifact.updateMany({
+      where: { id, tenantId },
       data: updates as any,
+    });
+
+    // Re-fetch with includes
+    const updated = await this.prisma.artifact.findFirst({
+      where: { id, tenantId },
       include: {
         binary: true,
         uploadedBy: true,
@@ -462,5 +483,92 @@ export class ArtifactsService {
     });
 
     return artifact;
+  }
+
+  /**
+   * SECURITY: Validate file upload (size, MIME type)
+   */
+  private validateFileUpload(file: Express.Multer.File): void {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+
+    // File size limit: 100MB
+    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+    if (file.size > MAX_FILE_SIZE) {
+      throw new BadRequestException(
+        `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB, got ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+      );
+    }
+
+    // MIME type whitelist (compliance artifacts are typically documents, images, or PDFs)
+    const ALLOWED_MIME_TYPES = [
+      // Documents
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'text/csv',
+      // Images (for screenshots, diagrams)
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      // Archives (for log bundles, exports)
+      'application/zip',
+      'application/x-zip-compressed',
+      'application/gzip',
+      'application/x-tar',
+      // JSON/XML (for exports, configs)
+      'application/json',
+      'application/xml',
+      'text/xml',
+    ];
+
+    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      throw new BadRequestException(
+        `File type not allowed. Received: ${file.mimetype}. Allowed types: PDF, Office documents, images, archives, JSON/XML`,
+      );
+    }
+  }
+
+  /**
+   * SECURITY: Sanitize filename to prevent path traversal and injection attacks
+   */
+  private sanitizeFilename(filename: string): string {
+    if (!filename || filename.trim() === '') {
+      return 'unnamed-file';
+    }
+
+    // Remove path traversal attempts (../, ..\, etc.)
+    let sanitized = filename.replace(/\.\.[\/\\]/g, '');
+
+    // Remove absolute path indicators
+    sanitized = sanitized.replace(/^[\/\\]+/, '');
+
+    // Remove null bytes
+    sanitized = sanitized.replace(/\0/g, '');
+
+    // Replace dangerous characters with underscores
+    // Allow: alphanumeric, dash, underscore, dot, space
+    sanitized = sanitized.replace(/[^a-zA-Z0-9가-힣._\-\s]/g, '_');
+
+    // Collapse multiple spaces/underscores
+    sanitized = sanitized.replace(/[\s_]+/g, '_');
+
+    // Trim and limit length
+    sanitized = sanitized.trim().substring(0, 255);
+
+    // Ensure we still have a valid filename
+    if (sanitized.length === 0 || sanitized === '.') {
+      return 'unnamed-file';
+    }
+
+    return sanitized;
   }
 }

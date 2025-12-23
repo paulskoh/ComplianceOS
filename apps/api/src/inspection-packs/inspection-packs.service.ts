@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { AuditLogService } from '../audit-log/audit-log.service';
+import { ArtifactEventsService } from '../artifacts/artifact-events.service';
 import { PackGeneratorService } from './pack-generator.service';
 import { CreateInspectionPackDto } from '@complianceos/shared';
 import { randomBytes } from 'crypto';
@@ -13,6 +14,7 @@ export class InspectionPacksService {
     private s3: S3Service,
     private auditLog: AuditLogService,
     private packGenerator: PackGeneratorService,
+    private artifactEvents: ArtifactEventsService,
   ) {}
 
   async create(tenantId: string, userId: string, dto: CreateInspectionPackDto) {
@@ -129,9 +131,28 @@ export class InspectionPacksService {
         })),
       });
 
-      // Update pack status
-      await this.prisma.inspectionPack.update({
-        where: { id: packId },
+      // CRITICAL: Record chain of custody events for pack inclusion
+      // Log when each artifact was included in this inspection pack
+      // SECURITY: Use tenantId check to prevent cross-tenant access
+      const pack = await this.prisma.inspectionPack.findFirst({
+        where: { id: packId, tenantId },
+        select: { createdById: true },
+      });
+
+      const userId = pack?.createdById;
+
+      for (const artifact of artifacts) {
+        await this.artifactEvents.recordPackInclusion(
+          tenantId,
+          artifact.id,
+          packId,
+          userId || 'system',
+        );
+      }
+
+      // SECURITY: Update with tenantId check
+      await this.prisma.inspectionPack.updateMany({
+        where: { id: packId, tenantId },
         data: {
           status: 'COMPLETED',
           summaryS3Key: summaryKey,
@@ -141,8 +162,9 @@ export class InspectionPacksService {
       });
     } catch (error) {
       console.error('Pack generation failed:', error);
-      await this.prisma.inspectionPack.update({
-        where: { id: packId },
+      // SECURITY: Update with tenantId check
+      await this.prisma.inspectionPack.updateMany({
+        where: { id: packId, tenantId },
         data: { status: 'FAILED' },
       });
     }
