@@ -150,13 +150,21 @@ export class StorageService {
   /**
    * Generate presigned GET URL for downloads
    */
-  async presignGetUrl(key: string, expiresIn = 3600): Promise<string> {
+  async presignGetUrl(
+    key: string,
+    filename?: string,
+    expiresIn = 3600,
+  ): Promise<{ url: string; expiresAt: string }> {
     const command = new GetObjectCommand({
       Bucket: this.bucket,
       Key: key,
+      ResponseContentDisposition: filename ? `attachment; filename="${filename}"` : undefined,
     });
 
-    return getSignedUrl(this.s3Client, command, { expiresIn });
+    const url = await getSignedUrl(this.s3Client, command, { expiresIn });
+    const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
+
+    return { url, expiresAt };
   }
 
   /**
