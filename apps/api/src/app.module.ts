@@ -29,6 +29,7 @@ import { ApplicabilityModule } from './applicability/applicability.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
 import { HealthModule } from './health/health.module';
 import { AwsModule } from './aws/aws.module';
+import { WorkersModule } from './workers/workers.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { StructuredLogger } from './common/services/structured-logger.service';
@@ -46,6 +47,7 @@ import { StructuredLogger } from './common/services/structured-logger.service';
     PrismaModule,
     S3Module,
     AwsModule,
+    WorkersModule,
     HealthModule,
     AuthModule,
     UsersModule,

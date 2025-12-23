@@ -131,15 +131,15 @@ model User {
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  ownedObligations              Obligation[]
-  ownedControls                 Control[]
-  ownedRisks                    RiskItem[]
-  assignedTasks                 Task[]
-  createdArtifacts              Artifact[]
-  policyAcks                    PolicyAcknowledgment[]
-  trainingAssignments           TrainingAssignment[]
-  createdPacks                  InspectionPack[]
-  startedWorkflows              WorkflowInstance[]
+  ownedObligations                Obligation[]
+  ownedControls                   Control[]
+  ownedRisks                      RiskItem[]
+  assignedTasks                   Task[]
+  createdArtifacts                Artifact[]
+  policyAcks                      PolicyAcknowledgment[]
+  trainingAssignments             TrainingAssignment[]
+  createdPacks                    InspectionPack[]
+  startedWorkflows                WorkflowInstance[]
   createdEvidenceRequirementLinks ArtifactEvidenceRequirement[]
 
   @@index([tenantId])
@@ -281,25 +281,25 @@ model ControlTemplate {
 }
 
 model Control {
-  id                     String          @id @default(uuid())
-  tenantId               String
-  templateId             String?
-  fromTemplateCode       String?         @map("from_template_code") // Template code this was instantiated from
-  code                   String? // Control code
-  name                   String
-  description            String          @db.Text
-  type                   ControlType
-  controlType            String?         @map("controlType") // Alias for type (for evaluation service)
-  automationLevel        AutomationLevel
-  implementationStatus   String          @default("NOT_STARTED") @map("implementationStatus") // Implementation status
-  ownerId                String?
-  isActive               Boolean         @default(true)
+  id                   String          @id @default(uuid())
+  tenantId             String
+  templateId           String?
+  fromTemplateCode     String?         @map("from_template_code") // Template code this was instantiated from
+  code                 String? // Control code
+  name                 String
+  description          String          @db.Text
+  type                 ControlType
+  controlType          String?         @map("controlType") // Alias for type (for evaluation service)
+  automationLevel      AutomationLevel
+  implementationStatus String          @default("NOT_STARTED") @map("implementationStatus") // Implementation status
+  ownerId              String?
+  isActive             Boolean         @default(true)
   // Evaluation tracking
-  lastEvaluatedAt        DateTime?       @map("last_evaluated_at")
-  evaluationStatus       String?         @map("evaluation_status") // PASS/FAIL/WARN
-  evaluationDetails      Json?           @map("evaluation_details")
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @updatedAt
+  lastEvaluatedAt      DateTime?       @map("last_evaluated_at")
+  evaluationStatus     String?         @map("evaluation_status") // PASS/FAIL/WARN
+  evaluationDetails    Json?           @map("evaluation_details")
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
 
   tenant   Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   template ControlTemplate? @relation(fields: [templateId], references: [id])
@@ -348,8 +348,8 @@ model ControlEvidenceRequirement {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  control              Control                       @relation(fields: [controlId], references: [id], onDelete: Cascade)
-  artifactLinks        ArtifactEvidenceRequirement[]
+  control       Control                       @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  artifactLinks ArtifactEvidenceRequirement[]
 
   @@index([controlId])
   @@index([fromTemplateCode])
@@ -391,38 +391,38 @@ enum ArtifactStatus {
 }
 
 model Artifact {
-  id                      String               @id @default(uuid())
-  tenantId                String
-  name                    String
-  description             String?              @db.Text
-  type                    ArtifactType
-  source                  String
-  accessClassification    AccessClassification
-  retentionDays           Int?
-  metadata                Json?
-  hash                    String?
-  fileName                String?              @map("fileName") // File name
-  fileSize                Int?                 @map("fileSize") // File size in bytes
-  mimeType                String?              @map("mimeType") // MIME type
-  sha256Hash              String?              @map("sha256Hash") // SHA-256 hash
-  uploadedAt              DateTime?            @map("uploadedAt") // Upload timestamp
-  s3Key                   String?              @map("s3Key") // S3 key for storage
-  s3Bucket                String?              @map("s3Bucket") // S3 bucket name
-  etag                    String?              @map("etag") // S3 ETag for finalization verification
-  evidenceRequirementId   String?              @map("evidenceRequirementId") // Linked evidence requirement
-  uploadedById            String
-  isDeleted               Boolean              @default(false)
-  deletedAt               DateTime?
+  id                    String               @id @default(uuid())
+  tenantId              String
+  name                  String
+  description           String?              @db.Text
+  type                  ArtifactType
+  source                String
+  accessClassification  AccessClassification
+  retentionDays         Int?
+  metadata              Json?
+  hash                  String?
+  fileName              String?              @map("fileName") // File name
+  fileSize              Int?                 @map("fileSize") // File size in bytes
+  mimeType              String?              @map("mimeType") // MIME type
+  sha256Hash            String?              @map("sha256Hash") // SHA-256 hash
+  uploadedAt            DateTime?            @map("uploadedAt") // Upload timestamp
+  s3Key                 String?              @map("s3Key") // S3 key for storage
+  s3Bucket              String?              @map("s3Bucket") // S3 bucket name
+  etag                  String?              @map("etag") // S3 ETag for finalization verification
+  evidenceRequirementId String?              @map("evidenceRequirementId") // Linked evidence requirement
+  uploadedById          String
+  isDeleted             Boolean              @default(false)
+  deletedAt             DateTime?
   // Two-phase upload lifecycle
-  status                  ArtifactStatus       @default(PENDING_UPLOAD)
-  version                 Int                  @default(1)
+  status                ArtifactStatus       @default(PENDING_UPLOAD)
+  version               Int                  @default(1)
   // Immutability & approval tracking
-  isApproved              Boolean              @default(false)
-  approvedById            String?
-  approvedAt              DateTime?
-  isImmutable             Boolean              @default(false) // Once true, binary cannot be modified
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @updatedAt
+  isApproved            Boolean              @default(false)
+  approvedById          String?
+  approvedAt            DateTime?
+  isImmutable           Boolean              @default(false) // Once true, binary cannot be modified
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
 
   tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   uploadedBy User   @relation(fields: [uploadedById], references: [id])
@@ -493,9 +493,9 @@ model ArtifactEvidenceRequirement {
   createdAt             DateTime @default(now())
   createdByUserId       String?
 
-  artifact            Artifact                     @relation(fields: [artifactId], references: [id], onDelete: Cascade)
-  evidenceRequirement ControlEvidenceRequirement   @relation(fields: [evidenceRequirementId], references: [id], onDelete: Cascade)
-  createdBy           User?                        @relation(fields: [createdByUserId], references: [id])
+  artifact            Artifact                   @relation(fields: [artifactId], references: [id], onDelete: Cascade)
+  evidenceRequirement ControlEvidenceRequirement @relation(fields: [evidenceRequirementId], references: [id], onDelete: Cascade)
+  createdBy           User?                      @relation(fields: [createdByUserId], references: [id])
 
   @@unique([artifactId, evidenceRequirementId])
   @@index([artifactId])
@@ -614,7 +614,7 @@ model Task {
   title       String
   description String?       @db.Text
   status      TaskStatus    @default(OPEN)
-  type        String?       // e.g., 'APPROVAL', 'NOTIFICATION', 'ACTION', 'ESCALATION'
+  type        String? // e.g., 'APPROVAL', 'NOTIFICATION', 'ACTION', 'ESCALATION'
   priority    TaskPriority? @default(MEDIUM)
   riskItemId  String?
   assigneeId  String?
@@ -1245,18 +1245,18 @@ model ContentVersion {
 // ============================================
 
 model InspectorAccess {
-  id                     String    @id @default(uuid())
-  packId                 String    @map("packId")
-  token                  String    @unique
-  inspectorEmail         String    @map("inspectorEmail")
-  inspectorName          String    @map("inspectorName")
-  inspectorOrganization  String    @map("inspectorOrganization")
-  expiresAt              DateTime  @map("expiresAt")
-  isActive               Boolean   @default(true) @map("isActive")
-  permissions            Json      @default("{}") // Permissions JSON
-  createdAt              DateTime  @default(now()) @map("createdAt")
-  revokedAt              DateTime? @map("revokedAt")
-  revocationReason       String?   @map("revocationReason") @db.Text
+  id                    String    @id @default(uuid())
+  packId                String    @map("packId")
+  token                 String    @unique
+  inspectorEmail        String    @map("inspectorEmail")
+  inspectorName         String    @map("inspectorName")
+  inspectorOrganization String    @map("inspectorOrganization")
+  expiresAt             DateTime  @map("expiresAt")
+  isActive              Boolean   @default(true) @map("isActive")
+  permissions           Json      @default("{}") // Permissions JSON
+  createdAt             DateTime  @default(now()) @map("createdAt")
+  revokedAt             DateTime? @map("revokedAt")
+  revocationReason      String?   @map("revocationReason") @db.Text
 
   pack       InspectionPack         @relation(fields: [packId], references: [id], onDelete: Cascade)
   activities InspectorActivityLog[]
@@ -1265,6 +1265,19 @@ model InspectorAccess {
   @@index([token])
   @@index([expiresAt])
   @@map("inspector_access")
+}
+
+// Simple inspector session for time-limited share links
+model InspectorSession {
+  id        String   @id @default(uuid())
+  packId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([packId])
+  @@index([token])
+  @@map("inspector_sessions")
 }
 
 model InspectorActivityLog {
@@ -1286,17 +1299,17 @@ model InspectorActivityLog {
 // ============================================
 
 model EvidenceRequirement {
-  id            String    @id @default(uuid())
-  companyId     String    @map("companyId")
-  controlId     String    @map("controlId")
+  id            String   @id @default(uuid())
+  companyId     String   @map("companyId")
+  controlId     String   @map("controlId")
   name          String
-  description   String?   @db.Text
-  cadenceRule   Json?     @map("cadenceRule")
-  retentionRule Json?     @map("retentionRule")
-  isMandatory   Boolean   @default(true) @map("isMandatory")
-  evidenceType  String    @default("DOCUMENT") @map("evidenceType")
-  createdAt     DateTime  @default(now()) @map("createdAt")
-  updatedAt     DateTime  @updatedAt @map("updatedAt")
+  description   String?  @db.Text
+  cadenceRule   Json?    @map("cadenceRule")
+  retentionRule Json?    @map("retentionRule")
+  isMandatory   Boolean  @default(true) @map("isMandatory")
+  evidenceType  String   @default("DOCUMENT") @map("evidenceType")
+  createdAt     DateTime @default(now()) @map("createdAt")
+  updatedAt     DateTime @updatedAt @map("updatedAt")
 
   @@index([companyId])
   @@index([controlId])

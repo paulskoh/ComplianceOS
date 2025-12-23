@@ -273,6 +273,20 @@ export class ArtifactsService {
             metadata: { evidenceRequirementId },
           });
         }
+
+        // Enqueue document extraction job if artifact is linked to evidence requirements
+        if (this.queue && artifact.binary) {
+          await this.queue.enqueueJob({
+            tenantId,
+            type: 'DOC_EXTRACT',
+            payload: {
+              artifactId: id,
+              version: artifact.version || 1,
+              s3Key: artifact.binary.s3Key,
+              contentType: artifact.binary.mimeType || artifact.mimeType,
+            },
+          });
+        }
       }
     }
 
