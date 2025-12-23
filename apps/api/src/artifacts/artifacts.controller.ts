@@ -20,13 +20,39 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CreateArtifactDto, LinkArtifactDto } from '@complianceos/shared';
 import { ArtifactsService } from './artifacts.service';
+import { ArtifactsV2Service } from './artifacts-v2.service';
+import {
+  ArtifactCreateIntentDto,
+  ArtifactFinalizeDto,
+} from './dto/upload-intent.dto';
 
 @ApiTags('artifacts')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('artifacts')
 export class ArtifactsController {
-  constructor(private readonly artifactsService: ArtifactsService) {}
+  constructor(
+    private readonly artifactsService: ArtifactsService,
+    private readonly artifactsV2Service: ArtifactsV2Service,
+  ) {}
+
+  @Post('upload-intent')
+  @ApiOperation({ summary: 'Create upload intent and get presigned URL (two-phase upload)' })
+  uploadIntent(@CurrentUser() user: any, @Body() dto: ArtifactCreateIntentDto) {
+    return this.artifactsV2Service.createUploadIntent(user.userId, {
+      ...dto,
+      tenantId: user.tenantId, // Derive from auth context
+    });
+  }
+
+  @Post('finalize-upload')
+  @ApiOperation({ summary: 'Finalize upload after client completes S3 PUT' })
+  finalizeUpload(@CurrentUser() user: any, @Body() dto: ArtifactFinalizeDto) {
+    return this.artifactsV2Service.finalizeUpload(user.userId, {
+      ...dto,
+      tenantId: user.tenantId, // Derive from auth context
+    });
+  }
 
   @Post('upload')
   @ApiConsumes('multipart/form-data')

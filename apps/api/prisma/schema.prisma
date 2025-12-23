@@ -378,6 +378,18 @@ enum AccessClassification {
   PII
 }
 
+enum ArtifactStatus {
+  PENDING_UPLOAD
+  UPLOADED
+  READY
+  PROCESSING
+  VERIFIED
+  FLAGGED
+  EXPIRED
+  SUPERSEDED
+  DELETED
+}
+
 model Artifact {
   id                      String               @id @default(uuid())
   tenantId                String
@@ -395,10 +407,15 @@ model Artifact {
   sha256Hash              String?              @map("sha256Hash") // SHA-256 hash
   uploadedAt              DateTime?            @map("uploadedAt") // Upload timestamp
   s3Key                   String?              @map("s3Key") // S3 key for storage
+  s3Bucket                String?              @map("s3Bucket") // S3 bucket name
+  etag                    String?              @map("etag") // S3 ETag for finalization verification
   evidenceRequirementId   String?              @map("evidenceRequirementId") // Linked evidence requirement
   uploadedById            String
   isDeleted               Boolean              @default(false)
   deletedAt               DateTime?
+  // Two-phase upload lifecycle
+  status                  ArtifactStatus       @default(PENDING_UPLOAD)
+  version                 Int                  @default(1)
   // Immutability & approval tracking
   isApproved              Boolean              @default(false)
   approvedById            String?
@@ -424,6 +441,8 @@ model Artifact {
   @@index([sha256Hash])
   @@index([isApproved])
   @@index([evidenceRequirementId])
+  @@index([status])
+  @@index([version])
   @@map("artifacts")
 }
 
@@ -1101,6 +1120,8 @@ enum AuditEventType {
   POLICY_PUBLISHED
   POLICY_ACKNOWLEDGED
   ARTIFACT_UPLOADED
+  ARTIFACT_UPLOAD_INTENT_CREATED
+  ARTIFACT_FINALIZED
   ARTIFACT_DELETED
   ARTIFACT_LINKED
   ARTIFACT_APPROVED

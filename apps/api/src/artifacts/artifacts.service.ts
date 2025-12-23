@@ -1,8 +1,9 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, Optional } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { AuditLogService } from '../audit-log/audit-log.service';
 import { ArtifactEventsService } from './artifact-events.service';
+import { QueueService } from '../aws/queue.service';
 import { CreateArtifactDto, LinkArtifactDto } from '@complianceos/shared';
 import { ArtifactEventType } from '@prisma/client';
 
@@ -13,6 +14,7 @@ export class ArtifactsService {
     private s3: S3Service,
     private auditLog: AuditLogService,
     private artifactEvents: ArtifactEventsService,
+    private queue?: QueueService, // Optional to avoid breaking existing code
   ) {}
 
   async uploadFile(
