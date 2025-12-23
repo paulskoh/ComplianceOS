@@ -1295,6 +1295,64 @@ model InspectorActivityLog {
 }
 
 // ============================================
+// Document Intelligence Pipeline
+// ============================================
+
+// Document extraction results (PDF/DOCX → text)
+model DocumentExtraction {
+  id            String   @id @default(uuid())
+  artifactId    String   @map("artifact_id")
+  version       Int      @default(1)
+  extractedText String   @map("extracted_text") @db.Text
+  method        String // PDF_TEXT, TEXTRACT_OCR, DOCX_TEXT
+  language      String?
+  confidence    Float?
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@unique([artifactId, version])
+  @@index([artifactId])
+  @@map("document_extractions")
+}
+
+// Document classification results (rules-based + LLM)
+model DocumentClassification {
+  id         String   @id @default(uuid())
+  artifactId String   @map("artifact_id")
+  version    Int      @default(1)
+  docType    String   @map("doc_type") // PRIVACY_POLICY, PROCESSING_RECORD, etc.
+  confidence Float
+  rationale  String   @db.Text
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([artifactId, version])
+  @@index([artifactId])
+  @@index([docType])
+  @@map("document_classifications")
+}
+
+// LLM-powered compliance analysis results
+model DocumentAnalysis {
+  id                String   @id @default(uuid())
+  artifactId        String   @map("artifact_id")
+  version           Int      @default(1)
+  overallCompliance String   @map("overall_compliance") // COMPLIANT, PARTIAL, NON_COMPLIANT, UNCLEAR
+  confidence        Float
+  findings          Json // Array of compliance findings per requirement
+  missingElements   Json     @map("missing_elements") // Array of missing compliance elements
+  recommendations   Json // Array of recommendations
+  analysisMetadata  Json     @map("analysis_metadata") // Model, tokens, timestamp
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([artifactId, version])
+  @@index([artifactId])
+  @@index([overallCompliance])
+  @@map("document_analyses")
+}
+
+// ============================================
 // Evidence Requirements (for evaluation engine)
 // ============================================
 

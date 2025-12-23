@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/commo
 import { QueueService, JobType, JobEnvelope } from '../aws/queue.service';
 import { DocumentExtractionWorker } from './document-extraction.worker';
 import { DocumentClassificationWorker } from './document-classification.worker';
+import { DocumentAnalysisWorker } from './document-analysis.worker';
 
 /**
  * Worker Host Service
@@ -21,6 +22,7 @@ export class WorkerHostService implements OnModuleInit, OnModuleDestroy {
     private queue: QueueService,
     private docExtractWorker: DocumentExtractionWorker,
     private docClassifyWorker: DocumentClassificationWorker,
+    private docAnalyzeWorker: DocumentAnalysisWorker,
   ) {
     this.workerMode = process.env.WORKER_MODE === 'true';
     this.abortController = new AbortController();
@@ -38,7 +40,8 @@ export class WorkerHostService implements OnModuleInit, OnModuleDestroy {
     const jobTypes: JobType[] = [
       'DOC_EXTRACT',
       'DOC_CLASSIFY',
-      // Add more as needed: 'DOC_ANALYZE', 'READINESS_RECOMPUTE', etc.
+      'DOC_ANALYZE',
+      // Add more as needed: 'READINESS_RECOMPUTE', 'EXPIRATION_CHECK', etc.
     ];
 
     for (const jobType of jobTypes) {
@@ -80,9 +83,9 @@ export class WorkerHostService implements OnModuleInit, OnModuleDestroy {
         await this.docClassifyWorker.handleDocClassification(job, payload);
         break;
 
-      // case 'DOC_ANALYZE':
-      //   await this.docAnalyzeWorker.handleDocAnalysis(job, payload);
-      //   break;
+      case 'DOC_ANALYZE':
+        await this.docAnalyzeWorker.handleDocAnalysis(job, payload);
+        break;
 
       // case 'READINESS_RECOMPUTE':
       //   await this.readinessWorker.handleReadinessRecompute(job, payload);

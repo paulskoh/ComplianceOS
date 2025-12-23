@@ -18,6 +18,7 @@
     "db:generate": "prisma generate"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@aws-sdk/client-kms": "^3.957.0",
     "@aws-sdk/client-s3": "^3.957.0",
     "@aws-sdk/client-sqs": "^3.957.0",
