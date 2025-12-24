@@ -502,6 +502,58 @@ export class ArtifactsService {
   }
 
   /**
+   * Get document analysis results for an artifact
+   */
+  async getAnalysis(tenantId: string, id: string) {
+    const artifact = await this.findOne(tenantId, id);
+    if (!artifact) {
+      throw new BadRequestException('Artifact not found');
+    }
+
+    // Query document analysis from raw table
+    const analyses = await this.prisma.$queryRaw<Array<{
+      id: string;
+      artifact_id: string;
+      version: number;
+      overall_compliance: string;
+      confidence: number;
+      findings: any;
+      missing_elements: any;
+      recommendations: any;
+      analysis_metadata: any;
+      created_at: Date;
+      updated_at: Date;
+    }>>`
+      SELECT *
+      FROM document_analyses
+      WHERE artifact_id = ${id}::uuid
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+
+    if (analyses.length === 0) {
+      return {
+        hasAnalysis: false,
+        status: 'PENDING',
+      };
+    }
+
+    const analysis = analyses[0];
+
+    return {
+      hasAnalysis: true,
+      status: 'COMPLETED',
+      overallCompliance: analysis.overall_compliance,
+      confidence: analysis.confidence,
+      findings: analysis.findings,
+      missingElements: analysis.missing_elements,
+      recommendations: analysis.recommendations,
+      metadata: analysis.analysis_metadata,
+      analyzedAt: analysis.created_at,
+    };
+  }
+
+  /**
    * SECURITY: Validate file upload (size, MIME type)
    */
   private validateFileUpload(file: Express.Multer.File): void {

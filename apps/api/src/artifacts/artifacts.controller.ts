@@ -157,4 +157,25 @@ export class ArtifactsController {
   getImmutabilityStatus(@CurrentUser() user: any, @Param('id') id: string) {
     return this.artifactsService.getImmutabilityStatus(user.tenantId, id);
   }
+
+  @Get(':id/analysis')
+  @ApiOperation({ summary: 'Get document analysis results' })
+  async getAnalysis(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.artifactsService.getAnalysis(user.tenantId, id);
+  }
+
+  @Post(':id/link-evidence-requirement')
+  @ApiOperation({ summary: 'Link artifact to evidence requirement' })
+  async linkEvidenceRequirement(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() body: { evidenceRequirementId: string },
+  ) {
+    return this.artifactsService.linkToResources(
+      user.tenantId,
+      user.userId,
+      id,
+      { evidenceRequirementIds: [body.evidenceRequirementId] },
+    );
+  }
 }

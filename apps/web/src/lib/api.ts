@@ -76,6 +76,7 @@ export const artifacts = {
     api.post('/artifacts/finalize-upload', { artifactId, version, etag }),
   linkToEvidenceRequirement: (artifactId: string, evidenceRequirementId: string) =>
     api.post(`/artifacts/${artifactId}/link-evidence-requirement`, { evidenceRequirementId }),
+  getAnalysis: (id: string) => api.get(`/artifacts/${id}/analysis`),
 }
 
 export const evidenceRequirements = {
