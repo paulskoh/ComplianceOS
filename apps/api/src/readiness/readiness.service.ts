@@ -561,4 +561,132 @@ export class ReadinessService {
         return '조치가 필요합니다.';
     }
   }
+
+  /**
+   * Get readiness score V2 for CEO demo
+   * Returns obligation-wise breakdown with weighted scoring and top 3 risks
+   */
+  async getScoreV2(tenantId: string) {
+    // Get all obligations with evidence requirements and artifacts
+    const obligations = await this.prisma.obligation.findMany({
+      where: { tenantId, isActive: true },
+      include: {
+        controls: {
+          include: {
+            control: {
+              include: {
+                evidenceRequirements: {
+                  include: {
+                    artifactLinks: {
+                      include: {
+                        artifact: true,
+                      },
+                      orderBy: {
+                        artifact: { uploadedAt: 'desc' },
+                      },
+                      take: 1,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { severity: 'desc' },
+    });
+
+    // Weight mapping based on severity
+    const severityWeights = {
+      HIGH: 40,
+      MEDIUM: 35,
+      LOW: 25,
+    };
+
+    let totalObligations = obligations.length;
+    let totalEvidence = 0;
+    let verifiedEvidence = 0;
+    const obligationScores: any[] = [];
+    const allRisks: any[] = [];
+
+    let weightedSum = 0;
+    let totalWeight = 0;
+
+    for (const obligation of obligations) {
+      const evidenceRequirements = obligation.controls.flatMap(
+        (oc) => oc.control.evidenceRequirements,
+      );
+
+      if (evidenceRequirements.length === 0) continue;
+
+      const evidenceCount = evidenceRequirements.length;
+      totalEvidence += evidenceCount;
+
+      let verifiedCount = 0;
+      let missingCount = 0;
+      let flaggedCount = 0;
+
+      for (const req of evidenceRequirements) {
+        const latestArtifactLink = req.artifactLinks[0];
+        const latestArtifact = latestArtifactLink?.artifact;
+
+        if (!latestArtifact) {
+          missingCount++;
+          allRisks.push({
+            obligationId: obligation.id,
+            obligationTitleKo: obligation.titleKo,
+            evidenceRequirementId: req.id,
+            evidenceRequirementTitleKo: req.name,
+            severity: obligation.severity,
+            reason: '증빙 자료가 아직 제출되지 않았습니다',
+            impact: severityWeights[obligation.severity] || 25,
+          });
+        } else if (latestArtifact.isApproved) {
+          verifiedCount++;
+          verifiedEvidence++;
+        } else if (latestArtifact.status === 'READY') {
+          // Uploaded but not yet approved - count as in progress (not verified, not missing)
+        }
+      }
+
+      // Calculate obligation score (0-100)
+      const completionRate = evidenceCount > 0 ? verifiedCount / evidenceCount : 0;
+      const obligationScore = Math.round(completionRate * 100);
+
+      // Calculate weight percentage
+      const weight = severityWeights[obligation.severity] || 25;
+      totalWeight += weight;
+      weightedSum += obligationScore * (weight / 100);
+
+      obligationScores.push({
+        obligationId: obligation.id,
+        obligationTitleKo: obligation.titleKo,
+        severity: obligation.severity,
+        weightPercent: weight,
+        evidenceCount,
+        verifiedCount,
+        missingCount,
+        flaggedCount,
+        score: obligationScore,
+      });
+    }
+
+    // Calculate overall weighted score
+    const overallScore = totalWeight > 0 ? Math.round(weightedSum) : 0;
+
+    // Get top 3 risks by impact
+    const topRisks = allRisks
+      .sort((a, b) => b.impact - a.impact)
+      .slice(0, 3)
+      .map(({ impact, ...rest }) => rest);
+
+    return {
+      overallScore,
+      totalObligations,
+      totalEvidence,
+      verifiedEvidence,
+      obligationScores,
+      topRisks,
+    };
+  }
 }

@@ -18,19 +18,10 @@ import {
 } from '@heroicons/react/24/outline'
 
 const navigation = [
-    { name: 'Home', href: '/dashboard', icon: HomeIcon },
-    { name: 'Readiness', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
-    { name: 'Obligations', href: '/dashboard/obligations', icon: ScaleIcon },
-    { name: 'Controls', href: '/dashboard/controls', icon: ShieldCheckIcon },
-    { name: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
-    { name: 'Workflows', href: '/dashboard/workflows', icon: CpuChipIcon },
-    // { name: 'Risks', href: '/dashboard/risks', icon: ExclamationTriangleIcon }, // Merged?
-    { name: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
-    { name: 'Policies', href: '/dashboard/policies', icon: AcademicCapIcon },
-    { name: 'Vendors', href: '/dashboard/vendors', icon: BuildingOfficeIcon },
-    // { name: 'Reports', href: '/dashboard/reports', icon: ChartBarIcon },
-    // { name: 'Integrations', href: '/dashboard/integrations', icon: PuzzlePieceIcon },
-    { name: 'Audit Log', href: '/dashboard/audit-log', icon: ChartBarIcon },
+    { name: '홈', href: '/dashboard', icon: HomeIcon },
+    { name: '증빙 제출', href: '/dashboard/evidence', icon: InboxStackIcon },
+    { name: '준수 현황', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
+    { name: '검사 팩', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
 ]
 
 const secondaryNavigation = [

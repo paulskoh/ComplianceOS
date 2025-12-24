@@ -74,6 +74,14 @@ export const artifacts = {
   }) => api.post('/artifacts/upload-intent', data),
   finalizeUpload: (artifactId: string, version: number, etag: string) =>
     api.post('/artifacts/finalize-upload', { artifactId, version, etag }),
+  linkToEvidenceRequirement: (artifactId: string, evidenceRequirementId: string) =>
+    api.post(`/artifacts/${artifactId}/link-evidence-requirement`, { evidenceRequirementId }),
+}
+
+export const evidenceRequirements = {
+  getOverview: () => api.get('/evidence-requirements/overview'),
+  getOne: (id: string) => api.get(`/evidence-requirements/${id}`),
+  pollStatus: (id: string) => api.get(`/evidence-requirements/${id}/poll-status`),
 }
 
 export const risks = {

@@ -27,6 +27,7 @@ import { PlansModule } from './plans/plans.module';
 import { InspectionModule } from './inspection/inspection.module';
 import { ApplicabilityModule } from './applicability/applicability.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
+import { EvidenceRequirementsModule } from './evidence-requirements/evidence-requirements.module';
 import { HealthModule } from './health/health.module';
 import { AwsModule } from './aws/aws.module';
 import { WorkersModule } from './workers/workers.module';
@@ -71,6 +72,7 @@ import { StructuredLogger } from './common/services/structured-logger.service';
     InspectionModule,
     ApplicabilityModule,
     EvaluationModule,
+    EvidenceRequirementsModule,
   ],
   providers: [
     StructuredLogger,

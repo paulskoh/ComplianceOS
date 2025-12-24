@@ -1,149 +1,248 @@
 'use client'
 
-import { useState } from 'react'
-import { InboxStackIcon, FolderIcon, DocumentIcon, PaperClipIcon, CalendarIcon } from '@heroicons/react/24/outline'
+import { useEffect, useState } from 'react'
+import { evidenceRequirements } from '@/lib/api'
+import Link from 'next/link'
+import { DocumentArrowUpIcon } from '@heroicons/react/24/outline'
+import UploadModal from '@/components/UploadModal'
+import StatusPill from '@/components/StatusPill'
+
+type EvidenceStatus = 'MISSING' | 'UPLOADED' | 'VERIFIED' | 'FLAGGED'
+
+interface LatestArtifact {
+  artifactId: string
+  version: number
+  filename: string
+  uploadedAt: string
+}
+
+interface LatestAnalysis {
+  overallStatus: string
+  score: number
+  summaryKo: string
+  findings: any[]
+}
+
+interface EvidenceRequirement {
+  id: string
+  titleKo: string
+  descriptionKo: string
+  status: EvidenceStatus
+  obligationId: string
+  obligationTitleKo: string
+  obligationSeverity: string
+  controlId: string
+  controlName: string
+  latestArtifact: LatestArtifact | null
+  latestAnalysis: LatestAnalysis | null
+  updatedAt: string
+}
+
+interface Obligation {
+  id: string
+  titleKo: string
+  severity: string
+}
+
+interface ObligationGroup {
+  obligation: Obligation
+  evidenceRequirements: EvidenceRequirement[]
+}
 
 export default function EvidencePage() {
-  const [activeTab, setActiveTab] = useState('inbox')
+  const [data, setData] = useState<ObligationGroup[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploadModalOpen, setUploadModalOpen] = useState(false)
+  const [selectedEvidenceReqId, setSelectedEvidenceReqId] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      const response = await evidenceRequirements.getOverview()
+      setData(response.data.obligations)
+    } catch (error) {
+      console.error('Failed to fetch evidence requirements:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUploadClick = (evidenceReqId: string) => {
+    setSelectedEvidenceReqId(evidenceReqId)
+    setUploadModalOpen(true)
+  }
+
+  const handleUploadSuccess = () => {
+    setUploadModalOpen(false)
+    setSelectedEvidenceReqId(null)
+    fetchData() // Refresh data
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 tracking-tight">Evidence Management</h2>
-          <p className="mt-1 text-sm text-gray-500">Collect, classify, and retain audit evidence.</p>
+          <h1 className="text-2xl font-bold text-gray-900">증빙 제출</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            개인정보 보호법 준수를 위해 필요한 증빙 자료를 제출하세요
+          </p>
         </div>
-        <button className="bg-gray-900 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 shadow-sm">
-          Upload Evidence
-        </button>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('inbox')}
-            className={`${activeTab === 'inbox' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-          >
-            <InboxStackIcon className="w-5 h-5 mr-2" />
-            Inbox
-            <span className="ml-2 bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">3</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('repository')}
-            className={`${activeTab === 'repository' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-          >
-            <FolderIcon className="w-5 h-5 mr-2" />
-            Repository
-          </button>
-        </nav>
-      </div>
-
-      {activeTab === 'inbox' ? <EvidenceInbox /> : <EvidenceRepository />}
-    </div>
-  )
-}
-
-function EvidenceInbox() {
-  const items = [
-    { id: 1, name: 'AWS_Config_Snapshot_2024-12-21.json', source: 'AWS Integration', date: '10 mins ago', size: '2.4 MB' },
-    { id: 2, name: 'Slack_Access_Logs_Q4.csv', source: 'Slack Integration', date: '2 hours ago', size: '14 KB' },
-    { id: 3, name: 'Screen_Shot_2024-12-20.png', source: 'Manual Upload (J. Doe)', date: 'Yesterday', size: '4.1 MB' },
-  ]
-
-  return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-subtle overflow-hidden">
-      <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-        <h3 className="text-sm font-medium text-gray-900">Unclassified Evidence</h3>
-        <span className="text-xs text-gray-500">Items waiting for mapping</span>
-      </div>
-      <ul className="divide-y divide-gray-200">
-        {items.map((item) => (
-          <li key={item.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group">
-            <div className="flex items-start space-x-4">
-              <div className="bg-gray-100 p-2 rounded">
-                <DocumentIcon className="w-6 h-6 text-gray-500" />
+      {data.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">아직 증빙 요구사항이 없습니다.</p>
+          <p className="text-sm text-gray-400 mt-2">
+            온보딩을 완료하면 증빙 요구사항이 생성됩니다.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {data.map((group) => (
+            <div key={group.obligation.id} className="bg-white rounded-lg border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      {group.obligation.titleKo}
+                    </h2>
+                    <StatusPill
+                      status={group.obligation.severity}
+                      label={getSeverityLabel(group.obligation.severity)}
+                    />
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {group.evidenceRequirements.length}개 증빙 항목
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{item.name}</p>
-                <div className="flex items-center space-x-4 mt-1 text-xs text-gray-500">
-                  <span>{item.source}</span>
-                  <span>&bull;</span>
-                  <span>{item.size}</span>
-                  <span>&bull;</span>
-                  <span>{item.date}</span>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 gap-4">
+                  {group.evidenceRequirements.map((req) => (
+                    <Link
+                      key={req.id}
+                      href={`/dashboard/evidence/${req.id}`}
+                      className="block border border-gray-200 rounded-lg p-5 hover:border-gray-300 hover:shadow-sm transition-all"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0 mr-4">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="text-base font-medium text-gray-900">
+                              {req.titleKo}
+                            </h3>
+                            <StatusPill
+                              status={req.status}
+                              label={getStatusLabel(req.status)}
+                            />
+                          </div>
+                          <p className="text-sm text-gray-600 mb-3">
+                            {req.descriptionKo}
+                          </p>
+
+                          {req.latestArtifact && (
+                            <div className="flex items-center space-x-4 text-xs text-gray-500">
+                              <span className="flex items-center">
+                                <svg
+                                  className="w-4 h-4 mr-1"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                  />
+                                </svg>
+                                {req.latestArtifact.filename}
+                              </span>
+                              <span>
+                                v{req.latestArtifact.version}
+                              </span>
+                              <span>
+                                {new Date(req.latestArtifact.uploadedAt).toLocaleDateString('ko-KR')}
+                              </span>
+                            </div>
+                          )}
+
+                          {req.latestAnalysis && (
+                            <div className="mt-2 text-sm text-gray-700">
+                              <p className="line-clamp-2">{req.latestAnalysis.summaryKo}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            handleUploadClick(req.id)
+                          }}
+                          className="flex-shrink-0 inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          <DocumentArrowUpIcon className="w-4 h-4 mr-1.5" />
+                          업로드
+                        </button>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button className="px-3 py-1.5 border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50">View</button>
-              <button className="px-3 py-1.5 bg-primary-600 text-white rounded text-xs font-medium hover:bg-primary-700 shadow-sm">Map to Control</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </div>
+      )}
+
+      <UploadModal
+        open={uploadModalOpen}
+        onClose={() => {
+          setUploadModalOpen(false)
+          setSelectedEvidenceReqId(null)
+        }}
+        onSuccess={handleUploadSuccess}
+        evidenceRequirementId={selectedEvidenceReqId || undefined}
+      />
     </div>
   )
 }
 
-function EvidenceRepository() {
-  const files = [
-    { id: 1, name: 'Q4_Access_Review_Signed.pdf', control: 'CTL-002', period: '2024-Q4', uploader: 'System' },
-    { id: 2, name: 'Penetration_Test_Report_vFinal.pdf', control: 'CTL-003', period: '2024-H2', uploader: 'Ext. Auditor' },
-    { id: 3, name: 'Security_Policy_v2.1.pdf', control: 'CTL-015', period: 'Effective', uploader: 'Policy Mgr' },
-    { id: 4, name: 'Data_Backup_Logs_Dec.zip', control: 'CTL-009', period: '2024-12', uploader: 'Auto-Collector' },
-  ]
+function getStatusLabel(status: EvidenceStatus): string {
+  switch (status) {
+    case 'MISSING':
+      return '미제출'
+    case 'UPLOADED':
+      return '검토중'
+    case 'VERIFIED':
+      return '승인'
+    case 'FLAGGED':
+      return '수정필요'
+    default:
+      return status
+  }
+}
 
-  return (
-    <div className="flex flex-col">
-      {/* Filters */}
-      <div className="flex space-x-3 mb-4">
-        <select className="block w-40 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
-          <option>All Controls</option>
-          <option>CTL-002</option>
-        </select>
-        <select className="block w-40 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
-          <option>All Periods</option>
-          <option>2024-Q4</option>
-        </select>
-      </div>
-
-      <div className="bg-white rounded-lg border border-gray-200 shadow-subtle overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Linked Control</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-              <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {files.map((file) => (
-              <tr key={file.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 group flex items-center">
-                  <PaperClipIcon className="w-4 h-4 text-gray-400 mr-2" />
-                  {file.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500 font-mono bg-gray-50 rounded w-min">
-                  {file.control}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center">
-                  <CalendarIcon className="w-4 h-4 text-gray-400 mr-1.5" />
-                  {file.period}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {file.uploader}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <a href="#" className="text-primary-600 hover:text-primary-900">Download</a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
+function getSeverityLabel(severity: string): string {
+  switch (severity) {
+    case 'HIGH':
+      return '높음'
+    case 'MEDIUM':
+      return '보통'
+    case 'LOW':
+      return '낮음'
+    default:
+      return severity
+  }
 }

@@ -13,20 +13,25 @@ import { artifacts } from '@/lib/api'
 import axios from 'axios'
 
 interface UploadModalProps {
-  isOpen: boolean
+  isOpen?: boolean
+  open?: boolean
   onClose: () => void
   evidenceRequirementId?: string
   onUploadComplete?: (artifact: any) => void
+  onSuccess?: () => void
 }
 
-type UploadState = 'idle' | 'uploading' | 'success' | 'error'
+type UploadState = 'idle' | 'uploading' | 'analyzing' | 'success' | 'error'
 
 export default function UploadModal({
   isOpen,
+  open,
   onClose,
   evidenceRequirementId,
   onUploadComplete,
+  onSuccess,
 }: UploadModalProps) {
+  const modalOpen = open ?? isOpen ?? false
   const [file, setFile] = useState<File | null>(null)
   const [uploadState, setUploadState] = useState<UploadState>('idle')
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -54,6 +59,46 @@ export default function UploadModal({
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
+  }
+
+  const pollForAnalysis = async () => {
+    if (!evidenceRequirementId) return
+
+    const maxAttempts = 15 // 30 seconds with 2s intervals
+    let attempts = 0
+
+    while (attempts < maxAttempts) {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/evidence-requirements/${evidenceRequirementId}/poll-status`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          }
+        )
+        const data = await response.json()
+
+        if (data.analysisReady) {
+          setUploadState('success')
+          return
+        }
+
+        attempts++
+        if (attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+        }
+      } catch (error) {
+        console.error('Polling error:', error)
+        attempts++
+        if (attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+        }
+      }
+    }
+
+    // Timeout - analysis is still pending but show success anyway
+    setUploadState('success')
   }
 
   const handleUpload = async () => {
@@ -94,12 +139,22 @@ export default function UploadModal({
       // Phase 3: Finalize upload and trigger analysis
       const finalizeResponse = await artifacts.finalizeUpload(artifactId, version, etag)
 
-      setUploadState('success')
       setUploadProgress(100)
 
-      // Call onUploadComplete callback
+      // If evidenceRequirementId is provided, poll for analysis completion
+      if (evidenceRequirementId) {
+        setUploadState('analyzing')
+        await pollForAnalysis()
+      } else {
+        setUploadState('success')
+      }
+
+      // Call callbacks
       if (onUploadComplete) {
         onUploadComplete(finalizeResponse.data)
+      }
+      if (onSuccess) {
+        onSuccess()
       }
 
       // Auto-close after success
@@ -144,7 +199,7 @@ export default function UploadModal({
   }
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition appear show={modalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={handleClose}>
         <Transition.Child
           as={Fragment}
@@ -271,6 +326,19 @@ export default function UploadModal({
                         />
                       </div>
                       <p className="text-xs text-gray-500">{uploadProgress}% 완료</p>
+                    </div>
+                  )}
+
+                  {/* Upload State: Analyzing */}
+                  {uploadState === 'analyzing' && (
+                    <div className="text-center py-8">
+                      <div className="mb-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900 mb-2">AI 분석 중...</p>
+                      <p className="text-xs text-gray-500">
+                        문서를 분석하고 있습니다. 잠시만 기다려주세요.
+                      </p>
                     </div>
                   )}
 
