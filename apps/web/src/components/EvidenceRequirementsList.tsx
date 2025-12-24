@@ -79,8 +79,8 @@ export default function EvidenceRequirementsList({
       )
     }
 
-    const latestArtifact = requirement.artifacts[0]
-    if (latestArtifact.status === 'APPROVED') {
+    const latestArtifact = requirement.artifacts?.[0]
+    if (latestArtifact?.status === 'APPROVED') {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
           <CheckCircleIcon className="h-4 w-4 mr-1" />
@@ -89,7 +89,7 @@ export default function EvidenceRequirementsList({
       )
     }
 
-    if (latestArtifact.status === 'ANALYZED') {
+    if (latestArtifact?.status === 'ANALYZED') {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
           <DocumentCheckIcon className="h-4 w-4 mr-1" />
