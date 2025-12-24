@@ -21,8 +21,18 @@ export class OnboardingController {
     );
   }
 
+  @Post('apply-pipa')
+  async applyPIPAContentPack(@CurrentUser() user: any) {
+    return this.onboarding.applyPIPAContentPack(user.tenantId);
+  }
+
   @Get('profile')
   async getProfile(@CurrentUser() user: any) {
     return this.onboarding.getCompanyProfile(user.tenantId);
+  }
+
+  @Get('questions')
+  async getOnboardingQuestions() {
+    return this.onboarding.getOnboardingQuestions();
   }
 }

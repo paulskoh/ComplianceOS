@@ -20,6 +20,12 @@ export class ReadinessController {
     return this.readinessService.getScore(user.tenantId);
   }
 
+  @Get('score-v2')
+  @ApiOperation({ summary: 'Get weighted readiness score with top risks' })
+  getWeightedScore(@CurrentUser() user: any) {
+    return this.readinessService.calculateWeightedScore(user.tenantId);
+  }
+
   @Get('gaps')
   getGapReport(@CurrentUser() user: any) {
     return this.readinessService.getGapReport(user.tenantId);

@@ -1,0 +1,771 @@
+metadata:
+  code: pipa-v1-kr
+  name: "개인정보 보호법 (PIPA) v1"
+  domain: PRIVACY
+  jurisdiction: "KR"
+  language: "ko"
+  effectiveDate: "2025-01-15"
+  maintainer: "ComplianceOS Team"
+  targetAudience: "온라인 서비스 제공 중소기업"
+  version: "1.0.0"
+  lastUpdated: "2025-01-15"
+  description: "개인정보를 처리하는 온라인 서비스 기업을 위한 PIPA 준수 패키지"
+
+obligations:
+  - code: PIPA-01
+    name: "개인정보 수집·이용 동의"
+    description: "개인정보를 수집하는 경우 정보주체의 동의를 받아야 합니다."
+    severity: CRITICAL
+    references:
+      - law: "개인정보 보호법"
+        article: "제15조 제1항"
+        url: "https://www.law.go.kr"
+    whyApplicable: "귀사가 고객의 이름, 이메일, 전화번호 등을 수집하는 경우 적용됩니다."
+
+  - code: PIPA-02
+    name: "개인정보 처리방침 공개"
+    description: "개인정보 처리방침을 작성하여 공개해야 합니다."
+    severity: CRITICAL
+    references:
+      - law: "개인정보 보호법"
+        article: "제30조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "모든 개인정보 처리자는 처리방침을 홈페이지에 게재해야 합니다."
+
+  - code: PIPA-03
+    name: "개인정보 파기"
+    description: "보유 기간이 경과하거나 목적이 달성된 개인정보는 지체없이 파기해야 합니다."
+    severity: CRITICAL
+    references:
+      - law: "개인정보 보호법"
+        article: "제21조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "회원 탈퇴 시 또는 보유 기간 종료 시 개인정보를 삭제해야 합니다."
+
+  - code: PIPA-04
+    name: "외부 위탁 시 안전조치"
+    description: "개인정보 처리를 외부에 위탁하는 경우 위탁 계약서를 작성하고 관리·감독해야 합니다."
+    severity: HIGH
+    references:
+      - law: "개인정보 보호법"
+        article: "제26조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "결제 대행, 고객 상담 등을 외부 업체에 맡기는 경우 적용됩니다."
+
+  - code: PIPA-05
+    name: "정보주체 권리 보장"
+    description: "정보주체의 열람·정정·삭제·처리정지 요구에 응해야 합니다."
+    severity: HIGH
+    references:
+      - law: "개인정보 보호법"
+        article: "제35조~제37조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "고객이 본인의 개인정보 확인 또는 삭제를 요청할 수 있어야 합니다."
+
+  - code: PIPA-06
+    name: "안전성 확보 조치"
+    description: "접근 통제, 암호화 등 기술적·관리적·물리적 보호조치를 해야 합니다."
+    severity: HIGH
+    references:
+      - law: "개인정보 보호법"
+        article: "제29조"
+        url: "https://www.law.go.kr"
+      - standard: "개인정보의 안전성 확보조치 기준(고시)"
+        url: "https://www.law.go.kr"
+    whyApplicable: "개인정보 유출 방지를 위한 암호화, 접근 권한 관리 등이 필요합니다."
+
+  - code: PIPA-07
+    name: "개인정보 유출 통지"
+    description: "개인정보 유출 발생 시 정보주체 및 보호위원회에 통지해야 합니다."
+    severity: CRITICAL
+    references:
+      - law: "개인정보 보호법"
+        article: "제34조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "유출 사고 발생 시 즉시 통지 의무가 있습니다."
+
+  - code: PIPA-08
+    name: "개인정보 보호책임자 지정"
+    description: "개인정보 보호책임자(CPO)를 지정하고 공개해야 합니다."
+    severity: MEDIUM
+    references:
+      - law: "개인정보 보호법"
+        article: "제31조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "개인정보 처리에 대한 책임자를 지정해야 합니다."
+
+  - code: PIPA-09
+    name: "직원 교육"
+    description: "개인정보를 처리하는 직원에게 정기적으로 교육을 실시해야 합니다."
+    severity: MEDIUM
+    references:
+      - law: "개인정보 보호법"
+        article: "제28조"
+        url: "https://www.law.go.kr"
+      - standard: "개인정보의 안전성 확보조치 기준 제4조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "연 1회 이상 개인정보 보호 교육이 필요합니다."
+
+  - code: PIPA-10
+    name: "개인정보 처리 기록 관리"
+    description: "개인정보 처리 현황을 기록하고 관리해야 합니다."
+    severity: MEDIUM
+    references:
+      - law: "개인정보 보호법"
+        article: "제32조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "처리 목록을 작성하여 보유·관리해야 합니다."
+
+  - code: PIPA-11
+    name: "제3자 제공 시 동의"
+    description: "개인정보를 제3자에게 제공하는 경우 별도 동의를 받아야 합니다."
+    severity: HIGH
+    references:
+      - law: "개인정보 보호법"
+        article: "제17조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "마케팅 제휴 등으로 고객 정보를 제3자에게 제공하는 경우 적용됩니다."
+
+  - code: PIPA-12
+    name: "영상정보처리기기 운영"
+    description: "CCTV 등 영상정보처리기기 운영 시 안내판 설치 및 관리 기준을 준수해야 합니다."
+    severity: LOW
+    references:
+      - law: "개인정보 보호법"
+        article: "제25조"
+        url: "https://www.law.go.kr"
+    whyApplicable: "사무실에 CCTV를 설치한 경우 적용됩니다."
+
+controls:
+  - code: CTRL-PIPA-01
+    name: "개인정보 처리방침 문서화"
+    obligationCodes: [PIPA-02]
+    description: "개인정보 처리방침을 작성하고 홈페이지에 게시"
+    implementationGuidance: |
+      - 수집 항목, 목적, 보유기간 명시
+      - 파기 절차 및 방법 기술
+      - 정보주체 권리 행사 방법 안내
+      - 개인정보 보호책임자 연락처 공개
+
+  - code: CTRL-PIPA-02
+    name: "개인정보 수집 동의 체계"
+    obligationCodes: [PIPA-01]
+    description: "동의서 양식 구비 및 동의 절차 마련"
+    implementationGuidance: |
+      - 명확한 동의 문구 사용
+      - 선택 항목 분리 (필수/선택)
+      - 동의 철회 방법 안내
+
+  - code: CTRL-PIPA-03
+    name: "개인정보 파기 절차"
+    obligationCodes: [PIPA-03]
+    description: "보유기간 경과 시 자동 파기 프로세스"
+    implementationGuidance: |
+      - 파기 대상 식별 절차
+      - 파기 방법 (완전 삭제, 복구 불가)
+      - 파기 이력 기록
+
+  - code: CTRL-PIPA-04
+    name: "외부 위탁 계약서"
+    obligationCodes: [PIPA-04]
+    description: "위탁업체와 개인정보 보호 계약 체결"
+    implementationGuidance: |
+      - 위탁 범위 및 목적 명시
+      - 재위탁 금지 조항
+      - 안전조치 의무 규정
+      - 손해배상 책임
+
+  - code: CTRL-PIPA-05
+    name: "정보주체 권리 행사 창구"
+    obligationCodes: [PIPA-05]
+    description: "열람·정정·삭제 요청 처리 프로세스"
+    implementationGuidance: |
+      - 온라인 신청 양식 제공
+      - 10일 이내 처리
+      - 거절 시 사유 통지
+
+  - code: CTRL-PIPA-06
+    name: "접근 권한 관리"
+    obligationCodes: [PIPA-06]
+    description: "개인정보 시스템 접근 권한 통제"
+    implementationGuidance: |
+      - 업무별 최소 권한 부여
+      - 퇴사자 즉시 권한 회수
+      - 접근 로그 기록
+
+  - code: CTRL-PIPA-07
+    name: "개인정보 암호화"
+    obligationCodes: [PIPA-06]
+    description: "주민번호, 비밀번호 등 암호화 저장"
+    implementationGuidance: |
+      - 주민번호 암호화 (AES-256)
+      - 비밀번호 해시 (bcrypt)
+      - 전송 구간 암호화 (TLS)
+
+  - code: CTRL-PIPA-08
+    name: "유출 대응 절차"
+    obligationCodes: [PIPA-07]
+    description: "개인정보 유출 사고 대응 체계"
+    implementationGuidance: |
+      - 유출 탐지 모니터링
+      - 즉시 통지 프로세스
+      - 재발 방지 조치
+
+  - code: CTRL-PIPA-09
+    name: "보호책임자 지정 및 공개"
+    obligationCodes: [PIPA-08]
+    description: "CPO 지정 및 연락처 공개"
+    implementationGuidance: |
+      - 책임자 성명 및 연락처
+      - 홈페이지 공개
+      - 정기 검토 및 업데이트
+
+  - code: CTRL-PIPA-10
+    name: "직원 교육 프로그램"
+    obligationCodes: [PIPA-09]
+    description: "연 1회 이상 개인정보 보호 교육"
+    implementationGuidance: |
+      - 교육 계획 수립
+      - 출석 관리
+      - 교육 자료 보관
+
+  - code: CTRL-PIPA-11
+    name: "처리 목록 관리"
+    obligationCodes: [PIPA-10]
+    description: "개인정보 처리 현황 기록"
+    implementationGuidance: |
+      - 처리 항목 목록화
+      - 보유 기간 명시
+      - 정기 업데이트
+
+  - code: CTRL-PIPA-12
+    name: "제3자 제공 동의 관리"
+    obligationCodes: [PIPA-11]
+    description: "제3자 제공 시 별도 동의 절차"
+    implementationGuidance: |
+      - 제공 목적 명시
+      - 제공 항목 고지
+      - 동의 기록 보관
+
+  - code: CTRL-PIPA-13
+    name: "파기 대상 식별"
+    obligationCodes: [PIPA-03]
+    description: "보유기간 만료 개인정보 자동 식별"
+    implementationGuidance: |
+      - 보유기간 설정
+      - 만료 알림
+      - 파기 스케줄링
+
+  - code: CTRL-PIPA-14
+    name: "위탁업체 관리 감독"
+    obligationCodes: [PIPA-04]
+    description: "위탁업체 정기 점검"
+    implementationGuidance: |
+      - 분기별 점검
+      - 시정 조치 요구
+      - 점검 결과 기록
+
+  - code: CTRL-PIPA-15
+    name: "권리 행사 요청 접수"
+    obligationCodes: [PIPA-05]
+    description: "열람·정정·삭제 요청 접수 창구"
+    implementationGuidance: |
+      - 온라인 양식
+      - 이메일 접수
+      - 전화 접수
+
+  - code: CTRL-PIPA-16
+    name: "로그 기록 관리"
+    obligationCodes: [PIPA-06]
+    description: "개인정보 접근 로그 기록 및 보관"
+    implementationGuidance: |
+      - 접근 시각 기록
+      - 접근 IP 기록
+      - 6개월 이상 보관
+
+  - code: CTRL-PIPA-17
+    name: "취약점 점검"
+    obligationCodes: [PIPA-06]
+    description: "분기별 보안 취약점 점검"
+    implementationGuidance: |
+      - 정기 점검
+      - 패치 적용
+      - 점검 결과 보고
+
+  - code: CTRL-PIPA-18
+    name: "유출 통지 프로세스"
+    obligationCodes: [PIPA-07]
+    description: "유출 시 정보주체 및 당국 통지"
+    implementationGuidance: |
+      - 24시간 내 통지
+      - 유출 범위 파악
+      - 대응 조치 안내
+
+  - code: CTRL-PIPA-19
+    name: "교육 이수 관리"
+    obligationCodes: [PIPA-09]
+    description: "직원 교육 이수 현황 관리"
+    implementationGuidance: |
+      - 이수 현황 추적
+      - 미이수자 독려
+      - 이수 증빙 보관
+
+  - code: CTRL-PIPA-20
+    name: "처리 현황 검토"
+    obligationCodes: [PIPA-10]
+    description: "연 1회 처리 현황 전체 검토"
+    implementationGuidance: |
+      - 처리 항목 확인
+      - 불필요 항목 삭제
+      - 검토 결과 기록
+
+  - code: CTRL-PIPA-21
+    name: "제3자 제공 현황 관리"
+    obligationCodes: [PIPA-11]
+    description: "제3자 제공 내역 기록 및 공개"
+    implementationGuidance: |
+      - 제공 일시 기록
+      - 제공 목적 기록
+      - 처리방침 공개
+
+  - code: CTRL-PIPA-22
+    name: "영상정보 안내판"
+    obligationCodes: [PIPA-12]
+    description: "CCTV 운영 안내판 설치"
+    implementationGuidance: |
+      - 설치 위치 명시
+      - 촬영 목적 공지
+      - 관리책임자 연락처
+
+  - code: CTRL-PIPA-23
+    name: "영상정보 보관"
+    obligationCodes: [PIPA-12]
+    description: "촬영 영상 보관 및 파기"
+    implementationGuidance: |
+      - 보관 기간 설정
+      - 접근 권한 제한
+      - 기간 경과 시 자동 파기
+
+  - code: CTRL-PIPA-24
+    name: "동의 철회 처리"
+    obligationCodes: [PIPA-01, PIPA-05]
+    description: "동의 철회 요청 즉시 처리"
+    implementationGuidance: |
+      - 철회 요청 접수
+      - 즉시 처리 (지체 없이)
+      - 처리 결과 통지
+
+evidenceRequirements:
+  - code: EV-PIPA-01
+    controlCode: CTRL-PIPA-01
+    name: "개인정보 처리방침 최신본"
+    description: "현재 공개 중인 개인정보 처리방침 문서 (PDF 또는 DOCX)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "수집 항목이 명시되어 있음"
+      - "보유기간이 기재되어 있음"
+      - "파기 절차가 설명되어 있음"
+      - "개인정보 보호책임자 연락처가 있음"
+      - "마지막 수정일이 1년 이내"
+
+  - code: EV-PIPA-02
+    controlCode: CTRL-PIPA-04
+    name: "개인정보 처리 위탁 계약서"
+    description: "외부 업체와 체결한 개인정보 처리 위탁 계약서 (PDF/DOCX)"
+    freshnessWindowDays: 730
+    required: true
+    acceptanceCriteria:
+      - "위탁 업무 내용이 명시되어 있음"
+      - "위탁 기간이 기재되어 있음"
+      - "재위탁 금지 조항이 있음"
+      - "안전조치 의무가 규정되어 있음"
+      - "서명날인이 있음"
+
+  - code: EV-PIPA-03
+    controlCode: CTRL-PIPA-03
+    name: "개인정보 파기 이력"
+    description: "지난 1년간 개인정보 파기 내역 (Excel/PDF)"
+    freshnessWindowDays: 90
+    required: true
+    acceptanceCriteria:
+      - "파기 일자가 기록되어 있음"
+      - "파기 대상 개인정보 유형이 명시되어 있음"
+      - "파기 건수가 기재되어 있음"
+      - "파기 방법이 설명되어 있음"
+      - "파기 담당자가 확인되어 있음"
+
+  - code: EV-PIPA-04
+    controlCode: CTRL-PIPA-05
+    name: "정보주체 권리 행사 처리 대장"
+    description: "열람·정정·삭제 요청 처리 내역 (Excel)"
+    freshnessWindowDays: 90
+    required: false
+    acceptanceCriteria:
+      - "요청 일자가 기록되어 있음"
+      - "요청 유형(열람/정정/삭제)이 명시되어 있음"
+      - "처리 결과가 기재되어 있음"
+      - "처리 완료일이 있음"
+
+  - code: EV-PIPA-05
+    controlCode: CTRL-PIPA-06
+    name: "접근 권한 관리 대장"
+    description: "개인정보 시스템 접근 권한 현황 (Excel)"
+    freshnessWindowDays: 180
+    required: true
+    acceptanceCriteria:
+      - "직원별 권한 목록이 있음"
+      - "권한 부여 일자가 기록되어 있음"
+      - "최근 권한 검토 일자가 있음"
+
+  - code: EV-PIPA-06
+    controlCode: CTRL-PIPA-10
+    name: "개인정보 보호 교육 이수 증빙"
+    description: "직원 교육 실시 내역 (출석부, 교육자료)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "교육 일자가 1년 이내"
+      - "참석 직원 명단이 있음"
+      - "교육 내용(커리큘럼)이 포함되어 있음"
+      - "교육 시간이 1시간 이상"
+
+  - code: EV-PIPA-07
+    controlCode: CTRL-PIPA-11
+    name: "개인정보 처리 목록"
+    description: "현재 처리 중인 개인정보 항목 목록 (Excel/PDF)"
+    freshnessWindowDays: 180
+    required: true
+    acceptanceCriteria:
+      - "처리 항목이 나열되어 있음"
+      - "처리 목적이 명시되어 있음"
+      - "보유 기간이 기재되어 있음"
+      - "최근 업데이트 일자가 있음"
+
+  - code: EV-PIPA-08
+    controlCode: CTRL-PIPA-14
+    name: "위탁업체 점검 결과"
+    description: "위탁업체 정기 점검 보고서 (PDF/DOCX)"
+    freshnessWindowDays: 90
+    required: false
+    acceptanceCriteria:
+      - "점검 일자가 기록되어 있음"
+      - "점검 항목이 명시되어 있음"
+      - "시정 사항이 있는 경우 조치 계획이 있음"
+
+  - code: EV-PIPA-09
+    controlCode: CTRL-PIPA-16
+    name: "접근 로그 기록"
+    description: "개인정보 시스템 접근 로그 (6개월분)"
+    freshnessWindowDays: 180
+    required: true
+    acceptanceCriteria:
+      - "접근 일시가 기록되어 있음"
+      - "접근자 ID가 명시되어 있음"
+      - "접근 IP가 기록되어 있음"
+      - "작업 내용이 로깅되어 있음"
+
+  - code: EV-PIPA-10
+    controlCode: CTRL-PIPA-17
+    name: "보안 취약점 점검 보고서"
+    description: "분기별 보안 점검 결과 (PDF)"
+    freshnessWindowDays: 90
+    required: true
+    acceptanceCriteria:
+      - "점검 일자가 기재되어 있음"
+      - "점검 범위가 명시되어 있음"
+      - "발견된 취약점이 기록되어 있음"
+      - "조치 계획이 있음"
+
+  - code: EV-PIPA-11
+    controlCode: CTRL-PIPA-07
+    name: "암호화 적용 현황"
+    description: "개인정보 암호화 적용 현황 보고서 (PDF/Excel)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "암호화 대상 항목이 명시되어 있음"
+      - "암호화 알고리즘이 기재되어 있음"
+      - "전송 구간 암호화 여부가 확인되어 있음"
+
+  - code: EV-PIPA-12
+    controlCode: CTRL-PIPA-09
+    name: "개인정보 보호책임자 지정 공문"
+    description: "CPO 지정 및 공개 증빙 (PDF)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "책임자 성명이 명시되어 있음"
+      - "연락처가 기재되어 있음"
+      - "지정 일자가 있음"
+      - "홈페이지 공개 확인 가능"
+
+  - code: EV-PIPA-13
+    controlCode: CTRL-PIPA-02
+    name: "개인정보 수집 동의서 양식"
+    description: "현재 사용 중인 동의서 양식 (PDF/DOCX)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "수집 항목이 명시되어 있음"
+      - "수집 목적이 기재되어 있음"
+      - "필수/선택 항목이 구분되어 있음"
+      - "동의 철회 방법이 안내되어 있음"
+
+  - code: EV-PIPA-14
+    controlCode: CTRL-PIPA-13
+    name: "파기 프로세스 문서"
+    description: "개인정보 파기 절차 매뉴얼 (PDF/DOCX)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "파기 대상 식별 방법이 설명되어 있음"
+      - "파기 방법이 기술되어 있음"
+      - "파기 담당자가 지정되어 있음"
+
+  - code: EV-PIPA-15
+    controlCode: CTRL-PIPA-15
+    name: "권리 행사 요청 양식"
+    description: "열람·정정·삭제 요청 양식 (PDF/Online)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "요청 유형 선택 가능"
+      - "본인 확인 절차 포함"
+      - "접수 방법 안내"
+
+  - code: EV-PIPA-16
+    controlCode: CTRL-PIPA-18
+    name: "유출 대응 매뉴얼"
+    description: "개인정보 유출 사고 대응 절차 (PDF/DOCX)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "유출 탐지 절차가 설명되어 있음"
+      - "통지 절차가 기술되어 있음"
+      - "담당자 연락처가 명시되어 있음"
+
+  - code: EV-PIPA-17
+    controlCode: CTRL-PIPA-21
+    name: "제3자 제공 내역"
+    description: "제3자 제공 현황 기록 (Excel)"
+    freshnessWindowDays: 90
+    required: false
+    acceptanceCriteria:
+      - "제공 일자가 기록되어 있음"
+      - "제공 받는 자가 명시되어 있음"
+      - "제공 목적이 기재되어 있음"
+      - "동의 여부가 확인되어 있음"
+
+  - code: EV-PIPA-18
+    controlCode: CTRL-PIPA-22
+    name: "CCTV 안내판 사진"
+    description: "영상정보처리기기 안내판 설치 사진 (JPG/PNG)"
+    freshnessWindowDays: 365
+    required: false
+    acceptanceCriteria:
+      - "안내판이 명확히 보임"
+      - "설치 위치가 적절함"
+      - "관리책임자 연락처가 표시되어 있음"
+
+  - code: EV-PIPA-19
+    controlCode: CTRL-PIPA-23
+    name: "영상정보 관리 대장"
+    description: "CCTV 영상 보관 및 파기 기록 (Excel)"
+    freshnessWindowDays: 90
+    required: false
+    acceptanceCriteria:
+      - "촬영 일시가 기록되어 있음"
+      - "보관 기간이 명시되어 있음"
+      - "파기 일자가 기재되어 있음"
+
+  - code: EV-PIPA-20
+    controlCode: CTRL-PIPA-24
+    name: "동의 철회 처리 내역"
+    description: "동의 철회 요청 처리 기록 (Excel)"
+    freshnessWindowDays: 90
+    required: false
+    acceptanceCriteria:
+      - "철회 요청 일자가 기록되어 있음"
+      - "처리 일자가 기재되어 있음"
+      - "처리 결과가 명시되어 있음"
+
+  - code: EV-PIPA-21
+    controlCode: CTRL-PIPA-01
+    name: "처리방침 변경 이력"
+    description: "개인정보 처리방침 변경 내역 (PDF)"
+    freshnessWindowDays: 365
+    required: false
+    acceptanceCriteria:
+      - "변경 일자가 기록되어 있음"
+      - "변경 사유가 명시되어 있음"
+      - "주요 변경 내용이 요약되어 있음"
+
+  - code: EV-PIPA-22
+    controlCode: CTRL-PIPA-04
+    name: "위탁업체 목록"
+    description: "현재 계약 중인 위탁업체 목록 (Excel)"
+    freshnessWindowDays: 180
+    required: true
+    acceptanceCriteria:
+      - "업체명이 나열되어 있음"
+      - "위탁 업무가 명시되어 있음"
+      - "계약 기간이 기재되어 있음"
+
+  - code: EV-PIPA-23
+    controlCode: CTRL-PIPA-06
+    name: "접근 권한 변경 이력"
+    description: "개인정보 시스템 권한 변경 기록 (Excel)"
+    freshnessWindowDays: 180
+    required: true
+    acceptanceCriteria:
+      - "변경 일자가 기록되어 있음"
+      - "변경 사유가 명시되어 있음"
+      - "승인자가 확인되어 있음"
+
+  - code: EV-PIPA-24
+    controlCode: CTRL-PIPA-19
+    name: "교육 자료"
+    description: "개인정보 보호 교육 교재 및 자료 (PDF/PPT)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "교육 커리큘럼이 포함되어 있음"
+      - "PIPA 주요 내용이 설명되어 있음"
+      - "사례 및 예시가 있음"
+
+  - code: EV-PIPA-25
+    controlCode: CTRL-PIPA-20
+    name: "처리 현황 검토 보고서"
+    description: "연간 개인정보 처리 현황 검토 결과 (PDF)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "검토 일자가 기재되어 있음"
+      - "처리 항목 전체가 검토되어 있음"
+      - "개선 사항이 도출되어 있음"
+
+  - code: EV-PIPA-26
+    controlCode: CTRL-PIPA-08
+    name: "유출 사고 대응 훈련 기록"
+    description: "유출 사고 대응 모의훈련 결과 (PDF)"
+    freshnessWindowDays: 365
+    required: false
+    acceptanceCriteria:
+      - "훈련 일자가 기록되어 있음"
+      - "참여 인원이 명시되어 있음"
+      - "시나리오가 설명되어 있음"
+      - "개선 사항이 도출되어 있음"
+
+  - code: EV-PIPA-27
+    controlCode: CTRL-PIPA-03
+    name: "자동 파기 시스템 설정"
+    description: "보유기간 경과 시 자동 파기 시스템 설정 증빙 (스크린샷/문서)"
+    freshnessWindowDays: 365
+    required: false
+    acceptanceCriteria:
+      - "자동 파기 설정이 확인됨"
+      - "파기 주기가 설정되어 있음"
+      - "파기 대상 조건이 명시되어 있음"
+
+  - code: EV-PIPA-28
+    controlCode: CTRL-PIPA-05
+    name: "권리 행사 처리 프로세스"
+    description: "열람·정정·삭제 요청 처리 절차 매뉴얼 (PDF/DOCX)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "접수 절차가 설명되어 있음"
+      - "본인 확인 방법이 기술되어 있음"
+      - "처리 기한이 명시되어 있음"
+      - "거절 사유 예시가 있음"
+
+  - code: EV-PIPA-29
+    controlCode: CTRL-PIPA-07
+    name: "암호화 키 관리 정책"
+    description: "암호화 키 생성·보관·폐기 절차 (PDF)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "키 생성 절차가 설명되어 있음"
+      - "키 보관 방법이 기술되어 있음"
+      - "키 변경 주기가 명시되어 있음"
+
+  - code: EV-PIPA-30
+    controlCode: CTRL-PIPA-16
+    name: "로그 백업 현황"
+    description: "접근 로그 백업 및 보관 현황 (PDF/Excel)"
+    freshnessWindowDays: 180
+    required: true
+    acceptanceCriteria:
+      - "백업 주기가 명시되어 있음"
+      - "보관 장소가 기재되어 있음"
+      - "보관 기간이 6개월 이상"
+
+  - code: EV-PIPA-31
+    controlCode: CTRL-PIPA-17
+    name: "패치 적용 이력"
+    description: "보안 패치 적용 내역 (Excel)"
+    freshnessWindowDays: 90
+    required: true
+    acceptanceCriteria:
+      - "패치 일자가 기록되어 있음"
+      - "패치 내용이 명시되어 있음"
+      - "적용 결과가 확인되어 있음"
+
+  - code: EV-PIPA-32
+    controlCode: CTRL-PIPA-12
+    name: "제3자 제공 동의서"
+    description: "제3자 제공 동의 양식 및 기록 (PDF)"
+    freshnessWindowDays: 365
+    required: false
+    acceptanceCriteria:
+      - "제공 목적이 명시되어 있음"
+      - "제공 항목이 기재되어 있음"
+      - "제공 받는 자가 명시되어 있음"
+      - "보유 기간이 안내되어 있음"
+
+  - code: EV-PIPA-33
+    controlCode: CTRL-PIPA-14
+    name: "위탁 계약 종료 시 파기 증빙"
+    description: "위탁 종료 후 개인정보 파기 확인서 (PDF)"
+    freshnessWindowDays: 365
+    required: false
+    acceptanceCriteria:
+      - "파기 일자가 기록되어 있음"
+      - "파기 방법이 명시되어 있음"
+      - "위탁업체 서명이 있음"
+
+  - code: EV-PIPA-34
+    controlCode: CTRL-PIPA-10
+    name: "교육 출석부"
+    description: "개인정보 보호 교육 참석자 출석부 (PDF/Excel)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "교육 일자가 기록되어 있음"
+      - "참석자 명단이 있음"
+      - "서명 또는 확인란이 있음"
+
+  - code: EV-PIPA-35
+    controlCode: CTRL-PIPA-11
+    name: "처리 목록 최종 승인"
+    description: "개인정보 처리 목록 최종 승인 문서 (PDF)"
+    freshnessWindowDays: 365
+    required: true
+    acceptanceCriteria:
+      - "승인 일자가 기재되어 있음"
+      - "승인자 서명이 있음"
+      - "검토 의견이 포함되어 있음"
+
+  - code: EV-PIPA-36
+    controlCode: CTRL-PIPA-01
+    name: "처리방침 게시 확인"
+    description: "홈페이지 개인정보 처리방침 게시 스크린샷 (PNG/JPG)"
+    freshnessWindowDays: 90
+    required: true
+    acceptanceCriteria:
+      - "홈페이지 URL이 확인됨"
+      - "처리방침 전문이 게시되어 있음"
+      - "최종 수정일이 표시되어 있음"
+      - "캡처 일자가 최근 3개월 이내"

@@ -66,6 +66,14 @@ export const artifacts = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  createUploadIntent: (data: {
+    filename: string
+    contentType: string
+    sizeBytes: number
+    evidenceRequirementId?: string
+  }) => api.post('/artifacts/upload-intent', data),
+  finalizeUpload: (artifactId: string, version: number, etag: string) =>
+    api.post('/artifacts/finalize-upload', { artifactId, version, etag }),
 }
 
 export const risks = {
@@ -76,6 +84,7 @@ export const risks = {
 
 export const readiness = {
   getScore: () => api.get('/readiness/score'),
+  getScoreV2: () => api.get('/readiness/score-v2'),
   getGaps: () => api.get('/readiness/gaps'),
   getSimulationPresets: () => api.get('/readiness/simulate/presets'),
   simulate: (data: { preset: string; startDate: string; endDate: string }) =>
@@ -84,7 +93,9 @@ export const readiness = {
 }
 
 export const onboarding = {
+  getQuestions: () => api.get('/onboarding/questions'),
   completeOnboarding: (data: any) => api.post('/onboarding/complete', data),
+  applyPIPAContentPack: () => api.post('/onboarding/apply-pipa'),
   getProfile: () => api.get('/onboarding/profile'),
 }
 

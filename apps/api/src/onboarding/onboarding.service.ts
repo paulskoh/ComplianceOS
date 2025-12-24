@@ -4,6 +4,7 @@ import { AuditLogService } from '../audit-log/audit-log.service';
 import { CompanyProfileDto } from '@complianceos/shared';
 import { TemplateInstantiationService } from './template-instantiation.service';
 import { CompanyProfile } from '../common/types/company-profile.types';
+import { ContentLoaderService } from '../compliance-content/content-loader.service';
 
 interface ObligationActivationRule {
   templateId: string;
@@ -20,6 +21,7 @@ export class OnboardingService {
     private prisma: PrismaService,
     private auditLog: AuditLogService,
     private templateInstantiation: TemplateInstantiationService,
+    private contentLoader: ContentLoaderService,
   ) {}
 
   /**
@@ -537,5 +539,233 @@ export class OnboardingService {
     });
 
     return updated;
+  }
+
+  /**
+   * Apply PIPA content pack to tenant
+   * This creates all PIPA obligations, controls, and evidence requirements
+   */
+  async applyPIPAContentPack(tenantId: string) {
+    this.logger.log(`Applying PIPA content pack to tenant ${tenantId}`);
+
+    try {
+      // Apply PIPA v1 content pack
+      await this.contentLoader.applyContentPackToTenant(tenantId, 'PIPA');
+
+      // Mark tenant as onboarded
+      await this.prisma.tenant.update({
+        where: { id: tenantId },
+        data: { onboardingComplete: true },
+      });
+
+      this.logger.log(`✅ PIPA content pack applied to tenant ${tenantId}`);
+
+      return {
+        success: true,
+        message: 'PIPA 준수 요건이 성공적으로 적용되었습니다.',
+      };
+    } catch (error) {
+      this.logger.error(`Failed to apply PIPA content pack:`, error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Get onboarding questions (3 steps, 15 questions total)
+   * Korean-first for SME onboarding
+   */
+  getOnboardingQuestions() {
+    return {
+      steps: [
+        {
+          step: 1,
+          title: '회사 기본 정보',
+          description: '귀사의 기본 정보를 입력해주세요',
+          questions: [
+            {
+              id: 'company_name',
+              type: 'text',
+              label: '회사명',
+              required: true,
+              placeholder: '예: 주식회사 컴플라이언스OS',
+            },
+            {
+              id: 'business_number',
+              type: 'text',
+              label: '사업자등록번호',
+              required: true,
+              placeholder: '123-45-67890',
+            },
+            {
+              id: 'employee_count',
+              type: 'select',
+              label: '직원 수',
+              required: true,
+              options: [
+                { value: '1-9', label: '1-9명' },
+                { value: '10-29', label: '10-29명' },
+                { value: '30-99', label: '30-99명' },
+                { value: '100-299', label: '100-299명' },
+                { value: '300+', label: '300명 이상' },
+              ],
+            },
+            {
+              id: 'industry',
+              type: 'select',
+              label: '업종',
+              required: true,
+              options: [
+                { value: 'TECHNOLOGY', label: '정보통신/소프트웨어' },
+                { value: 'ECOMMERCE', label: '전자상거래' },
+                { value: 'FINANCE', label: '금융' },
+                { value: 'HEALTHCARE', label: '의료/헬스케어' },
+                { value: 'EDUCATION', label: '교육' },
+                { value: 'MANUFACTURING', label: '제조' },
+                { value: 'OTHER', label: '기타' },
+              ],
+            },
+            {
+              id: 'has_remote_work',
+              type: 'radio',
+              label: '재택근무를 운영하고 있나요?',
+              required: true,
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+          ],
+        },
+        {
+          step: 2,
+          title: '개인정보 처리 현황',
+          description: '개인정보 수집 및 처리 현황을 알려주세요',
+          questions: [
+            {
+              id: 'collects_customer_data',
+              type: 'radio',
+              label: '고객 개인정보를 수집하나요?',
+              required: true,
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+            {
+              id: 'data_types',
+              type: 'checkbox',
+              label: '어떤 종류의 개인정보를 수집하나요? (복수 선택)',
+              required: true,
+              dependsOn: { field: 'collects_customer_data', value: true },
+              options: [
+                { value: 'EMPLOYEE_DATA', label: '직원 정보 (이름, 연락처 등)' },
+                { value: 'CUSTOMER_DATA', label: '고객 정보 (이름, 연락처, 주소 등)' },
+                { value: 'RESIDENT_NUMBERS', label: '주민등록번호' },
+                { value: 'PAYMENT_DATA', label: '결제 정보 (카드번호 등)' },
+                { value: 'HEALTH_DATA', label: '건강 정보' },
+                { value: 'BIOMETRIC_DATA', label: '생체 정보 (지문, 안면인식 등)' },
+              ],
+            },
+            {
+              id: 'has_privacy_policy',
+              type: 'radio',
+              label: '개인정보 처리방침을 공개하고 있나요?',
+              required: true,
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+            {
+              id: 'collects_consent',
+              type: 'radio',
+              label: '개인정보 수집 시 동의를 받고 있나요?',
+              required: true,
+              dependsOn: { field: 'collects_customer_data', value: true },
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+            {
+              id: 'has_encryption',
+              type: 'radio',
+              label: '개인정보를 암호화하고 있나요?',
+              required: true,
+              dependsOn: { field: 'collects_customer_data', value: true },
+              options: [
+                { value: true, label: '예 (DB 암호화, 통신 암호화 등)' },
+                { value: false, label: '아니오' },
+              ],
+            },
+          ],
+        },
+        {
+          step: 3,
+          title: '외부 위탁 및 시스템',
+          description: '외부 서비스 이용 현황을 알려주세요',
+          questions: [
+            {
+              id: 'has_vendors',
+              type: 'radio',
+              label: '개인정보 처리를 외부 업체에 위탁하고 있나요?',
+              required: true,
+              helpText: '예: 결제대행사, 고객상담 대행, SMS 발송 업체 등',
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+            {
+              id: 'vendor_types',
+              type: 'checkbox',
+              label: '어떤 업무를 위탁하고 있나요? (복수 선택)',
+              required: false,
+              dependsOn: { field: 'has_vendors', value: true },
+              options: [
+                { value: 'PAYMENT', label: '결제 대행' },
+                { value: 'CS', label: '고객 상담' },
+                { value: 'MARKETING', label: '마케팅/광고' },
+                { value: 'SMS', label: 'SMS/이메일 발송' },
+                { value: 'HOSTING', label: '서버/호스팅' },
+                { value: 'OTHER', label: '기타' },
+              ],
+            },
+            {
+              id: 'has_dpa_contracts',
+              type: 'radio',
+              label: '위탁 업체와 개인정보 처리 위탁 계약을 체결했나요?',
+              required: false,
+              dependsOn: { field: 'has_vendors', value: true },
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+            {
+              id: 'has_international_transfer',
+              type: 'radio',
+              label: '해외로 개인정보를 이전하고 있나요?',
+              required: true,
+              helpText: '예: 해외 클라우드 서비스 (AWS, GCP 등) 사용',
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+            {
+              id: 'has_cpo',
+              type: 'radio',
+              label: '개인정보 보호책임자(CPO)를 지정했나요?',
+              required: true,
+              options: [
+                { value: true, label: '예' },
+                { value: false, label: '아니오' },
+              ],
+            },
+          ],
+        },
+      ],
+    };
   }
 }

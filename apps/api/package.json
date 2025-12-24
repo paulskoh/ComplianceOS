@@ -15,7 +15,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "ts-node prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "content:seed-pipa": "tsx scripts/seed-pipa-content.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -52,6 +53,7 @@
     "pdfkit": "^0.14.0",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
+    "yaml": "^2.8.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {

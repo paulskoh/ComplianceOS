@@ -5,9 +5,15 @@ import { TemplateInstantiationService } from './template-instantiation.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuditLogModule } from '../audit-log/audit-log.module';
 import { ApplicabilityModule } from '../applicability/applicability.module';
+import { ContentLoaderModule } from '../compliance-content/content-loader.module';
 
 @Module({
-  imports: [PrismaModule, AuditLogModule, ApplicabilityModule],
+  imports: [
+    PrismaModule,
+    AuditLogModule,
+    ApplicabilityModule,
+    ContentLoaderModule,
+  ],
   controllers: [OnboardingController],
   providers: [OnboardingService, TemplateInstantiationService],
   exports: [OnboardingService, TemplateInstantiationService],

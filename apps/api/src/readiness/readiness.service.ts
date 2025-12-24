@@ -176,7 +176,8 @@ export class ReadinessService {
   }
 
   /**
-   * Calculate readiness score (0-100)
+   * Calculate readiness score (0-100) using weighted scoring
+   * Based on obligation severity weights and evidence requirement completion
    */
   private calculateScore(gaps: GapItem[]): { overall: number; level: string } {
     let baseScore = 100;
@@ -210,6 +211,181 @@ export class ReadinessService {
     else level = 'CRITICAL';
 
     return { overall: score, level };
+  }
+
+  /**
+   * Calculate weighted readiness score (v2)
+   * Weights: CRITICAL=20%, HIGH=15%, MEDIUM=10%, LOW=5%
+   */
+  async calculateWeightedScore(tenantId: string): Promise<{
+    overallScore: number
+    level: string
+    breakdown: {
+      totalPossiblePoints: number
+      earnedPoints: number
+      criticalRequirements: { total: number; completed: number; percentage: number }
+      highRequirements: { total: number; completed: number; percentage: number }
+      mediumRequirements: { total: number; completed: number; percentage: number }
+      lowRequirements: { total: number; completed: number; percentage: number }
+    }
+    topRisks: Array<{
+      obligationId: string
+      obligationTitle: string
+      severity: RiskSeverity
+      missingRequirements: number
+      impact: number
+    }>
+  }> {
+    // Weight mapping
+    const weights = {
+      CRITICAL: 20,
+      HIGH: 15,
+      MEDIUM: 10,
+      LOW: 5,
+    };
+
+    // Get all obligations with their evidence requirements
+    const obligations = await this.prisma.obligation.findMany({
+      where: { tenantId, isActive: true },
+      include: {
+        controls: {
+          include: {
+            control: {
+              include: {
+                evidenceRequirements: {
+                  include: {
+                    artifacts: {
+                      where: {
+                        status: { in: ['ANALYZED', 'APPROVED'] },
+                      },
+                      orderBy: { createdAt: 'desc' },
+                      take: 1,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    let totalPossiblePoints = 0;
+    let earnedPoints = 0;
+
+    const breakdown = {
+      CRITICAL: { total: 0, completed: 0 },
+      HIGH: { total: 0, completed: 0 },
+      MEDIUM: { total: 0, completed: 0 },
+      LOW: { total: 0, completed: 0 },
+    };
+
+    const obligationRisks: Map<string, { missing: number; weight: number; title: string }> = new Map();
+
+    // Calculate scores per obligation
+    for (const obligation of obligations) {
+      const severity = obligation.severity as RiskSeverity;
+      const weight = weights[severity] || 5;
+
+      // Get all evidence requirements for this obligation
+      const evidenceRequirements = obligation.controls.flatMap(co =>
+        co.control.evidenceRequirements || [],
+      );
+
+      if (evidenceRequirements.length === 0) continue;
+
+      const totalRequirements = evidenceRequirements.length;
+      const completedRequirements = evidenceRequirements.filter(
+        req => req.artifacts && req.artifacts.length > 0,
+      ).length;
+
+      // Calculate points for this obligation
+      const obligationPoints = weight;
+      const completionRate = completedRequirements / totalRequirements;
+      const obligationEarned = obligationPoints * completionRate;
+
+      totalPossiblePoints += obligationPoints;
+      earnedPoints += obligationEarned;
+
+      // Track breakdown by severity
+      breakdown[severity].total += totalRequirements;
+      breakdown[severity].completed += completedRequirements;
+
+      // Track risks (obligations with missing requirements)
+      if (completedRequirements < totalRequirements) {
+        obligationRisks.set(obligation.id, {
+          missing: totalRequirements - completedRequirements,
+          weight,
+          title: obligation.titleKo || obligation.title,
+        });
+      }
+    }
+
+    // Calculate overall score (0-100)
+    const overallScore = totalPossiblePoints > 0
+      ? Math.round((earnedPoints / totalPossiblePoints) * 100)
+      : 0;
+
+    // Determine level
+    let level: string;
+    if (overallScore >= 90) level = 'EXCELLENT';
+    else if (overallScore >= 75) level = 'GOOD';
+    else if (overallScore >= 60) level = 'FAIR';
+    else if (overallScore >= 40) level = 'POOR';
+    else level = 'CRITICAL';
+
+    // Identify top 3 risks (highest impact)
+    const topRisks = Array.from(obligationRisks.entries())
+      .map(([id, data]) => {
+        const obligation = obligations.find(o => o.id === id)!;
+        return {
+          obligationId: id,
+          obligationTitle: data.title,
+          severity: obligation.severity as RiskSeverity,
+          missingRequirements: data.missing,
+          impact: data.missing * data.weight,
+        };
+      })
+      .sort((a, b) => b.impact - a.impact)
+      .slice(0, 3);
+
+    return {
+      overallScore,
+      level,
+      breakdown: {
+        totalPossiblePoints,
+        earnedPoints,
+        criticalRequirements: {
+          total: breakdown.CRITICAL.total,
+          completed: breakdown.CRITICAL.completed,
+          percentage: breakdown.CRITICAL.total > 0
+            ? Math.round((breakdown.CRITICAL.completed / breakdown.CRITICAL.total) * 100)
+            : 0,
+        },
+        highRequirements: {
+          total: breakdown.HIGH.total,
+          completed: breakdown.HIGH.completed,
+          percentage: breakdown.HIGH.total > 0
+            ? Math.round((breakdown.HIGH.completed / breakdown.HIGH.total) * 100)
+            : 0,
+        },
+        mediumRequirements: {
+          total: breakdown.MEDIUM.total,
+          completed: breakdown.MEDIUM.completed,
+          percentage: breakdown.MEDIUM.total > 0
+            ? Math.round((breakdown.MEDIUM.completed / breakdown.MEDIUM.total) * 100)
+            : 0,
+        },
+        lowRequirements: {
+          total: breakdown.LOW.total,
+          completed: breakdown.LOW.completed,
+          percentage: breakdown.LOW.total > 0
+            ? Math.round((breakdown.LOW.completed / breakdown.LOW.total) * 100)
+            : 0,
+        },
+      },
+      topRisks,
+    };
   }
 
   /**

@@ -30,6 +30,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
 import { HealthModule } from './health/health.module';
 import { AwsModule } from './aws/aws.module';
 import { WorkersModule } from './workers/workers.module';
+import { ContentLoaderModule } from './compliance-content/content-loader.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { StructuredLogger } from './common/services/structured-logger.service';
@@ -48,6 +49,7 @@ import { StructuredLogger } from './common/services/structured-logger.service';
     S3Module,
     AwsModule,
     WorkersModule,
+    ContentLoaderModule,
     HealthModule,
     AuthModule,
     UsersModule,
