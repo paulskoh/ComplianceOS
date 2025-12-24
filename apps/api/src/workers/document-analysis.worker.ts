@@ -125,6 +125,18 @@ export class DocumentAnalysisWorker {
           updated_at = NOW()
       `;
 
+      // Auto-approve artifact if analysis shows COMPLIANT
+      if (analysis.overallCompliance === 'COMPLIANT' && analysis.confidence >= 0.7) {
+        await this.prisma.artifact.updateMany({
+          where: { id: artifactId },
+          data: {
+            isApproved: true,
+            approvedAt: new Date(),
+          },
+        });
+        this.logger.log(`Auto-approved artifact ${artifactId} based on COMPLIANT analysis`);
+      }
+
       // Enqueue readiness recompute if compliance status changed
       if (analysis.overallCompliance === 'COMPLIANT' || analysis.overallCompliance === 'PARTIAL') {
         await this.queue.enqueueJob({
