@@ -169,6 +169,50 @@ export class OnboardingService {
     // Convert CompanyProfileDto to CompanyProfile format for applicability engine
     const profile: CompanyProfile = this.convertToCompanyProfile(profileDto);
 
+    // Create or update CompanyProfile record in database
+    const companyProfile = await this.prisma.companyProfile.upsert({
+      where: { tenantId: companyId },
+      create: {
+        tenantId: companyId,
+        industry: profileDto.industry as any,
+        employeeCount: profileDto.employeeCount || 0,
+        hasRemoteWork: profileDto.hasRemoteWork || false,
+        hasOvertimeWork: profileDto.hasOvertimeWork || false,
+        hasContractors: profileDto.hasContractors || false,
+        hasVendors: profileDto.hasVendors || false,
+        dataTypes: (profileDto.dataTypes || []) as any[],
+        hasInternationalTransfer: profileDto.hasInternationalTransfer || false,
+        headcountBand: profile.headcount_band,
+        workStyle: profile.work_style,
+        usesVendorsForData: profile.uses_vendors_for_data || false,
+        dataCustomerPii: profile.data_types?.customer_pii || false,
+        dataEmployeePii: profile.data_types?.employee_pii || false,
+        dataResidentId: profile.data_types?.resident_id || false,
+        dataHealthData: profile.data_types?.health_data || false,
+        dataPaymentData: profile.data_types?.payment_data || false,
+      },
+      update: {
+        industry: profileDto.industry as any,
+        employeeCount: profileDto.employeeCount || 0,
+        hasRemoteWork: profileDto.hasRemoteWork || false,
+        hasOvertimeWork: profileDto.hasOvertimeWork || false,
+        hasContractors: profileDto.hasContractors || false,
+        hasVendors: profileDto.hasVendors || false,
+        dataTypes: (profileDto.dataTypes || []) as any[],
+        hasInternationalTransfer: profileDto.hasInternationalTransfer || false,
+        headcountBand: profile.headcount_band,
+        workStyle: profile.work_style,
+        usesVendorsForData: profile.uses_vendors_for_data || false,
+        dataCustomerPii: profile.data_types?.customer_pii || false,
+        dataEmployeePii: profile.data_types?.employee_pii || false,
+        dataResidentId: profile.data_types?.resident_id || false,
+        dataHealthData: profile.data_types?.health_data || false,
+        dataPaymentData: profile.data_types?.payment_data || false,
+      },
+    });
+
+    this.logger.log(`Created/updated company profile: ${companyProfile.id}`);
+
     // Instantiate compliance templates based on applicability
     const instantiationResult =
       await this.templateInstantiation.instantiateTemplatesForCompany(
@@ -191,6 +235,7 @@ export class OnboardingService {
       resourceId: companyId,
       metadata: {
         action: 'ONBOARDING_COMPLETED',
+        companyProfileId: companyProfile.id,
         obligationsCreated: instantiationResult.obligationsCreated,
         controlsCreated: instantiationResult.controlsCreated,
         evidenceRequirementsCreated:
@@ -208,7 +253,7 @@ export class OnboardingService {
     );
 
     return {
-      profile,
+      profile: companyProfile,
       instantiation: instantiationResult,
       recommendedIntegrations,
       nextSteps,

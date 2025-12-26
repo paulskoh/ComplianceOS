@@ -77,6 +77,7 @@ export const artifacts = {
   linkToEvidenceRequirement: (artifactId: string, evidenceRequirementId: string) =>
     api.post(`/artifacts/${artifactId}/link-evidence-requirement`, { evidenceRequirementId }),
   getAnalysis: (id: string) => api.get(`/artifacts/${id}/analysis`),
+  approve: (id: string) => api.post(`/artifacts/${id}/approve`),
 }
 
 export const evidenceRequirements = {

@@ -111,6 +111,30 @@ export default function OnboardingPage() {
     setCurrentStep(currentStep - 1)
   }
 
+  // Map form data to DTO format
+  const mapFormDataToDto = (data: Record<string, any>) => {
+    // Convert employee count string to number
+    const employeeCountMap: Record<string, number> = {
+      '1-9': 5,
+      '10-29': 20,
+      '30-99': 50,
+      '100-299': 150,
+      '300+': 400,
+    }
+
+    return {
+      companyName: data.company_name || '',
+      industry: data.industry || 'OTHER',
+      employeeCount: employeeCountMap[data.employee_count] || 10,
+      hasRemoteWork: data.has_remote_work === true,
+      hasOvertimeWork: data.has_overtime_work === true,
+      hasContractors: data.has_contractors === true,
+      hasVendors: data.has_vendors === true,
+      dataTypes: data.data_types || [],
+      hasInternationalTransfer: data.has_international_transfer === true,
+    }
+  }
+
   const handleSubmit = async () => {
     if (!questions) return
 
@@ -120,8 +144,11 @@ export default function OnboardingPage() {
     setLoading(true)
 
     try {
+      // Map form data to DTO format
+      const profileDto = mapFormDataToDto(formData)
+
       // First, complete the onboarding profile
-      await onboarding.completeOnboarding(formData)
+      await onboarding.completeOnboarding(profileDto)
 
       // Then apply the PIPA content pack
       await onboarding.applyPIPAContentPack()

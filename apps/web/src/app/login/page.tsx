@@ -80,7 +80,7 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Demo credentials: admin@example.com / Admin123!
+            Demo credentials: admin@example.com / admin123
           </p>
         </div>
       </div>

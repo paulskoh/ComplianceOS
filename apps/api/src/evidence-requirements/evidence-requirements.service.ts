@@ -89,10 +89,21 @@ export class EvidenceRequirementsService {
   }
 
   async getDetail(tenantId: string, evidenceRequirementId: string) {
-    const evidenceRequirement = await this.prisma.evidenceRequirement.findFirst({
+    // Use ControlEvidenceRequirement model (same as overview)
+    const evidenceRequirement = await this.prisma.controlEvidenceRequirement.findFirst({
       where: {
         id: evidenceRequirementId,
-        companyId: tenantId,
+      },
+      include: {
+        control: {
+          include: {
+            obligations: {
+              include: {
+                obligation: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -100,7 +111,12 @@ export class EvidenceRequirementsService {
       throw new Error('Evidence requirement not found');
     }
 
-    // Get all artifacts for this evidence requirement
+    // Verify tenant access through control
+    if (evidenceRequirement.control.tenantId !== tenantId) {
+      throw new Error('Evidence requirement not found');
+    }
+
+    // Get all artifacts linked to this evidence requirement (direct link on artifact)
     const artifacts = await this.prisma.artifact.findMany({
       where: {
         tenantId,
@@ -109,7 +125,7 @@ export class EvidenceRequirementsService {
       include: {
         binary: true,
       },
-      orderBy: { uploadedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     const latestArtifact = artifacts[0];
@@ -123,17 +139,25 @@ export class EvidenceRequirementsService {
       }
     }
 
+    // Get obligation info
+    const obligation = evidenceRequirement.control.obligations[0]?.obligation;
+
     return {
       id: evidenceRequirement.id,
       titleKo: evidenceRequirement.name,
       descriptionKo: evidenceRequirement.description || '',
       status,
+      obligationId: obligation?.id,
+      obligationTitleKo: obligation?.titleKo,
+      controlId: evidenceRequirement.control.id,
+      controlName: evidenceRequirement.control.name,
       artifacts: artifacts.map((artifact) => ({
         artifactId: artifact.id,
         version: artifact.version,
         filename: artifact.fileName,
         uploadedAt: artifact.uploadedAt,
         status: artifact.status,
+        isApproved: artifact.isApproved,
         analysis: null,
       })),
       latestAnalysis: null,
@@ -141,25 +165,27 @@ export class EvidenceRequirementsService {
   }
 
   async getStatus(tenantId: string, evidenceRequirementId: string) {
-    // Quick status check for polling
-    const evidenceRequirement = await this.prisma.evidenceRequirement.findFirst({
+    // Quick status check for polling - use ControlEvidenceRequirement model
+    const evidenceRequirement = await this.prisma.controlEvidenceRequirement.findFirst({
       where: {
         id: evidenceRequirementId,
-        companyId: tenantId,
+      },
+      include: {
+        control: true,
       },
     });
 
-    if (!evidenceRequirement) {
+    if (!evidenceRequirement || evidenceRequirement.control.tenantId !== tenantId) {
       return { status: 'MISSING', hasAnalysis: false };
     }
 
-    // Get latest artifact for this evidence requirement
+    // Get latest artifact linked to this evidence requirement (direct link on artifact)
     const latestArtifact = await this.prisma.artifact.findFirst({
       where: {
         tenantId,
         evidenceRequirementId: evidenceRequirementId,
       },
-      orderBy: { uploadedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
 
     let status = 'MISSING';

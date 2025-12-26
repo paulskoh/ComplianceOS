@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { evidenceRequirements, artifacts } from '@/lib/api'
-import { ArrowLeftIcon, DocumentArrowUpIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline'
+import { ArrowLeftIcon, DocumentArrowUpIcon, ClipboardDocumentCheckIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import StatusPill from '@/components/StatusPill'
 import UploadModal from '@/components/UploadModal'
 import FindingsSummary from '@/components/FindingsSummary'
@@ -14,6 +14,7 @@ interface Artifact {
   filename: string
   uploadedAt: string
   status: string
+  isApproved: boolean
   analysis: {
     overallStatus: string
     score: number
@@ -44,6 +45,7 @@ export default function EvidenceDetailPage() {
   const [data, setData] = useState<EvidenceRequirementDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
+  const [approving, setApproving] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -75,6 +77,18 @@ export default function EvidenceDetailPage() {
       }
     } catch (error) {
       console.error('Failed to download artifact:', error)
+    }
+  }
+
+  const handleApproveArtifact = async (artifactId: string) => {
+    try {
+      setApproving(artifactId)
+      await artifacts.approve(artifactId)
+      fetchData()
+    } catch (error) {
+      console.error('Failed to approve artifact:', error)
+    } finally {
+      setApproving(null)
     }
   }
 
@@ -182,12 +196,30 @@ export default function EvidenceDetailPage() {
 
                   <div className="flex items-center space-x-2 ml-4">
                     {artifact.status === 'READY' && (
-                      <button
-                        onClick={() => handleDownloadArtifact(artifact.artifactId)}
-                        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        다운로드
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleDownloadArtifact(artifact.artifactId)}
+                          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          다운로드
+                        </button>
+                        {!artifact.isApproved && (
+                          <button
+                            onClick={() => handleApproveArtifact(artifact.artifactId)}
+                            disabled={approving === artifact.artifactId}
+                            className="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                          >
+                            <CheckCircleIcon className="w-4 h-4 mr-1" />
+                            {approving === artifact.artifactId ? '승인중...' : '승인'}
+                          </button>
+                        )}
+                        {artifact.isApproved && (
+                          <span className="inline-flex items-center px-3 py-2 text-sm font-medium text-green-700">
+                            <CheckCircleIcon className="w-4 h-4 mr-1" />
+                            승인됨
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

@@ -69,7 +69,8 @@ export default function Home() {
           evidenceRequirements.getOverview().catch(() => null),
         ])
 
-        setHasOnboarding(!!profileRes?.data?.companyName)
+        // Check if company profile exists OR tenant.onboardingComplete is true
+        setHasOnboarding(!!profileRes?.data?.id || !!profileRes?.data?.tenant?.onboardingComplete)
 
         // Check if any evidence has been uploaded
         const obligations = evidenceRes?.data?.obligations || []

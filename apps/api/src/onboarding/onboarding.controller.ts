@@ -35,4 +35,32 @@ export class OnboardingController {
   async getOnboardingQuestions() {
     return this.onboarding.getOnboardingQuestions();
   }
+
+  @Post('refresh-templates')
+  async refreshTemplates(@CurrentUser() user: any) {
+    // Re-run template instantiation for existing company profile
+    const profile = await this.onboarding.getCompanyProfile(user.tenantId);
+    if (!profile) {
+      return { error: 'Company profile not found. Please complete onboarding first.' };
+    }
+
+    // Convert DB profile back to DTO format
+    const profileDto: CompanyProfileDto = {
+      companyName: profile.tenant?.name || '',
+      industry: profile.industry as any,
+      employeeCount: profile.employeeCount || 0,
+      hasRemoteWork: profile.hasRemoteWork || false,
+      hasOvertimeWork: profile.hasOvertimeWork || false,
+      hasContractors: profile.hasContractors || false,
+      hasVendors: profile.hasVendors || false,
+      dataTypes: (profile.dataTypes || []) as any[],
+      hasInternationalTransfer: profile.hasInternationalTransfer || false,
+    };
+
+    return this.onboarding.completeOnboarding(
+      user.tenantId,
+      user.id,
+      profileDto,
+    );
+  }
 }

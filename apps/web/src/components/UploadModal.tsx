@@ -64,13 +64,14 @@ export default function UploadModal({
   const pollForAnalysis = async () => {
     if (!evidenceRequirementId) return
 
-    const maxAttempts = 15 // 30 seconds with 2s intervals
+    const maxAttempts = 10 // 20 seconds with 2s intervals
     let attempts = 0
 
     while (attempts < maxAttempts) {
       try {
+        // Add cache-busting timestamp to prevent 304 responses
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/evidence-requirements/${evidenceRequirementId}/poll-status`,
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/evidence-requirements/${evidenceRequirementId}/poll-status?_t=${Date.now()}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -79,7 +80,8 @@ export default function UploadModal({
         )
         const data = await response.json()
 
-        if (data.analysisReady) {
+        // Success if status is UPLOADED or VERIFIED (file successfully uploaded)
+        if (data.status === 'UPLOADED' || data.status === 'VERIFIED' || data.analysisReady) {
           setUploadState('success')
           return
         }
@@ -97,7 +99,7 @@ export default function UploadModal({
       }
     }
 
-    // Timeout - analysis is still pending but show success anyway
+    // Timeout - show success anyway since upload completed
     setUploadState('success')
   }
 
