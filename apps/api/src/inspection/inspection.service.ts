@@ -84,7 +84,7 @@ export class InspectionService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expiresInDays);
 
-    const link = await this.prisma.packShareLink.create({
+    await this.prisma.packShareLink.create({
       data: {
         packId,
         token,

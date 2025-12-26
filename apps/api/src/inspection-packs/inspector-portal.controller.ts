@@ -3,8 +3,6 @@ import {
   Get,
   Param,
   Query,
-  NotFoundException,
-  UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';

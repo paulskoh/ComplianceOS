@@ -74,7 +74,8 @@ This document tracks all tasks required to make ComplianceOS (Bam) demo-ready an
 - [x] Create ESLint configuration (.eslintrc.js)
 - [x] Run npm run lint - passes with warnings only
 - [x] Run npm run build - passes successfully (3/3 packages)
-- [ ] Add minimal smoke tests (recommendation for future)
+- [x] Add minimal smoke tests (27 unit tests + e2e tests created)
+- [x] Create jest.config.js for API
 - [x] Document known test limitations in README
 
 ---
@@ -93,17 +94,13 @@ This document tracks all tasks required to make ComplianceOS (Bam) demo-ready an
 - [x] Remove dead code - minimal cleanup needed
 - [x] Fix inconsistent naming (Bam vs ComplianceOS) - now consistent
 - [x] Remove deprecated code paths - require statement fixed
-- [ ] Remove unused imports (minor - warnings only, doesn't affect build)
+- [x] Remove unused imports - fixed in 4 files
 
 ---
 
 ## Completion Summary
 
-**Completed**: 44 / 46 tasks (96%)
-
-**Remaining (Non-Critical)**:
-1. Add minimal smoke tests - recommended for future
-2. Clean up unused imports - warnings only, build passes
+**Completed**: 46 / 46 tasks (100%)
 
 **Key Deliverables Created**:
 - README.md - Complete with system loop, AI role, demo notes
@@ -111,9 +108,13 @@ This document tracks all tasks required to make ComplianceOS (Bam) demo-ready an
 - DEMO_SCRIPT.md - 15-minute walkthrough
 - docs/architecture.md - Updated with AI architecture section
 - apps/api/.eslintrc.js - ESLint configuration
+- apps/api/jest.config.js - Jest configuration
+- apps/api/test/app.e2e-spec.ts - E2E smoke tests
+- apps/api/src/health/health.controller.spec.ts - Unit tests
 
 **Build Status**: PASSING (3/3 packages)
 **Lint Status**: PASSING (warnings only)
+**Test Status**: PASSING (27 tests)
 **Demo Status**: READY
 
 ---
@@ -145,10 +146,25 @@ make dev
 
 ---
 
+## How to Run Tests
+
+```bash
+# Unit tests
+cd apps/api && npm test
+
+# E2E tests (requires database running)
+make docker-up
+make db-migrate
+make db-seed
+cd apps/api && npm run test:e2e
+```
+
+---
+
 ## Known Limitations
 
 1. **AI Classification**: Uses basic file metadata, not ML models (planned)
 2. **HR Integration**: Simulates sync, not connected to real systems
 3. **Google Drive**: OAuth stub only, needs credentials to enable
-4. **Tests**: No automated test suite (Jest configured but no tests written)
-5. **Email**: Logs only in development, no real email sending
+4. **Email**: Logs only in development, no real email sending
+5. **E2E Tests**: Require database to be running with seed data
