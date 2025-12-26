@@ -319,6 +319,69 @@ Recommended observability:
 
 See [threat-model.md](./threat-model.md) for detailed security analysis.
 
+## AI Architecture
+
+### Where AI is Invoked
+
+Bam uses AI at specific points in the compliance lifecycle:
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│                        AI INVOCATION POINTS                                │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  1. DOCUMENT UPLOAD                    2. METADATA EXTRACTION              │
+│  ──────────────────                    ────────────────────                 │
+│  Input: Raw file (PDF/DOC/image)       Input: Extracted text               │
+│  AI Action: Classify document type     AI Action: Extract dates, parties,  │
+│  Output: Type + confidence score       values, key terms                   │
+│                                        Output: Structured metadata         │
+│                                                                            │
+│  3. GAP ANALYSIS (Deterministic)       4. REMEDIATION SUGGESTIONS          │
+│  ──────────────────────────────        ───────────────────────             │
+│  Input: Evidence requirements          Input: Gap type + context           │
+│  Rule Engine: Compare evidence         AI Action: Generate recommended     │
+│  dates vs freshness windows            action in Korean                    │
+│  Output: Gap list with severity        Output: Actionable next step        │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+### AI Components
+
+| Component | Location | Model | Purpose |
+|-----------|----------|-------|---------|
+| DocumentClassifier | `apps/api/src/workers/` | OpenAI GPT-4 | Classify document types |
+| MetadataExtractor | `apps/api/src/workers/` | OpenAI GPT-4 | Extract structured data |
+| RecommendationEngine | `apps/api/src/readiness/` | Rule-based + AI | Generate action items |
+
+### Current State (MVP)
+
+- **Document Classification**: Basic type detection using file metadata
+- **Metadata Extraction**: PDF text extraction via pdf-parse
+- **Gap Analysis**: Fully deterministic (no AI needed)
+- **Recommendations**: Template-based Korean text
+
+### Production Roadmap
+
+1. **Phase 1**: Integrate OpenAI for classification confidence scoring
+2. **Phase 2**: Fine-tune extraction for Korean regulatory documents
+3. **Phase 3**: Add vector search for similar evidence discovery
+4. **Phase 4**: Predictive risk scoring based on historical patterns
+
+### AI Boundaries
+
+What AI **does NOT** do:
+- Make final compliance decisions (human approval required)
+- Auto-approve exceptions
+- Delete or modify evidence
+- Bypass RBAC permissions
+
+All AI actions are:
+- Logged to immutable audit trail
+- Reversible by human override
+- Transparent in confidence scores
+
 ## Future Enhancements
 
 1. **Background Jobs**: Implement BullMQ for async pack generation and integrations

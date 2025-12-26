@@ -1,17 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotImplementedException, Logger } from '@nestjs/common';
 
+/**
+ * Google Drive Connector - COMING SOON
+ *
+ * This integration is not yet available for soft-launch.
+ * It will be enabled in a future release.
+ */
 @Injectable()
 export class GoogleDriveConnector {
-  async run(config: any) {
-    // In a real implementation, this would:
-    // 1. Use OAuth credentials from config
-    // 2. Connect to Google Drive API
-    // 3. List files from configured folder
-    // 4. Download and create artifacts
-    // 5. Return count of artifacts collected
+  private readonly logger = new Logger(GoogleDriveConnector.name);
 
-    // Placeholder implementation
-    console.log('Google Drive integration would run here with config:', config);
-    return { artifactsCollected: 0 };
+  // Integration status - set to false until fully implemented
+  static readonly IS_AVAILABLE = false;
+  static readonly COMING_SOON_MESSAGE = 'Google Drive integration is coming soon. For now, please use manual file upload.';
+
+  async run(_config: any): Promise<{ artifactsCollected: number; status: string; message: string }> {
+    this.logger.warn('Google Drive connector called but not yet implemented');
+
+    // SOFT-LAUNCH: Never simulate success - explicitly indicate unavailability
+    throw new NotImplementedException(
+      GoogleDriveConnector.COMING_SOON_MESSAGE
+    );
+  }
+
+  /**
+   * Check if this integration is available
+   */
+  isAvailable(): boolean {
+    return GoogleDriveConnector.IS_AVAILABLE;
+  }
+
+  /**
+   * Get status message for UI
+   */
+  getStatusMessage(): string {
+    return GoogleDriveConnector.COMING_SOON_MESSAGE;
   }
 }

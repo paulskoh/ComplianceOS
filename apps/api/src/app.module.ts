@@ -30,6 +30,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
 import { EvidenceRequirementsModule } from './evidence-requirements/evidence-requirements.module';
 import { HealthModule } from './health/health.module';
 import { AwsModule } from './aws/aws.module';
+import { FrameworksModule } from './frameworks/frameworks.module';
 import { WorkersModule } from './workers/workers.module';
 import { ContentLoaderModule } from './compliance-content/content-loader.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
@@ -73,6 +74,7 @@ import { StructuredLogger } from './common/services/structured-logger.service';
     ApplicabilityModule,
     EvaluationModule,
     EvidenceRequirementsModule,
+    FrameworksModule,
   ],
   providers: [
     StructuredLogger,

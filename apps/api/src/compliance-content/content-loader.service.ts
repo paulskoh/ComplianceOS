@@ -87,7 +87,7 @@ export class ContentLoaderService {
           description: obligation.description,
           descriptionKo: obligation.description,
           summaryKo: obligation.description,
-          domain,
+          domain: domain as any,
           severity: obligation.severity,
           severityDefault: obligation.severity,
           evidenceFrequency: 'ANNUAL', // Default to annual
@@ -128,7 +128,7 @@ export class ContentLoaderService {
           description: control.description,
           descriptionKo: control.description,
           purposeKo: control.implementationGuidance,
-          domain,
+          domain: domain as any,
           type: 'PREVENTIVE', // Default type
           automationLevel: 'MANUAL', // Default automation level
           obligationCode: control.obligationCodes[0], // Primary obligation

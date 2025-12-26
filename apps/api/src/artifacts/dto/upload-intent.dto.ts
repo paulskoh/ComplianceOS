@@ -1,8 +1,9 @@
 import { IsString, IsNumber, IsUUID, IsOptional, IsObject, Min } from 'class-validator';
 
 export class ArtifactCreateIntentDto {
+  @IsOptional()
   @IsUUID()
-  tenantId: string;
+  tenantId?: string;
 
   @IsString()
   filename: string;
@@ -43,8 +44,9 @@ export class ArtifactCreateIntentResponseDto {
 }
 
 export class ArtifactFinalizeDto {
+  @IsOptional()
   @IsUUID()
-  tenantId: string;
+  tenantId?: string;
 
   @IsUUID()
   artifactId: string;

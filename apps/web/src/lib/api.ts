@@ -145,6 +145,16 @@ export const plans = {
   getUsage: () => api.get('/plans/usage'),
 }
 
+// SOFT-LAUNCH: Framework transparency - users can view what they're evaluated against
+export const frameworks = {
+  getAll: () => api.get('/frameworks'),
+  getOne: (code: string) => api.get(`/frameworks/${code}`),
+  getDomain: (code: string, domain: string) => api.get(`/frameworks/${code}/domains/${domain}`),
+  getControlsForObligation: (obligationCode: string) => api.get(`/frameworks/obligations/${obligationCode}/controls`),
+  getEvidenceRequirements: (controlCode: string) => api.get(`/frameworks/controls/${controlCode}/evidence-requirements`),
+  search: (query: string) => api.get('/frameworks/search', { params: { q: query } }),
+}
+
 export const inspection = {
   getPackByToken: (token: string) => api.get(`/inspection/pack/${token}`),
   createShareLink: (packId: string, expiresInDays: number) =>

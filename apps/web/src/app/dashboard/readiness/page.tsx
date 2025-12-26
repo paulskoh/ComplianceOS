@@ -5,6 +5,7 @@ import { readiness } from '@/lib/api'
 import { ExclamationTriangleIcon, CheckCircleIcon, ClockIcon } from '@heroicons/react/24/outline'
 import StatusPill from '@/components/StatusPill'
 import Link from 'next/link'
+import ErrorState, { EmptyState } from '@/components/ErrorState'
 
 interface ObligationScore {
   obligationId: string
@@ -36,18 +37,32 @@ interface ReadinessScore {
 export default function ReadinessPage() {
   const [scoreData, setScoreData] = useState<ReadinessScore | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchScore = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await readiness.getScoreV2()
+      setScoreData(response.data)
+    } catch (err: any) {
+      console.error('Failed to fetch readiness score:', err)
+      // SOFT-LAUNCH: Graceful error handling with user-friendly message
+      if (err.response?.status === 401) {
+        setError('로그인이 필요합니다. 다시 로그인해 주세요.')
+      } else if (err.response?.status === 403) {
+        setError('이 페이지에 접근할 권한이 없습니다.')
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.')
+      } else {
+        setError('준수 현황 데이터를 불러오는 중 오류가 발생했습니다.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    async function fetchScore() {
-      try {
-        const response = await readiness.getScoreV2()
-        setScoreData(response.data)
-      } catch (error) {
-        console.error('Failed to fetch readiness score:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchScore()
   }, [])
 
@@ -59,10 +74,46 @@ export default function ReadinessPage() {
     )
   }
 
+  // SOFT-LAUNCH: Graceful error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">준수 현황</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            개인정보 보호법 준수 점수 및 개선이 필요한 영역을 확인하세요
+          </p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200">
+          <ErrorState
+            title="데이터 로드 실패"
+            message={error}
+            onRetry={fetchScore}
+          />
+        </div>
+      </div>
+    )
+  }
+
   if (!scoreData) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">준수 현황 데이터를 불러올 수 없습니다.</p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">준수 현황</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            개인정보 보호법 준수 점수 및 개선이 필요한 영역을 확인하세요
+          </p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200">
+          <EmptyState
+            title="준수 현황 데이터가 없습니다"
+            message="증빙 자료를 업로드하면 준수 현황 점수가 계산됩니다. 먼저 증빙 제출 페이지에서 필요한 서류를 업로드해 주세요."
+            action={{
+              label: '증빙 제출하기',
+              onClick: () => window.location.href = '/dashboard/evidence',
+            }}
+          />
+        </div>
       </div>
     )
   }

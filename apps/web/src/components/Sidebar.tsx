@@ -14,7 +14,8 @@ import {
     BuildingOfficeIcon,
     ChartBarIcon,
     PuzzlePieceIcon,
-    Cog6ToothIcon
+    Cog6ToothIcon,
+    BookOpenIcon
 } from '@heroicons/react/24/outline'
 
 const navigation = [
@@ -22,6 +23,7 @@ const navigation = [
     { name: '증빙 제출', href: '/dashboard/evidence', icon: InboxStackIcon },
     { name: '준수 현황', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
     { name: '검사 팩', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
+    { name: '프레임워크', href: '/dashboard/frameworks', icon: BookOpenIcon },
 ]
 
 const secondaryNavigation = [

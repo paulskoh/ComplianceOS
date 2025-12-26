@@ -55,8 +55,28 @@ export class ArtifactsV2Service {
         status: ArtifactStatus.PENDING_UPLOAD,
         version: 1,
         metadata: tags,
+        evidenceRequirementId, // Direct field on Artifact model
       },
     });
+
+    // Link to control and obligation via join tables if provided
+    if (controlId) {
+      await this.prisma.artifactControl.create({
+        data: {
+          artifactId: artifact.id,
+          controlId,
+        },
+      });
+    }
+
+    if (obligationId) {
+      await this.prisma.artifactObligation.create({
+        data: {
+          artifactId: artifact.id,
+          obligationId,
+        },
+      });
+    }
 
     // Generate S3 key with tenant isolation
     const s3Key = this.storage.generateKey(tenantId, 'artifacts', artifact.id, artifact.version);

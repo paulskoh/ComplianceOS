@@ -29,9 +29,9 @@ export interface AwsConfig {
 }
 
 export default registerAs('aws', (): AwsConfig => ({
-  region: process.env.AWS_REGION || 'us-east-1',
+  region: process.env.AWS_REGION || process.env.S3_REGION || 'us-east-1',
   s3: {
-    bucket: process.env.S3_BUCKET || 'complianceos-artifacts',
+    bucket: process.env.S3_BUCKET_ARTIFACTS || process.env.S3_BUCKET || 'complianceos-artifacts',
     endpoint: process.env.S3_ENDPOINT,
     forcePathStyle: !!process.env.S3_ENDPOINT, // Required for MinIO/localstack
   },
@@ -50,7 +50,12 @@ export default registerAs('aws', (): AwsConfig => ({
   textract: {
     enabled: process.env.TEXTRACT_ENABLED === 'true',
   },
-  credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+  credentials: (process.env.S3_ACCESS_KEY && process.env.S3_SECRET_KEY)
+    ? {
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_SECRET_KEY,
+      }
+    : (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY)
     ? {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

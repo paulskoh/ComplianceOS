@@ -449,7 +449,7 @@ export class OnboardingService {
       recommendations.push('근무시간 및 연장근로 승인 시스템');
     }
 
-    if (profile.dataTypes.length > 0) {
+    if (Array.isArray(profile.dataTypes) && profile.dataTypes.length > 0) {
       recommendations.push('개인정보 접근 통제 시스템');
       recommendations.push('Google Drive / OneDrive (증빙 자료 수집)');
     }
@@ -478,7 +478,7 @@ export class OnboardingService {
       steps.push('근태 기록 시스템과 연동하여 자동 증빙 수집을 시작하세요.');
     }
 
-    if (profile.dataTypes.length > 0) {
+    if (Array.isArray(profile.dataTypes) && profile.dataTypes.length > 0) {
       steps.push(
         '개인정보 수집·이용 동의서를 업로드하고, 접근 권한을 설정하세요.',
       );

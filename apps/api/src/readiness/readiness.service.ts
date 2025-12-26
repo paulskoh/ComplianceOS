@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ObligationDomain, EvidenceFrequency, RiskSeverity } from '@prisma/client';
+import { ObligationDomain, RiskSeverity } from '@prisma/client';
 import { EvaluationService } from '../evaluation/evaluation.service';
 
 export interface GapItem {
@@ -94,7 +94,7 @@ export class ReadinessService {
       const controlData = controlMap.get(risk.controlCode); // This is actually the ID
 
       let gapType: GapItem['type'];
-      let severity: RiskSeverity = risk.severity as RiskSeverity;
+      const severity: RiskSeverity = risk.severity as RiskSeverity;
 
       // Map risk types to gap types
       switch (risk.riskType) {
@@ -254,11 +254,17 @@ export class ReadinessService {
               include: {
                 evidenceRequirements: {
                   include: {
-                    artifacts: {
+                    artifactLinks: {
                       where: {
-                        status: { in: ['ANALYZED', 'APPROVED'] },
+                        artifact: {
+                          status: { in: ['ANALYZED', 'APPROVED', 'READY'] },
+                          isApproved: true,
+                        },
                       },
-                      orderBy: { createdAt: 'desc' },
+                      include: {
+                        artifact: true,
+                      },
+                      orderBy: { createdAt: 'desc' as any },
                       take: 1,
                     },
                   },
@@ -268,7 +274,7 @@ export class ReadinessService {
           },
         },
       },
-    });
+    } as any);
 
     let totalPossiblePoints = 0;
     let earnedPoints = 0;
@@ -288,7 +294,7 @@ export class ReadinessService {
       const weight = weights[severity] || 5;
 
       // Get all evidence requirements for this obligation
-      const evidenceRequirements = obligation.controls.flatMap(co =>
+      const evidenceRequirements = (obligation as any).controls.flatMap((co: any) =>
         co.control.evidenceRequirements || [],
       );
 
@@ -296,7 +302,7 @@ export class ReadinessService {
 
       const totalRequirements = evidenceRequirements.length;
       const completedRequirements = evidenceRequirements.filter(
-        req => req.artifacts && req.artifacts.length > 0,
+        (req: any) => req.artifactLinks && req.artifactLinks.length > 0,
       ).length;
 
       // Calculate points for this obligation
@@ -603,7 +609,7 @@ export class ReadinessService {
       LOW: 25,
     };
 
-    let totalObligations = obligations.length;
+    const totalObligations = obligations.length;
     let totalEvidence = 0;
     let verifiedEvidence = 0;
     const obligationScores: any[] = [];
@@ -624,7 +630,7 @@ export class ReadinessService {
 
       let verifiedCount = 0;
       let missingCount = 0;
-      let flaggedCount = 0;
+      const flaggedCount = 0;
 
       for (const req of evidenceRequirements) {
         const latestArtifactLink = req.artifactLinks[0];
@@ -678,7 +684,7 @@ export class ReadinessService {
     const topRisks = allRisks
       .sort((a, b) => b.impact - a.impact)
       .slice(0, 3)
-      .map(({ impact, ...rest }) => rest);
+      .map(({ impact: _impact, ...rest }) => rest);
 
     return {
       overallScore,

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ReadinessService, GapItem } from './readiness.service';
+import { ReadinessService } from './readiness.service';
 import { ObligationDomain } from '@prisma/client';
 import { AuditLogService } from '../audit-log/audit-log.service';
 

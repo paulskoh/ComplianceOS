@@ -14,23 +14,7 @@ export class EvidenceRequirementsService {
           include: {
             control: {
               include: {
-                evidenceRequirements: {
-                  include: {
-                    artifactLinks: {
-                      include: {
-                        artifact: {
-                          include: {
-                            binary: true,
-                          },
-                        },
-                      },
-                      orderBy: {
-                        artifact: { uploadedAt: 'desc' },
-                      },
-                      take: 1,
-                    },
-                  },
-                },
+                evidenceRequirements: true,
               },
             },
           },
@@ -40,12 +24,21 @@ export class EvidenceRequirementsService {
     });
 
     // Transform to frontend-friendly format
-    const result = obligations.map((obligation) => {
-      const evidenceRequirements = obligation.controls.flatMap(
-        (oc) =>
-          oc.control.evidenceRequirements.map((er: any) => {
-            const latestArtifactLink = er.artifactLinks[0];
-            const latestArtifact = latestArtifactLink?.artifact;
+    const result = await Promise.all(obligations.map(async (obligation) => {
+      const evidenceRequirements = await Promise.all(
+        obligation.controls.flatMap((oc) =>
+          oc.control.evidenceRequirements.map(async (er: any) => {
+            // Get latest artifact for this evidence requirement
+            const latestArtifact = await this.prisma.artifact.findFirst({
+              where: {
+                tenantId,
+                evidenceRequirementId: er.id,
+              },
+              orderBy: { uploadedAt: 'desc' },
+              include: {
+                binary: true,
+              },
+            });
 
             // Determine status
             let status = 'MISSING';
@@ -71,7 +64,7 @@ export class EvidenceRequirementsService {
                 ? {
                     artifactId: latestArtifact.id,
                     version: latestArtifact.version,
-                    filename: latestArtifact.filename,
+                    filename: latestArtifact.fileName,
                     uploadedAt: latestArtifact.uploadedAt,
                   }
                 : null,
@@ -79,6 +72,7 @@ export class EvidenceRequirementsService {
               updatedAt: er.updatedAt,
             };
           }),
+        ),
       );
 
       return {
@@ -89,41 +83,36 @@ export class EvidenceRequirementsService {
         },
         evidenceRequirements,
       };
-    });
+    }));
 
     return { obligations: result };
   }
 
   async getDetail(tenantId: string, evidenceRequirementId: string) {
-    const evidenceRequirement = await this.prisma.evidenceRequirement.findFirst(
-      {
-        where: {
-          id: evidenceRequirementId,
-          companyId: tenantId,
-        },
-        include: {
-          artifactLinks: {
-            include: {
-              artifact: {
-                include: {
-                  binary: true,
-                },
-              },
-            },
-            orderBy: {
-              artifact: { uploadedAt: 'desc' },
-            },
-          },
-        },
+    const evidenceRequirement = await this.prisma.evidenceRequirement.findFirst({
+      where: {
+        id: evidenceRequirementId,
+        companyId: tenantId,
       },
-    );
+    });
 
     if (!evidenceRequirement) {
       throw new Error('Evidence requirement not found');
     }
 
-    const latestArtifactLink = evidenceRequirement.artifactLinks[0];
-    const latestArtifact = latestArtifactLink?.artifact;
+    // Get all artifacts for this evidence requirement
+    const artifacts = await this.prisma.artifact.findMany({
+      where: {
+        tenantId,
+        evidenceRequirementId: evidenceRequirementId,
+      },
+      include: {
+        binary: true,
+      },
+      orderBy: { uploadedAt: 'desc' },
+    });
+
+    const latestArtifact = artifacts[0];
 
     let status = 'MISSING';
     if (latestArtifact) {
@@ -139,12 +128,12 @@ export class EvidenceRequirementsService {
       titleKo: evidenceRequirement.name,
       descriptionKo: evidenceRequirement.description || '',
       status,
-      artifacts: evidenceRequirement.artifactLinks.map((link) => ({
-        artifactId: link.artifact.id,
-        version: link.artifact.version,
-        filename: link.artifact.filename,
-        uploadedAt: link.artifact.uploadedAt,
-        status: link.artifact.status,
+      artifacts: artifacts.map((artifact) => ({
+        artifactId: artifact.id,
+        version: artifact.version,
+        filename: artifact.fileName,
+        uploadedAt: artifact.uploadedAt,
+        status: artifact.status,
         analysis: null,
       })),
       latestAnalysis: null,
@@ -153,32 +142,25 @@ export class EvidenceRequirementsService {
 
   async getStatus(tenantId: string, evidenceRequirementId: string) {
     // Quick status check for polling
-    const evidenceRequirement = await this.prisma.evidenceRequirement.findFirst(
-      {
-        where: {
-          id: evidenceRequirementId,
-          companyId: tenantId,
-        },
-        include: {
-          artifactLinks: {
-            include: {
-              artifact: true,
-            },
-            orderBy: {
-              artifact: { uploadedAt: 'desc' },
-            },
-            take: 1,
-          },
-        },
+    const evidenceRequirement = await this.prisma.evidenceRequirement.findFirst({
+      where: {
+        id: evidenceRequirementId,
+        companyId: tenantId,
       },
-    );
+    });
 
     if (!evidenceRequirement) {
       return { status: 'MISSING', hasAnalysis: false };
     }
 
-    const latestArtifactLink = evidenceRequirement.artifactLinks[0];
-    const latestArtifact = latestArtifactLink?.artifact;
+    // Get latest artifact for this evidence requirement
+    const latestArtifact = await this.prisma.artifact.findFirst({
+      where: {
+        tenantId,
+        evidenceRequirementId: evidenceRequirementId,
+      },
+      orderBy: { uploadedAt: 'desc' },
+    });
 
     let status = 'MISSING';
     if (latestArtifact) {

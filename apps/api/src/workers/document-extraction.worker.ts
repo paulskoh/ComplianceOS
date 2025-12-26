@@ -4,8 +4,8 @@ import { StorageService } from '../aws/storage.service';
 import { QueueService, JobEnvelope } from '../aws/queue.service';
 import { TextractClient, AnalyzeDocumentCommand, FeatureType } from '@aws-sdk/client-textract';
 
-// pdf-parse is ESM, use dynamic import
-const pdfParse = require('pdf-parse');
+// pdf-parse will be dynamically imported when needed
+let pdfParse: any = null;
 
 interface DocExtractionPayload {
   artifactId: string;
@@ -54,9 +54,26 @@ export class DocumentExtractionWorker {
       // Extract based on content type
       if (contentType === 'application/pdf') {
         try {
-          const data = await pdfParse(buffer);
-          extractedText = data.text;
-          method = 'PDF_TEXT';
+          // Lazy load pdf-parse
+          if (!pdfParse) {
+            try {
+              pdfParse = require('pdf-parse');
+            } catch (loadError) {
+              this.logger.error(`pdf-parse library not available: ${loadError.message}`);
+              // SOFT-LAUNCH FIX: Never return mock data - fail explicitly
+              throw new Error(
+                'PDF text extraction failed: pdf-parse library not available. ' +
+                'Please install pdf-parse or enable Textract OCR for PDF processing. ' +
+                'Manual review required.'
+              );
+            }
+          }
+
+          if (pdfParse) {
+            const data = await pdfParse(buffer);
+            extractedText = data.text;
+            method = 'PDF_TEXT';
+          }
 
           // If extracted text is too short, use Textract OCR
           if (extractedText.trim().length < 100 && process.env.TEXTRACT_ENABLED === 'true') {

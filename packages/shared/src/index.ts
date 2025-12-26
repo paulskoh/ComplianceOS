@@ -22,6 +22,9 @@ export * from './schemas/inspection-pack.schema';
 // Onboarding schemas
 export * from './schemas/onboarding.schema';
 
+// Compliance output schemas (SOFT-LAUNCH REQUIRED)
+export * from './schemas/compliance-output.schema';
+
 // Common types
 export interface PaginationQuery {
   page?: number;

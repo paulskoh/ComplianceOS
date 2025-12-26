@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { ArtifactsService } from '../artifacts/artifacts.service';
@@ -169,7 +170,7 @@ export class SyncService {
   private async syncHRSystem(
     tenantId: string,
     userId: string,
-    integration: any,
+    _integration: any,
   ): Promise<number> {
     // In production, this would call HR system API (Flex, Jobplanet, etc.)
     // For now, generate simulated payroll records
@@ -237,7 +238,7 @@ export class SyncService {
   private async syncTimeTracking(
     tenantId: string,
     userId: string,
-    integration: any,
+    _integration: any,
   ): Promise<number> {
     // Simulate finding overtime approvals from the last day
     const yesterday = new Date();
@@ -267,8 +268,8 @@ export class SyncService {
    * Simulate Google Drive files
    */
   private async simulateGoogleDriveFiles(
-    tenantId: string,
-    folderId: string,
+    _tenantId: string,
+    _folderId: string,
   ): Promise<any[]> {
     // In real implementation, this would call Google Drive API
     // For now, return empty or generate test data periodically
@@ -300,7 +301,6 @@ export class SyncService {
    * Generate hash for artifact
    */
   private generateHash(content: string): string {
-    const crypto = require('crypto');
     return crypto.createHash('sha256').update(content).digest('hex');
   }
 

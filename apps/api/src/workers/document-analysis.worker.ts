@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueueService, JobEnvelope } from '../aws/queue.service';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
 interface DocAnalysisPayload {
   artifactId: string;
@@ -10,38 +10,72 @@ interface DocAnalysisPayload {
   evidenceRequirementIds: string[];
 }
 
-interface ComplianceAnalysisResult {
-  overallCompliance: 'COMPLIANT' | 'PARTIAL' | 'NON_COMPLIANT' | 'UNCLEAR';
+/**
+ * SOFT-LAUNCH COMPLIANT: Evidence citation with file traceability
+ */
+interface EvidenceCitation {
+  file_id: string;
+  file_name: string;
+  excerpt: string;
+  location?: string; // e.g., "page 3, paragraph 2" or "section 4.1"
+}
+
+/**
+ * SOFT-LAUNCH COMPLIANT: Finding with full traceability
+ */
+interface FindingWithTraceability {
+  evidenceRequirementId: string;
+  requirementText: string;
+  status: 'MET' | 'PARTIALLY_MET' | 'NOT_MET' | 'NOT_APPLICABLE' | 'INSUFFICIENT_EVIDENCE';
+  evidence_citations: EvidenceCitation[];
+  reasoning: string;
   confidence: number;
-  findings: Array<{
-    evidenceRequirementId: string;
-    requirementText: string;
-    status: 'MET' | 'PARTIALLY_MET' | 'NOT_MET' | 'NOT_APPLICABLE';
-    evidence: string;
-    reasoning: string;
-    confidence: number;
-  }>;
+  uncertainty_note?: string; // Explicit statement of uncertainty when applicable
+}
+
+/**
+ * SOFT-LAUNCH COMPLIANT: Analysis result with traceability
+ */
+interface ComplianceAnalysisResult {
+  overallCompliance: 'COMPLIANT' | 'PARTIAL' | 'NON_COMPLIANT' | 'UNCLEAR' | 'INSUFFICIENT_EVIDENCE';
+  confidence: number;
+  findings: FindingWithTraceability[];
   missingElements: string[];
   recommendations: string[];
   analysisMetadata: {
     model: string;
     tokensUsed: number;
     analysisTimestamp: string;
+    sourceArtifact: {
+      id: string;
+      name: string;
+      version: number;
+    };
+    uncertaintyStatement?: string;
   };
 }
+
+/**
+ * SOFT-LAUNCH: Analysis status types for explicit failure handling
+ */
+type AnalysisStatus =
+  | 'COMPLETE'
+  | 'INSUFFICIENT_EVIDENCE'
+  | 'MANUAL_REVIEW_REQUIRED'
+  | 'ANALYSIS_FAILED';
 
 @Injectable()
 export class DocumentAnalysisWorker {
   private readonly logger = new Logger(DocumentAnalysisWorker.name);
-  private readonly anthropic: Anthropic;
+  private readonly openai: OpenAI;
 
   constructor(
     private prisma: PrismaService,
     private queue: QueueService,
   ) {
-    // Initialize Anthropic client
-    this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+    // Initialize OpenAI client
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
     });
   }
 
@@ -53,6 +87,18 @@ export class DocumentAnalysisWorker {
     );
 
     try {
+      // Fetch artifact metadata for traceability
+      const artifact = await this.prisma.artifact.findUnique({
+        where: { id: artifactId },
+        select: { id: true, name: true },
+      });
+
+      if (!artifact) {
+        await this.storeFailedAnalysis(artifactId, version, 'ANALYSIS_FAILED',
+          'Artifact not found. Cannot proceed with analysis.');
+        throw new Error(`Artifact ${artifactId} not found`);
+      }
+
       // Fetch extracted text
       const extraction = await this.prisma.$queryRaw<Array<{ extracted_text: string }>>`
         SELECT extracted_text
@@ -63,10 +109,22 @@ export class DocumentAnalysisWorker {
       `;
 
       if (!extraction || extraction.length === 0) {
-        throw new Error(`No extracted text found for artifact ${artifactId}`);
+        // SOFT-LAUNCH: Explicit failure - no extracted text
+        await this.storeFailedAnalysis(artifactId, version, 'INSUFFICIENT_EVIDENCE',
+          'No text could be extracted from this document. Manual review required.');
+        this.logger.warn(`No extracted text for artifact ${artifactId} - marking for manual review`);
+        return;
       }
 
       const extractedText = extraction[0].extracted_text;
+
+      // SOFT-LAUNCH: Check if extracted text is too short for meaningful analysis
+      if (extractedText.trim().length < 50) {
+        await this.storeFailedAnalysis(artifactId, version, 'INSUFFICIENT_EVIDENCE',
+          'Extracted text is too short for compliance analysis. The document may be a scan without OCR, or contain primarily images.');
+        this.logger.warn(`Extracted text too short for artifact ${artifactId}`);
+        return;
+      }
 
       // Fetch evidence requirements
       const requirements = await this.prisma.controlEvidenceRequirement.findMany({
@@ -86,8 +144,19 @@ export class DocumentAnalysisWorker {
         },
       });
 
-      // Analyze with Claude
-      const analysis = await this.analyzeWithLLM(extractedText, docType, requirements);
+      if (requirements.length === 0) {
+        await this.storeFailedAnalysis(artifactId, version, 'MANUAL_REVIEW_REQUIRED',
+          'No evidence requirements linked to this artifact. Please link to specific requirements before analysis.');
+        return;
+      }
+
+      // Analyze with OpenAI - pass artifact info for traceability
+      const analysis = await this.analyzeWithLLM(
+        extractedText,
+        docType,
+        requirements,
+        { id: artifact.id, name: artifact.name, version }
+      );
 
       // Store analysis result
       await this.prisma.$executeRaw`
@@ -125,8 +194,14 @@ export class DocumentAnalysisWorker {
           updated_at = NOW()
       `;
 
-      // Auto-approve artifact if analysis shows COMPLIANT
-      if (analysis.overallCompliance === 'COMPLIANT' && analysis.confidence >= 0.7) {
+      // SOFT-LAUNCH: Only auto-approve with high confidence AND no insufficient evidence findings
+      const hasInsufficientEvidence = analysis.findings.some(
+        f => f.status === 'INSUFFICIENT_EVIDENCE' || f.uncertainty_note
+      );
+
+      if (analysis.overallCompliance === 'COMPLIANT' &&
+          analysis.confidence >= 0.8 &&
+          !hasInsufficientEvidence) {
         await this.prisma.artifact.updateMany({
           where: { id: artifactId },
           data: {
@@ -134,7 +209,10 @@ export class DocumentAnalysisWorker {
             approvedAt: new Date(),
           },
         });
-        this.logger.log(`Auto-approved artifact ${artifactId} based on COMPLIANT analysis`);
+        this.logger.log(`Auto-approved artifact ${artifactId} based on COMPLIANT analysis with high confidence`);
+      } else if (analysis.overallCompliance === 'UNCLEAR' || hasInsufficientEvidence) {
+        // SOFT-LAUNCH: Flag for manual review when uncertain
+        this.logger.log(`Artifact ${artifactId} flagged for manual review: ${analysis.analysisMetadata.uncertaintyStatement || 'Low confidence or insufficient evidence'}`);
       }
 
       // Enqueue readiness recompute if compliance status changed
@@ -155,12 +233,79 @@ export class DocumentAnalysisWorker {
       );
     } catch (error) {
       this.logger.error(`Analysis failed for artifact ${artifactId}:`, error.stack);
+      // SOFT-LAUNCH: Store failed analysis with explicit error message
+      await this.storeFailedAnalysis(artifactId, version, 'ANALYSIS_FAILED',
+        `Analysis failed: ${error.message}. Please retry or request manual review.`);
       throw error;
     }
   }
 
   /**
-   * Analyze document with Claude using structured output
+   * SOFT-LAUNCH: Store explicit failure states for transparency
+   */
+  private async storeFailedAnalysis(
+    artifactId: string,
+    version: number,
+    status: AnalysisStatus,
+    message: string
+  ) {
+    const failedResult = {
+      overallCompliance: status === 'INSUFFICIENT_EVIDENCE' ? 'INSUFFICIENT_EVIDENCE' : 'UNCLEAR',
+      confidence: 0,
+      findings: [],
+      missingElements: [message],
+      recommendations: ['Manual review required to determine compliance status'],
+      analysisMetadata: {
+        model: 'N/A',
+        tokensUsed: 0,
+        analysisTimestamp: new Date().toISOString(),
+        sourceArtifact: { id: artifactId, name: 'Unknown', version },
+        uncertaintyStatement: message,
+      },
+    };
+
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO document_analyses (
+          id,
+          artifact_id,
+          version,
+          overall_compliance,
+          confidence,
+          findings,
+          missing_elements,
+          recommendations,
+          analysis_metadata,
+          created_at
+        )
+        VALUES (
+          gen_random_uuid(),
+          ${artifactId}::uuid,
+          ${version},
+          ${failedResult.overallCompliance},
+          ${failedResult.confidence},
+          ${JSON.stringify(failedResult.findings)}::jsonb,
+          ${JSON.stringify(failedResult.missingElements)}::jsonb,
+          ${JSON.stringify(failedResult.recommendations)}::jsonb,
+          ${JSON.stringify(failedResult.analysisMetadata)}::jsonb,
+          NOW()
+        )
+        ON CONFLICT (artifact_id, version) DO UPDATE SET
+          overall_compliance = ${failedResult.overallCompliance},
+          confidence = ${failedResult.confidence},
+          findings = ${JSON.stringify(failedResult.findings)}::jsonb,
+          missing_elements = ${JSON.stringify(failedResult.missingElements)}::jsonb,
+          recommendations = ${JSON.stringify(failedResult.recommendations)}::jsonb,
+          analysis_metadata = ${JSON.stringify(failedResult.analysisMetadata)}::jsonb,
+          updated_at = NOW()
+      `;
+    } catch (err) {
+      this.logger.error(`Failed to store failed analysis state: ${err.message}`);
+    }
+  }
+
+  /**
+   * SOFT-LAUNCH COMPLIANT: Analyze document with OpenAI using structured output with full traceability
    */
   private async analyzeWithLLM(
     extractedText: string,
@@ -172,59 +317,96 @@ export class DocumentAnalysisWorker {
       acceptanceCriteria: string[];
       control: { id: string; name: string; description: string | null };
     }>,
+    sourceArtifact: { id: string; name: string; version: number },
   ): Promise<ComplianceAnalysisResult> {
+    // SOFT-LAUNCH: Enhanced system prompt requiring evidence citations and explicit uncertainty
     const systemPrompt = `You are a compliance expert analyzing documents for Korean privacy and data protection regulations (PIPA, ISMS-P).
 
-Your task is to analyze the provided document and determine if it meets the specified evidence requirements.
+CRITICAL REQUIREMENTS FOR YOUR ANALYSIS:
 
-For each requirement, you must:
-1. Determine if the requirement is MET, PARTIALLY_MET, NOT_MET, or NOT_APPLICABLE
-2. Extract specific evidence from the document that supports your determination
-3. Provide clear reasoning for your assessment
-4. Assign a confidence score (0.0 to 1.0)
+1. TRACEABILITY: For EVERY determination, you MUST:
+   - Quote SPECIFIC text excerpts from the document
+   - Include the approximate location (e.g., "near the beginning", "in section about consent")
+   - If no relevant text exists, explicitly state this
 
-Be thorough but concise. Quote specific sections from the document when possible.`;
+2. EXPLICIT UNCERTAINTY: You MUST acknowledge when:
+   - Evidence is insufficient (use status "INSUFFICIENT_EVIDENCE")
+   - You are uncertain about interpretation (add "uncertainty_note")
+   - The document doesn't clearly address a requirement
 
-    const userPrompt = `Document Type: ${docType}
+3. NEVER HALLUCINATE: If you cannot find evidence for a requirement:
+   - Do NOT fabricate quotes
+   - Do NOT assume compliance
+   - DO use "INSUFFICIENT_EVIDENCE" or "NOT_MET" status
+   - DO explain what evidence would be needed
 
-Document Content:
-${extractedText.substring(0, 10000)} ${extractedText.length > 10000 ? '... (truncated)' : ''}
+4. CONFIDENCE SCORING:
+   - 0.9-1.0: Clear, explicit evidence found
+   - 0.7-0.89: Good evidence but some interpretation needed
+   - 0.5-0.69: Partial evidence, significant uncertainty
+   - Below 0.5: Insufficient evidence, use INSUFFICIENT_EVIDENCE status
 
-Evidence Requirements to Validate:
-${requirements.map((req, idx) => `
-${idx + 1}. Control: ${req.control.name}
-   Requirement ID: ${req.id}
-   Requirement Name: ${req.name}
-   Description: ${req.description}
-   ${req.acceptanceCriteria?.length > 0 ? `Acceptance Criteria: ${req.acceptanceCriteria.join(', ')}` : ''}
-`).join('\n')}
-
-Please analyze this document and provide a structured compliance assessment.
-
-Respond in the following JSON format:
+Respond ONLY with valid JSON in the following format:
 {
-  "overallCompliance": "COMPLIANT" | "PARTIAL" | "NON_COMPLIANT" | "UNCLEAR",
+  "overallCompliance": "COMPLIANT" | "PARTIAL" | "NON_COMPLIANT" | "UNCLEAR" | "INSUFFICIENT_EVIDENCE",
   "confidence": 0.0 to 1.0,
   "findings": [
     {
       "evidenceRequirementId": "requirement ID",
       "requirementText": "the requirement text",
-      "status": "MET" | "PARTIALLY_MET" | "NOT_MET" | "NOT_APPLICABLE",
-      "evidence": "specific quote or reference from document",
-      "reasoning": "explanation of your determination",
-      "confidence": 0.0 to 1.0
+      "status": "MET" | "PARTIALLY_MET" | "NOT_MET" | "NOT_APPLICABLE" | "INSUFFICIENT_EVIDENCE",
+      "evidence_citations": [
+        {
+          "excerpt": "exact quote from document",
+          "location": "where in document this was found"
+        }
+      ],
+      "reasoning": "explanation of your determination with reference to cited evidence",
+      "confidence": 0.0 to 1.0,
+      "uncertainty_note": "optional - explain any uncertainty or limitations"
     }
   ],
-  "missingElements": ["list of missing compliance elements"],
-  "recommendations": ["list of recommendations to improve compliance"]
+  "missingElements": ["list of missing compliance elements with specific descriptions"],
+  "recommendations": ["actionable recommendations to improve compliance"],
+  "uncertaintyStatement": "optional - overall statement about analysis limitations"
 }`;
 
-    const response = await this.anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4096,
+    const userPrompt = `SOURCE DOCUMENT INFORMATION:
+- Document ID: ${sourceArtifact.id}
+- Document Name: ${sourceArtifact.name}
+- Version: ${sourceArtifact.version}
+- Document Type: ${docType}
+
+DOCUMENT CONTENT:
+${extractedText.substring(0, 12000)}${extractedText.length > 12000 ? '\n... (document truncated for analysis)' : ''}
+
+EVIDENCE REQUIREMENTS TO VALIDATE:
+${requirements.map((req, idx) => `
+${idx + 1}. REQUIREMENT:
+   - Requirement ID: ${req.id}
+   - Control: ${req.control.name}
+   - Requirement Name: ${req.name}
+   - Description: ${req.description}
+   ${req.acceptanceCriteria?.length > 0 ? `- Acceptance Criteria: ${req.acceptanceCriteria.join('; ')}` : '- Acceptance Criteria: Not specified'}
+`).join('\n')}
+
+INSTRUCTIONS:
+Analyze the document above. For each requirement:
+1. Search for relevant text in the document
+2. Quote specific excerpts as evidence
+3. Determine compliance status based ONLY on what you can cite
+4. Be explicit about any uncertainty or missing information
+5. Never assume compliance without evidence`;
+
+    const response = await this.openai.chat.completions.create({
+      model: 'gpt-4o',
       temperature: 0.0, // Deterministic for compliance
-      system: systemPrompt,
+      response_format: { type: 'json_object' },
       messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
         {
           role: 'user',
           content: userPrompt,
@@ -233,37 +415,67 @@ Respond in the following JSON format:
     });
 
     // Extract JSON from response
-    const textContent = response.content[0];
-    if (textContent.type !== 'text') {
-      throw new Error('Unexpected response type from Claude');
+    const messageContent = response.choices[0]?.message?.content;
+    if (!messageContent) {
+      throw new Error('No response content from OpenAI');
     }
 
-    let analysisJson: ComplianceAnalysisResult;
+    let rawAnalysis: any;
     try {
-      // Try to parse the entire response as JSON
-      analysisJson = JSON.parse(textContent.text);
+      rawAnalysis = JSON.parse(messageContent);
     } catch {
-      // If that fails, try to extract JSON from markdown code blocks
-      const jsonMatch = textContent.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      const jsonMatch = messageContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (jsonMatch) {
-        analysisJson = JSON.parse(jsonMatch[1]);
+        rawAnalysis = JSON.parse(jsonMatch[1]);
       } else {
-        // Last resort: try to find JSON object in text
-        const objectMatch = textContent.text.match(/\{[\s\S]*\}/);
+        const objectMatch = messageContent.match(/\{[\s\S]*\}/);
         if (objectMatch) {
-          analysisJson = JSON.parse(objectMatch[0]);
+          rawAnalysis = JSON.parse(objectMatch[0]);
         } else {
-          throw new Error('Could not extract JSON from Claude response');
+          throw new Error('Could not extract JSON from OpenAI response');
         }
       }
     }
 
-    // Add metadata
-    analysisJson.analysisMetadata = {
-      model: response.model,
-      tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
-      analysisTimestamp: new Date().toISOString(),
+    // SOFT-LAUNCH: Transform response to include full traceability
+    const analysisJson: ComplianceAnalysisResult = {
+      overallCompliance: rawAnalysis.overallCompliance || 'UNCLEAR',
+      confidence: rawAnalysis.confidence || 0,
+      findings: (rawAnalysis.findings || []).map((f: any) => ({
+        evidenceRequirementId: f.evidenceRequirementId,
+        requirementText: f.requirementText || '',
+        status: f.status || 'INSUFFICIENT_EVIDENCE',
+        evidence_citations: (f.evidence_citations || []).map((c: any) => ({
+          file_id: sourceArtifact.id,
+          file_name: sourceArtifact.name,
+          excerpt: c.excerpt || f.evidence || '',
+          location: c.location || 'Location not specified',
+        })),
+        reasoning: f.reasoning || '',
+        confidence: f.confidence || 0,
+        uncertainty_note: f.uncertainty_note,
+      })),
+      missingElements: rawAnalysis.missingElements || [],
+      recommendations: rawAnalysis.recommendations || [],
+      analysisMetadata: {
+        model: response.model,
+        tokensUsed: (response.usage?.prompt_tokens || 0) + (response.usage?.completion_tokens || 0),
+        analysisTimestamp: new Date().toISOString(),
+        sourceArtifact,
+        uncertaintyStatement: rawAnalysis.uncertaintyStatement,
+      },
     };
+
+    // SOFT-LAUNCH: Validate that findings have proper evidence citations
+    for (const finding of analysisJson.findings) {
+      if (finding.status === 'MET' && finding.evidence_citations.length === 0) {
+        // Downgrade to PARTIAL if claiming MET without evidence
+        finding.status = 'PARTIALLY_MET';
+        finding.uncertainty_note = (finding.uncertainty_note || '') +
+          ' (Downgraded: No specific evidence citation provided for MET status)';
+        finding.confidence = Math.min(finding.confidence, 0.6);
+      }
+    }
 
     return analysisJson;
   }

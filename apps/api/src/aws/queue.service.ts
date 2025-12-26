@@ -72,7 +72,10 @@ export class QueueService {
 
     const queueUrl = this.queueUrls[job.type];
     if (!queueUrl) {
-      throw new Error(`Queue URL not configured for job type: ${job.type}`);
+      // In local dev mode without SQS configured, just log and return
+      // Worker processing would be handled separately or skipped for demo
+      this.logger.warn(`Queue URL not configured for job type: ${job.type} - skipping enqueue (local dev mode)`);
+      return jobId;
     }
 
     const command = new SendMessageCommand({

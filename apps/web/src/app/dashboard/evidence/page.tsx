@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { DocumentArrowUpIcon } from '@heroicons/react/24/outline'
 import UploadModal from '@/components/UploadModal'
 import StatusPill from '@/components/StatusPill'
+import ErrorState, { EmptyState } from '@/components/ErrorState'
 
 type EvidenceStatus = 'MISSING' | 'UPLOADED' | 'VERIFIED' | 'FLAGGED'
 
@@ -52,6 +53,7 @@ interface ObligationGroup {
 export default function EvidencePage() {
   const [data, setData] = useState<ObligationGroup[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
   const [selectedEvidenceReqId, setSelectedEvidenceReqId] = useState<string | null>(null)
 
@@ -62,10 +64,21 @@ export default function EvidencePage() {
   const fetchData = async () => {
     try {
       setLoading(true)
+      setError(null)
       const response = await evidenceRequirements.getOverview()
-      setData(response.data.obligations)
-    } catch (error) {
-      console.error('Failed to fetch evidence requirements:', error)
+      setData(response.data.obligations || [])
+    } catch (err: any) {
+      console.error('Failed to fetch evidence requirements:', err)
+      // SOFT-LAUNCH: Graceful error handling with user-friendly message
+      if (err.response?.status === 401) {
+        setError('로그인이 필요합니다. 다시 로그인해 주세요.')
+      } else if (err.response?.status === 403) {
+        setError('이 페이지에 접근할 권한이 없습니다.')
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.')
+      } else {
+        setError('증빙 요구사항을 불러오는 중 오류가 발생했습니다.')
+      }
     } finally {
       setLoading(false)
     }
@@ -90,6 +103,27 @@ export default function EvidencePage() {
     )
   }
 
+  // SOFT-LAUNCH: Graceful error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">증빙 제출</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            개인정보 보호법 준수를 위해 필요한 증빙 자료를 제출하세요
+          </p>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200">
+          <ErrorState
+            title="데이터 로드 실패"
+            message={error}
+            onRetry={fetchData}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -102,11 +136,15 @@ export default function EvidencePage() {
       </div>
 
       {data.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">아직 증빙 요구사항이 없습니다.</p>
-          <p className="text-sm text-gray-400 mt-2">
-            온보딩을 완료하면 증빙 요구사항이 생성됩니다.
-          </p>
+        <div className="bg-white rounded-lg border border-gray-200">
+          <EmptyState
+            title="아직 증빙 요구사항이 없습니다"
+            message="온보딩을 완료하면 귀사에 적용되는 규제에 따라 증빙 요구사항이 자동으로 생성됩니다."
+            action={{
+              label: '온보딩 시작하기',
+              onClick: () => window.location.href = '/onboarding',
+            }}
+          />
         </div>
       ) : (
         <div className="space-y-8">
