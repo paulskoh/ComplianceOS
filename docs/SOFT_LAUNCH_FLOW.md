@@ -1,234 +1,215 @@
-# ComplianceOS Soft-Launch Flow
-
-> **This is the ONLY supported workflow for soft-launch.**
-> Complete this flow within 10-15 minutes without developer assistance.
+# ComplianceOS Soft Launch Flow
 
 ## Overview
 
-ComplianceOS is an AI-native enterprise compliance operating system for Korean SMEs. This document defines the canonical golden path for first-time users during soft-launch.
+ComplianceOS is a Korean SME compliance management SaaS focused on labor law (PIPA) and data privacy regulations. This document describes the golden path user journey for soft launch.
 
-## Golden Path Workflow
+## Golden Path
+
+The canonical user journey follows this flow:
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     SOFT-LAUNCH GOLDEN PATH                         │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│   1. ORGANIZATION SETUP                                             │
-│      └─→ Create account / Login                                     │
-│      └─→ Complete 3-step onboarding wizard                          │
-│      └─→ Company profile captures applicability data                │
-│                                                                     │
-│   2. EVIDENCE UPLOAD                                                │
-│      └─→ Navigate to 증빙 제출 (Evidence)                            │
-│      └─→ Upload real compliance documents (PDF, DOCX)               │
-│      └─→ Link evidence to requirements                              │
-│      └─→ AI automatically analyzes documents                        │
-│                                                                     │
-│   3. FRAMEWORK SELECTION                                            │
-│      └─→ View 프레임워크 (Frameworks) to see requirements            │
-│      └─→ Understand what you're being evaluated against             │
-│      └─→ Obligations are auto-activated based on company profile    │
-│                                                                     │
-│   4. COMPLIANCE ANALYSIS                                            │
-│      └─→ AI processes uploaded evidence                             │
-│      └─→ Controls are evaluated against evidence                    │
-│      └─→ Gaps are identified with specific citations                │
-│                                                                     │
-│   5. RESULTS REVIEW                                                 │
-│      └─→ Navigate to 준수 현황 (Readiness)                           │
-│      └─→ View overall compliance score (0-100)                      │
-│      └─→ Review covered / partial / missing controls                │
-│      └─→ Inspect AI reasoning with evidence citations               │
-│      └─→ Get prioritized remediation recommendations                │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+/ (Landing) → /register → /onboarding → /dashboard → /dashboard/evidence → /dashboard/readiness → /dashboard/inspection-packs
 ```
 
-## Step-by-Step Guide
+### 1. Public/Auth Routes
 
-### Step 1: Organization Setup (3 minutes)
+| Route | Purpose | Endpoint Called |
+|-------|---------|-----------------|
+| `/` | Landing page with links to register/login | None |
+| `/register` | New user registration | `POST /api/auth/register` |
+| `/login` | User authentication | `POST /api/auth/login` |
 
-1. **Navigate to the application**
-   - URL: `https://app.complianceos.kr` (or local: `http://localhost:3000`)
+**Registration Flow:**
+1. User fills out: firstName, lastName, email, password, organizationName
+2. Password requirements: 8+ chars, uppercase, lowercase, number, special char
+3. On success: auto-login and redirect to `/onboarding`
 
-2. **Create Account or Login**
-   - New users: Click "회원가입" (Register)
-   - Existing users: Login with email/password
+**Login Flow:**
+1. Email/password authentication
+2. Token stored in localStorage as `accessToken`
+3. User data stored as `user`
+4. Redirect to `/dashboard`
 
-3. **Complete Onboarding Wizard**
-   The wizard collects company information to determine applicable regulations:
+### 2. Onboarding (`/onboarding`)
 
-   **Step 1 - Company Information:**
-   - 회사명 (Company Name)
-   - 사업자등록번호 (Business Number)
-   - 산업분류 (Industry)
-   - 직원 수 (Employee Count)
+**Purpose:** Collect company profile to determine applicable regulations.
 
-   **Step 2 - Data Processing:**
-   - 처리하는 개인정보 유형 (Types of personal data processed)
-   - 국외이전 여부 (International data transfer)
-   - 수탁사 유무 (Use of data processors)
+**Endpoint:** `POST /api/onboarding/complete`
 
-   **Step 3 - Work Environment:**
-   - 근무 형태 (Work style: office/remote/hybrid)
-   - 연장근로 여부 (Overtime work)
-   - 외주인력 유무 (Contractors)
+**Fields Collected:**
+- Company name
+- Industry (enum: TECH, MANUFACTURING, RETAIL, etc.)
+- Employee count
+- Remote work (boolean)
+- Overtime work (boolean)
+- Contractors (boolean)
+- Vendors (boolean)
+- Data types handled (array)
+- International data transfer (boolean)
 
-4. **Automatic Obligation Activation**
-   Based on your company profile, applicable obligations are automatically activated.
+**What happens on complete:**
+1. Company profile saved
+2. PIPA content pack automatically applied
+3. Obligations, controls, and evidence requirements created for tenant
+4. User redirected to `/dashboard`
 
-### Step 2: Evidence Upload (5 minutes)
+### 3. Dashboard (`/dashboard`)
 
-1. **Navigate to 증빙 제출 (Evidence)**
-   - Click the evidence upload section in the sidebar
+**Purpose:** Executive overview and workflow guidance.
 
-2. **View Evidence Requirements**
-   - See what documents are needed for each control
-   - Requirements show acceptance criteria
+**What's Displayed:**
+- **Workflow Progress:** Guides users through setup steps
+- **Active Packs:** Shows applied compliance packs (PIPA)
+- **Evidence Progress:** Shows X/Y evidence submitted with CTA
+- **Readiness Score:** 0-100 score with level badge
+- **Domain Breakdown:** Per-domain compliance scores
+- **Immediate Attention:** Gaps and open risks
 
-3. **Upload Documents**
-   - Click "파일 업로드" (Upload File)
-   - Drag and drop or select files (PDF, DOCX supported)
-   - Link to specific evidence requirement
+**Endpoints Called:**
+- `GET /api/onboarding/profile` - Check onboarding status
+- `GET /api/evidence-requirements/overview` - Evidence stats
+- `GET /api/frameworks` - Active packs
+- `GET /api/readiness/score` - Compliance score
+- `GET /api/readiness/gaps` - Gap analysis
+- `GET /api/risks` - Risk items
+- `GET /api/inspection-packs` - Existing packs
 
-4. **Wait for AI Processing**
-   - Document extraction (text extraction from PDF/DOCX)
-   - Document classification (type identification)
-   - Compliance analysis (requirement verification)
+### 4. Evidence Submission (`/dashboard/evidence`)
 
-### Step 3: Framework Review (2 minutes)
+**Purpose:** Upload compliance evidence documents.
 
-1. **Navigate to 프레임워크 (Frameworks)**
-   - View available compliance frameworks
-   - PIPA (개인정보 보호법) - Active
-   - Labor Standards (근로기준법) - Active
-   - ISMS-P - Coming Soon
+**List View Endpoints:**
+- `GET /api/evidence-requirements/overview` - All requirements grouped by obligation
 
-2. **Understand Your Requirements**
-   - Click on a framework to see domains
-   - Expand domains to see specific obligations
-   - Each obligation shows severity and frequency
+**Detail View (`/dashboard/evidence/[id]`):**
+- `GET /api/evidence-requirements/:id` - Requirement details with artifacts
 
-### Step 4: View Results (3 minutes)
+**Upload Flow:**
+1. Click "새 버전 업로드" (New Version Upload)
+2. Select file (PDF, DOCX, XLSX, images, etc.)
+3. `POST /api/artifacts/upload-intent` - Get presigned URL
+4. Upload directly to S3
+5. `POST /api/artifacts/finalize-upload` - Complete upload
+6. System sets artifact status to READY
+7. (Optional) AI analysis runs automatically
 
-1. **Navigate to 준수 현황 (Readiness)**
-
-2. **Review Overall Score**
-   - Score: 0-100
-   - Level: EXCELLENT (90+), GOOD (75-89), FAIR (60-74), POOR (40-59), CRITICAL (<40)
-
-3. **Review Obligation Breakdown**
-   - Each obligation shows completion percentage
-   - Severity-weighted scoring
-   - Top 3 risks highlighted
-
-4. **Inspect AI Analysis**
-   - Click on evidence items to see analysis details
-   - View specific citations from documents
-   - See AI confidence levels
-   - Understand uncertainty statements when applicable
-
-5. **Get Remediation Guidance**
-   - Missing evidence clearly indicated
-   - Specific actions recommended
-   - Priority based on severity
-
-### Step 5: Generate Inspection Pack (2 minutes)
-
-1. **Navigate to 검사 팩 (Inspection Packs)**
-
-2. **Create New Pack**
-   - Click "새 팩 생성" (Create New Pack)
-   - Select domain (LABOR, PRIVACY, etc.)
-   - Choose date range
-   - Select preset template (optional)
-
-3. **Review and Download**
-   - Pack includes all relevant evidence
-   - Signed manifest for integrity verification
-   - Auditor-ready format
-
-## Output Schemas
-
-### Control Coverage Output
-```json
-{
-  "control_id": "string",
-  "control_description": "string",
-  "coverage_status": "COVERED | PARTIAL | MISSING",
-  "evidence_used": [
-    {
-      "file_id": "string",
-      "excerpt": "string"
-    }
-  ],
-  "reasoning": "string"
-}
+**Analysis Lifecycle States:**
+```
+PENDING → UPLOADED → ANALYZING → ANALYZED → APPROVED
+                                    ↓
+                              NEEDS_REVIEW
 ```
 
-### Gap / Finding Output
-```json
-{
-  "gap_id": "string",
-  "severity": "HIGH | MEDIUM | LOW",
-  "description": "string",
-  "missing_or_weak_evidence": true,
-  "recommended_action": "string"
-}
+**Approval:**
+- `POST /api/artifacts/:id/approve` - Mark as approved
+- Approved artifacts are immutable
+- Status changes from "검토중" to "승인완료"
+
+### 5. Readiness (`/dashboard/readiness`)
+
+**Purpose:** View compliance score and gaps.
+
+**Endpoints:**
+- `GET /api/readiness/score` - Overall score with breakdown
+- `GET /api/readiness/gaps` - List of compliance gaps
+
+**Score Levels:**
+- EXCELLENT (90-100): 감사 준비 완료
+- GOOD (75-89): 양호
+- FAIR (60-74): 주의 필요
+- POOR (40-59): 조치 필요
+- CRITICAL (0-39): 긴급 조치
+
+### 6. Inspection Packs (`/dashboard/inspection-packs`)
+
+**Purpose:** Generate audit-ready document packages.
+
+**Endpoints:**
+- `GET /api/inspection-packs` - List existing packs
+- `POST /api/inspection-packs` - Create new pack
+- `GET /api/inspection-packs/:id/download-urls` - Get download links
+
+**Pack Contents:**
+- Cover page (manifest)
+- All approved evidence artifacts
+- SHA-256 hashes for verification
+
+### 7. Compliance Packs / Frameworks (`/dashboard/frameworks`)
+
+**Purpose:** View applicable regulations and control requirements.
+
+**Endpoints:**
+- `GET /api/frameworks` - List applied frameworks
+- `GET /api/frameworks/:code` - Framework details with domains
+
+**Currently Supported:**
+- PIPA (Personal Information Protection Act - Korea)
+
+## Authentication & Authorization
+
+### Auth Guard
+Dashboard routes are protected by a client-side guard in `/dashboard/layout.tsx`:
+
+1. Check for `accessToken` in localStorage
+2. If missing → redirect to `/login`
+3. Call `GET /api/onboarding/profile` to verify completion
+4. If no profile → redirect to `/onboarding`
+5. If profile exists → render dashboard
+
+### Token Refresh
+- Access tokens expire in 15 minutes
+- Refresh tokens expire in 7 days
+- 401 responses trigger logout and redirect
+
+## Environment Variables
+
+### Frontend (apps/web/.env)
+```
+NEXT_PUBLIC_API_URL=http://localhost:3002/api
+NEXT_PUBLIC_DEMO_MODE=false  # Set to 'true' to show demo credentials on login
 ```
 
-### Explicit Failure States
+### Backend (apps/api/.env)
+```
+DATABASE_URL=postgresql://...
+JWT_SECRET=...
+JWT_REFRESH_SECRET=...
+S3_ENDPOINT=...
+S3_ACCESS_KEY=...
+S3_SECRET_KEY=...
+S3_BUCKET_ARTIFACTS=evidence-artifacts
+S3_BUCKET_PACKS=inspection-packs
+```
 
-The system will explicitly communicate when:
-- **"Insufficient evidence to determine compliance"** - Not enough information in documents
-- **"Control is defined but not enforceable"** - Control exists but cannot be validated
-- **"Manual review required"** - AI confidence too low for automated determination
+## "Done" Criteria
 
-## Success Criteria
+A user has successfully completed the golden path when:
 
-A successful soft-launch flow completion means:
+1. **Registered:** Account created, email verified (if required)
+2. **Onboarded:** Company profile saved, PIPA pack applied
+3. **Evidence Uploaded:** At least one artifact submitted to an evidence requirement
+4. **Evidence Approved:** Artifact marked as approved
+5. **Readiness Viewed:** Dashboard shows non-zero score
+6. **Pack Generated:** At least one inspection pack created
 
-- [ ] User can create/login to organization
-- [ ] Onboarding wizard captures applicability data
-- [ ] Evidence files can be uploaded and processed
-- [ ] Framework requirements are visible and understandable
-- [ ] AI analysis runs with proper traceability
-- [ ] Readiness score displays with gap breakdown
-- [ ] Inspection pack can be generated and downloaded
-- [ ] All failures are explicit with clear next steps
+## UI Language
 
-## Troubleshooting
+The product is primarily in Korean for SME users:
+- Navigation labels in Korean
+- Status messages in Korean
+- Help text in Korean
+- API responses include Korean fields (`titleKo`, `descriptionKo`, etc.)
 
-### Common Issues
+## Testing Checklist
 
-1. **Evidence upload fails**
-   - Check file size (max 50MB)
-   - Ensure PDF/DOCX format
-   - Verify file is not corrupted
-
-2. **AI analysis shows "Insufficient Evidence"**
-   - Document may be scanned without OCR
-   - Content may not match evidence requirements
-   - Upload additional supporting documents
-
-3. **Score seems incorrect**
-   - Verify all evidence is linked to requirements
-   - Check that documents are approved
-   - Review AI analysis for each finding
-
-4. **Cannot generate inspection pack**
-   - Ensure at least some evidence exists
-   - Check date range includes uploaded documents
-   - Verify domain selection matches obligations
-
-## Contact Support
-
-For issues during soft-launch:
-- Email: support@complianceos.kr
-- In-app: Settings > Support Ticket
-
----
-
-*Document Version: 1.0 (Soft-Launch)*
-*Last Updated: 2024*
+- [ ] `/register` creates user and redirects to `/onboarding`
+- [ ] `/login` authenticates and redirects to `/dashboard`
+- [ ] Dashboard requires authentication (redirects if not logged in)
+- [ ] Dashboard requires onboarding (redirects if not complete)
+- [ ] Workflow progress shows correct step status
+- [ ] Evidence upload creates artifact
+- [ ] Artifact approval changes status to VERIFIED
+- [ ] Readiness score reflects uploaded/approved evidence
+- [ ] Sidebar has no broken links (no 404s)
+- [ ] No hardcoded demo credentials visible (unless DEMO_MODE=true)

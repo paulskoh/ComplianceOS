@@ -150,8 +150,9 @@ export default function WorkflowProgress({ steps, compact = false }: WorkflowPro
 export function useWorkflowSteps(
   hasOnboarding: boolean,
   hasEvidence: boolean,
-  hasAnalysis: boolean,
-  hasReadiness: boolean
+  hasFrameworksViewed: boolean,
+  hasReadiness: boolean,
+  hasInspectionPack: boolean = false
 ): WorkflowStep[] {
   const getStatus = (stepCompleted: boolean, prevCompleted: boolean): 'complete' | 'current' | 'upcoming' => {
     if (stepCompleted) return 'complete'
@@ -178,11 +179,11 @@ export function useWorkflowSteps(
     },
     {
       id: 'frameworks',
-      name: 'Framework Review',
-      nameKo: '프레임워크 확인',
+      name: 'Compliance Packs',
+      nameKo: '규제 팩 확인',
       description: '적용되는 규제 요구사항을 확인합니다',
       href: '/dashboard/frameworks',
-      status: getStatus(hasAnalysis, hasEvidence),
+      status: getStatus(hasFrameworksViewed, hasEvidence),
     },
     {
       id: 'readiness',
@@ -190,7 +191,7 @@ export function useWorkflowSteps(
       nameKo: '준수 현황 확인',
       description: '컴플라이언스 점수와 개선점을 확인합니다',
       href: '/dashboard/readiness',
-      status: getStatus(hasReadiness, hasAnalysis),
+      status: getStatus(hasReadiness, hasFrameworksViewed),
     },
     {
       id: 'inspection',
@@ -198,7 +199,7 @@ export function useWorkflowSteps(
       nameKo: '검사 팩 생성',
       description: '감사용 증빙 패키지를 생성합니다',
       href: '/dashboard/inspection-packs',
-      status: getStatus(false, hasReadiness),
+      status: getStatus(hasInspectionPack, hasReadiness),
     },
   ]
 }

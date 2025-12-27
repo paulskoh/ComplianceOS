@@ -1,37 +1,33 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
     HomeIcon,
     ClipboardDocumentCheckIcon,
-    ScaleIcon,
-    ShieldCheckIcon,
     InboxStackIcon,
-    CpuChipIcon,
     DocumentDuplicateIcon,
-    AcademicCapIcon,
-    BuildingOfficeIcon,
-    ChartBarIcon,
-    PuzzlePieceIcon,
-    Cog6ToothIcon,
-    BookOpenIcon
+    BookOpenIcon,
+    ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline'
 
 const navigation = [
-    { name: '홈', href: '/dashboard', icon: HomeIcon },
-    { name: '증빙 제출', href: '/dashboard/evidence', icon: InboxStackIcon },
-    { name: '준수 현황', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
-    { name: '검사 팩', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
-    { name: '프레임워크', href: '/dashboard/frameworks', icon: BookOpenIcon },
-]
-
-const secondaryNavigation = [
-    { name: 'Admin', href: '/dashboard/admin', icon: Cog6ToothIcon },
+    { name: '홈', nameEn: 'Home', href: '/dashboard', icon: HomeIcon },
+    { name: '증빙 제출', nameEn: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
+    { name: '준수 현황', nameEn: 'Readiness', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
+    { name: '검사 팩', nameEn: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
+    { name: '규제 팩', nameEn: 'Compliance Packs', href: '/dashboard/frameworks', icon: BookOpenIcon },
 ]
 
 export default function Sidebar() {
     const pathname = usePathname()
+    const router = useRouter()
+
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('user')
+        router.push('/login')
+    }
 
     return (
         <div className="flex flex-col w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40">
@@ -47,7 +43,8 @@ export default function Sidebar() {
 
             <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                 {navigation.map((item) => {
-                    const isActive = pathname === item.href
+                    const isActive = pathname === item.href ||
+                        (item.href !== '/dashboard' && pathname.startsWith(item.href))
                     return (
                         <Link
                             key={item.name}
@@ -69,19 +66,16 @@ export default function Sidebar() {
             </nav>
 
             <div className="border-t border-gray-200 p-3">
-                {secondaryNavigation.map((item) => (
-                    <Link
-                        key={item.name}
-                        href={item.href}
-                        className="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
-                    >
-                        <item.icon
-                            className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                            aria-hidden="true"
-                        />
-                        {item.name}
-                    </Link>
-                ))}
+                <button
+                    onClick={handleLogout}
+                    className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
+                >
+                    <ArrowRightOnRectangleIcon
+                        className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                    />
+                    로그아웃
+                </button>
             </div>
         </div>
     )

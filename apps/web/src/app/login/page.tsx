@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@/lib/api'
 
 export default function LoginPage() {
@@ -10,6 +11,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Only show demo credentials if explicitly enabled via environment variable
+  const showDemoCredentials = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,10 +82,21 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-3">
           <p className="text-sm text-gray-600">
-            Demo credentials: admin@example.com / admin123
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-primary-600 hover:text-primary-700 font-medium">
+              Sign up
+            </Link>
           </p>
+
+          {showDemoCredentials && (
+            <div className="pt-3 border-t border-gray-200">
+              <p className="text-xs text-gray-500">
+                Demo mode: admin@example.com / Admin123!
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
