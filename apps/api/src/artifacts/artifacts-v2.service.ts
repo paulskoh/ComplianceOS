@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../aws/storage.service';
 import { CryptoService } from '../aws/crypto.service';
 import { QueueService } from '../aws/queue.service';
 import { AuditLogService } from '../audit-log/audit-log.service';
 import { ArtifactEventsService } from './artifact-events.service';
+import { SyncAnalysisService } from './sync-analysis.service';
 import {
   ArtifactCreateIntentDto,
   ArtifactCreateIntentResponseDto,
@@ -15,6 +16,8 @@ import { createHash } from 'crypto';
 
 @Injectable()
 export class ArtifactsV2Service {
+  private readonly logger = new Logger(ArtifactsV2Service.name);
+
   constructor(
     private prisma: PrismaService,
     private storage: StorageService,
@@ -22,6 +25,7 @@ export class ArtifactsV2Service {
     private queue: QueueService,
     private auditLog: AuditLogService,
     private artifactEvents: ArtifactEventsService,
+    private syncAnalysis: SyncAnalysisService,
   ) {}
 
   /**
@@ -180,7 +184,7 @@ export class ArtifactsV2Service {
       },
     });
 
-    // Enqueue document extraction job
+    // Enqueue document extraction job (for production with SQS)
     await this.queue.enqueueJob({
       tenantId,
       type: 'DOC_EXTRACT',
@@ -191,6 +195,22 @@ export class ArtifactsV2Service {
         contentType: artifact.mimeType,
       },
     });
+
+    // SYNC_ANALYSIS: Run analysis immediately for local dev/demo
+    // This bypasses SQS and runs OpenAI analysis synchronously
+    if (process.env.SYNC_ANALYSIS === 'true' || !process.env.SQS_DOC_EXTRACT_QUEUE) {
+      this.logger.log(`Running synchronous analysis for artifact ${artifactId}`);
+      // Run async but don't block response
+      this.syncAnalysis.analyzeArtifact(
+        tenantId,
+        artifactId,
+        version,
+        artifact.s3Key!,
+        artifact.mimeType!,
+      ).catch(err => {
+        this.logger.error(`Sync analysis failed for ${artifactId}:`, err);
+      });
+    }
 
     // Record finalize event
     await this.artifactEvents.recordEvent(tenantId, {

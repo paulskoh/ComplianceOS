@@ -661,7 +661,7 @@ export class OnboardingService {
               required: true,
               options: [
                 { value: 'TECHNOLOGY', label: '정보통신/소프트웨어' },
-                { value: 'ECOMMERCE', label: '전자상거래' },
+                { value: 'RETAIL', label: '전자상거래/유통' },
                 { value: 'FINANCE', label: '금융' },
                 { value: 'HEALTHCARE', label: '의료/헬스케어' },
                 { value: 'EDUCATION', label: '교육' },
