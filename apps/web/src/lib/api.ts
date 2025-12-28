@@ -161,3 +161,15 @@ export const inspection = {
   createShareLink: (packId: string, expiresInDays: number) =>
     api.post(`/inspection/pack/${packId}/share-link`, { expiresInDays }),
 }
+
+// Document Generation API
+export const documentGen = {
+  getTemplates: () => api.get('/v2/documents/templates'),
+  getTypes: () => api.get('/v2/documents/types'),
+  generate: (templateType: string, customVariables?: Record<string, any>, evidenceRequirementId?: string) =>
+    api.post('/v2/documents/generate', { templateType, customVariables, evidenceRequirementId }),
+  getGenerated: (status?: string, limit?: number) =>
+    api.get('/v2/documents/generated', { params: { status, limit } }),
+  getGeneratedOne: (id: string) => api.get(`/v2/documents/generated/${id}`),
+  approve: (id: string) => api.post(`/v2/documents/generated/${id}/approve`),
+}

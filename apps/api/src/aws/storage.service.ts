@@ -148,6 +148,24 @@ export class StorageService {
   }
 
   /**
+   * Upload a buffer to S3
+   */
+  async uploadBuffer(
+    key: string,
+    buffer: Buffer,
+    contentType: string,
+  ): Promise<void> {
+    const command = new PutObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+      Body: buffer,
+      ContentType: contentType,
+    });
+
+    await this.s3Client.send(command);
+  }
+
+  /**
    * Generate presigned GET URL for downloads
    */
   async presignGetUrl(

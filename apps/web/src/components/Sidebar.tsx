@@ -8,11 +8,13 @@ import {
     InboxStackIcon,
     DocumentDuplicateIcon,
     BookOpenIcon,
-    ArrowRightOnRectangleIcon
+    ArrowRightOnRectangleIcon,
+    SparklesIcon
 } from '@heroicons/react/24/outline'
 
 const navigation = [
     { name: '홈', nameEn: 'Home', href: '/dashboard', icon: HomeIcon },
+    { name: '문서 생성', nameEn: 'Document Generator', href: '/dashboard/documents', icon: SparklesIcon },
     { name: '증빙 제출', nameEn: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
     { name: '준수 현황', nameEn: 'Readiness', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
     { name: '검사 팩', nameEn: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },

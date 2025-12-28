@@ -1410,3 +1410,128 @@ model Company {
 
   @@map("companies")
 }
+
+// ============================================
+// Document Generation System
+// ============================================
+
+enum DocumentTemplateType {
+  PRIVACY_POLICY           // 개인정보처리방침
+  INTERNAL_MANAGEMENT_PLAN // 내부관리계획
+  PRIVACY_TRAINING_PLAN    // 개인정보보호 교육계획
+  VENDOR_AGREEMENT         // 개인정보 처리 위탁계약서
+  PRIVACY_IMPACT_ASSESSMENT // 개인정보 영향평가서
+  EMPLOYMENT_CONTRACT      // 근로계약서
+  WORK_RULES              // 취업규칙
+  ACCESS_CONTROL_POLICY   // 접근권한 관리지침
+  INCIDENT_RESPONSE_PLAN  // 침해사고 대응계획
+  DATA_RETENTION_POLICY   // 개인정보 파기지침
+  CONSENT_FORM            // 개인정보 수집·이용 동의서
+  THIRD_PARTY_PROVISION   // 제3자 제공 동의서
+  CUSTOM                  // 사용자 정의
+}
+
+enum RegulationType {
+  PIPA              // 개인정보보호법
+  K_ISMS_P          // K-ISMS-P
+  LABOR_STANDARDS   // 근로기준법
+  EMPLOYMENT_SECURITY // 고용보험법
+  INDUSTRIAL_SAFETY // 산업안전보건법
+  CREDIT_INFO       // 신용정보법
+  ELECTRONIC_FINANCE // 전자금융거래법
+  CUSTOM            // 사용자 정의
+}
+
+enum GeneratedDocStatus {
+  DRAFT             // 초안
+  PENDING_REVIEW    // 검토 대기
+  APPROVED          // 승인됨
+  PUBLISHED         // 게시됨
+  ARCHIVED          // 보관됨
+}
+
+model DocumentTemplate {
+  id              String               @id @default(uuid())
+  tenantId        String?              // null = system-wide template
+  type            DocumentTemplateType
+  regulationType  RegulationType
+  name            String               // e.g., "Privacy Policy Generator"
+  nameKo          String               // e.g., "개인정보처리방침 생성기"
+  description     String?              @db.Text
+  descriptionKo   String?              @db.Text
+
+  // Template structure
+  basePrompt      String               @db.Text // Core generation prompt
+  sections        Json?                // Ordered list of sections to generate
+  variables       Json?                // Required variables from company profile
+  outputFormat    String               @default("docx") // docx, pdf, html
+
+  // Korean formatting options
+  useHanja        Boolean              @default(false) // Use 한자 in formal documents
+  formalityLevel  String               @default("FORMAL") // FORMAL, SEMI_FORMAL, INFORMAL
+
+  // Versioning
+  version         Int                  @default(1)
+  isActive        Boolean              @default(true)
+  isSystemTemplate Boolean             @default(false) // Built-in vs custom
+
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  generatedDocs   GeneratedDocument[]
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([regulationType])
+  @@index([isActive])
+  @@map("document_templates")
+}
+
+model GeneratedDocument {
+  id              String             @id @default(uuid())
+  tenantId        String
+  templateId      String
+
+  // Document info
+  title           String             // Generated document title
+  titleKo         String             // Korean title
+  status          GeneratedDocStatus @default(DRAFT)
+
+  // Generation context
+  variables       Json               // Values used for generation
+  companyProfile  Json?              // Snapshot of company profile at generation time
+
+  // Content
+  content         String             @db.Text // Generated content (markdown/HTML)
+  contentKo       String?            @db.Text // Korean content
+
+  // Output files
+  docxS3Key       String?            // Generated DOCX file in S3
+  pdfS3Key        String?            // Generated PDF file in S3
+
+  // Linking to evidence
+  artifactId      String?            // Linked artifact after approval
+  evidenceReqId   String?            // Linked evidence requirement
+
+  // Approval workflow
+  createdById     String
+  approvedById    String?
+  approvedAt      DateTime?
+  publishedAt     DateTime?
+
+  // AI metadata
+  modelUsed       String?            // e.g., "gpt-4o"
+  tokensUsed      Int?
+  generationTime  Int?               // milliseconds
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  template        DocumentTemplate   @relation(fields: [templateId], references: [id])
+
+  @@index([tenantId])
+  @@index([templateId])
+  @@index([status])
+  @@index([createdById])
+  @@map("generated_documents")
+}

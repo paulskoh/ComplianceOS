@@ -33,6 +33,7 @@ import { AwsModule } from './aws/aws.module';
 import { FrameworksModule } from './frameworks/frameworks.module';
 import { WorkersModule } from './workers/workers.module';
 import { ContentLoaderModule } from './compliance-content/content-loader.module';
+import { DocumentGenModule } from './document-gen/document-gen.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { StructuredLogger } from './common/services/structured-logger.service';
@@ -75,6 +76,7 @@ import { StructuredLogger } from './common/services/structured-logger.service';
     EvaluationModule,
     EvidenceRequirementsModule,
     FrameworksModule,
+    DocumentGenModule,
   ],
   providers: [
     StructuredLogger,
