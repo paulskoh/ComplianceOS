@@ -173,3 +173,11 @@ export const documentGen = {
   getGeneratedOne: (id: string) => api.get(`/v2/documents/generated/${id}`),
   approve: (id: string) => api.post(`/v2/documents/generated/${id}/approve`),
 }
+
+// System Health API (for demo mode status panel)
+export const health = {
+  getStatus: () => api.get('/health'),
+  getAIHealth: () => api.get('/health/ai'),
+  getAIMetrics: () => api.get('/health/ai/metrics'),
+  getAIStats: () => api.get('/health/ai/stats'),
+}

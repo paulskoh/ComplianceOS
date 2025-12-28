@@ -515,7 +515,7 @@ ${text.substring(0, 10000)}
       const parsed = JSON.parse(content);
 
       // Ensure required fields exist
-      return {
+      const rawResult: AnalysisResult = {
         overallStatus: parsed.overallStatus || 'NEEDS_REVIEW',
         score: parsed.score || 0,
         summaryKo: parsed.summaryKo || '분석을 완료했습니다.',
@@ -531,10 +531,90 @@ ${text.substring(0, 10000)}
         })),
         citations: parsed.citations || [],
       };
+
+      // CEO Demo Critical: Enforce citation requirement for MET status
+      // No "MET" without proof - this is the #1 auditor credibility requirement
+      return this.enforceCitationRequirement(rawResult);
     } catch (error) {
       this.logger.error('OpenAI analysis failed:', error);
       return this.fallbackAnalysis(text, requirements);
     }
+  }
+
+  /**
+   * CEO Demo Critical: Enforce citation requirement for MET status
+   *
+   * Non-negotiable rule: Any finding marked "MET" MUST have at least 1 citation
+   * If no citation exists, downgrade to "PARTIAL" with explanation
+   *
+   * This is the #1 "AI toy" smell - if an auditor asks "where?" and there's
+   * no excerpt, you lose trust immediately.
+   */
+  private enforceCitationRequirement(result: AnalysisResult): AnalysisResult {
+    let hasDowngrades = false;
+
+    const enforcedFindings = result.findings.map(finding => {
+      // Check if this finding has a citation (pageRef + excerpt OR just excerpt)
+      const hasCitation = (finding.pageRef !== undefined && finding.pageRef !== null) ||
+                          (finding.excerpt && finding.excerpt.length > 0);
+
+      // If status is MET but no citation, downgrade to PARTIAL
+      if (finding.status === 'MET' && !hasCitation) {
+        hasDowngrades = true;
+        this.logger.warn(`Downgrading finding "${finding.category}" from MET to PARTIAL (no citation)`);
+        return {
+          ...finding,
+          status: 'PARTIAL',
+          messageKo: `${finding.messageKo} (인용 없음 - 수동 검토 권장)`,
+          severity: finding.severity === 'LOW' ? 'MEDIUM' : finding.severity,
+        };
+      }
+
+      return finding;
+    });
+
+    // Recalculate overall status if any downgrades occurred
+    let newOverallStatus = result.overallStatus;
+    let newScore = result.score;
+
+    if (hasDowngrades) {
+      // Count findings by status
+      const metCount = enforcedFindings.filter(f => f.status === 'MET').length;
+      const partialCount = enforcedFindings.filter(f => f.status === 'PARTIAL').length;
+      const notMetCount = enforcedFindings.filter(f => f.status === 'NOT_MET').length;
+      const total = enforcedFindings.length;
+
+      if (total > 0) {
+        // Recalculate score based on new findings
+        newScore = Math.round(((metCount * 1.0 + partialCount * 0.5) / total) * 100);
+
+        // Determine overall status
+        if (notMetCount > 0 || (partialCount > metCount)) {
+          newOverallStatus = 'PARTIAL';
+        } else if (partialCount > 0) {
+          newOverallStatus = 'PARTIAL';
+        }
+      }
+    }
+
+    // Also check if there are NO citations at all for a COMPLIANT status
+    const hasAnyCitations = (result.citations && result.citations.length > 0) ||
+                            enforcedFindings.some(f => f.excerpt || f.pageRef);
+
+    if (newOverallStatus === 'COMPLIANT' && !hasAnyCitations) {
+      newOverallStatus = 'PARTIAL';
+      this.logger.warn('Downgrading overall status from COMPLIANT to PARTIAL (no citations found)');
+    }
+
+    return {
+      ...result,
+      overallStatus: newOverallStatus,
+      score: newScore,
+      findings: enforcedFindings,
+      summaryKo: hasDowngrades
+        ? `${result.summaryKo} (일부 항목은 인용 근거가 부족하여 수동 검토가 필요합니다)`
+        : result.summaryKo,
+    };
   }
 
   /**
@@ -591,6 +671,9 @@ ${text.substring(0, 10000)}
         context: '문서 날짜 정보',
       }] : [],
     };
+
+    // Apply the same citation enforcement to fallback analysis
+    return this.enforceCitationRequirement(result);
   }
 
   /**

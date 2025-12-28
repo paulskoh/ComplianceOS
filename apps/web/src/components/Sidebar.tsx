@@ -11,8 +11,13 @@ import {
     ArrowRightOnRectangleIcon,
     SparklesIcon
 } from '@heroicons/react/24/outline'
+import SystemStatusPanel from './SystemStatusPanel'
 
-const navigation = [
+// Demo mode detection
+const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
+// Full navigation for production
+const fullNavigation = [
     { name: '홈', nameEn: 'Home', href: '/dashboard', icon: HomeIcon },
     { name: '문서 생성', nameEn: 'Document Generator', href: '/dashboard/documents', icon: SparklesIcon },
     { name: '증빙 제출', nameEn: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
@@ -20,6 +25,17 @@ const navigation = [
     { name: '검사 팩', nameEn: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
     { name: '규제 팩', nameEn: 'Compliance Packs', href: '/dashboard/frameworks', icon: BookOpenIcon },
 ]
+
+// Demo mode: focus on core compliance flow
+const demoNavigation = [
+    { name: '홈', nameEn: 'Home', href: '/dashboard', icon: HomeIcon },
+    { name: '증빙 제출', nameEn: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
+    { name: '준수 현황', nameEn: 'Readiness', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
+    { name: '검사 팩', nameEn: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
+]
+
+// Select navigation based on mode
+const navigation = isDemoMode ? demoNavigation : fullNavigation
 
 export default function Sidebar() {
     const pathname = usePathname()
@@ -40,6 +56,11 @@ export default function Sidebar() {
                         <span className="text-white text-xs font-bold">COS</span>
                     </div>
                     <span className="text-gray-900 font-bold text-sm tracking-tight">ComplianceOS</span>
+                    {isDemoMode && (
+                        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 rounded">
+                            DEMO
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -66,6 +87,9 @@ export default function Sidebar() {
                     )
                 })}
             </nav>
+
+            {/* Demo Mode: System Status Panel */}
+            {isDemoMode && <SystemStatusPanel />}
 
             <div className="border-t border-gray-200 p-3">
                 <button
