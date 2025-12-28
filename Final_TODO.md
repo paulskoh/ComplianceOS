@@ -1,170 +1,165 @@
-# Final_TODO
+# ComplianceOS CEO Demo Build - Final TODO
 
-This document tracks all tasks required to make ComplianceOS (Bam) demo-ready and externally legible for CEOs, investors, and LLM handoffs.
-
-**Status**: COMPLETE
-**Last Updated**: 2025-12-26
-
----
-
-## Documentation
-
-- [x] Update README.md with crisp one-paragraph explanation
-- [x] Add "How Bam Works (System Loop)" pipeline documentation
-- [x] Add "Role of AI in Bam" section defining AI boundaries
-- [x] Add "Demo vs Production Notes" clarifying mocked vs real
-- [x] Verify and fix Quickstart commands
-- [x] Create EXECUTIVE_BRIEF.md (CEO-first summary)
-- [x] Update ARCHITECTURE.md with AI architecture section
-- [x] Create DEMO_SCRIPT.md (15-minute walkthrough)
-- [x] Standardize naming: Using "ComplianceOS (Bam)" consistently
+> **Target**: Korean SME CEO Demo
+> **Company**: 넥스트솔루션 (주) (85명, Technology)
+> **Demo Features**: 4 only (Smart Upload, Doc Gen, Contradiction, Audit Sim)
+> **Status**: ✅ BUILD COMPLETE
+> **Last Updated**: 2025-12-28
 
 ---
 
-## Product/Demo
+## Non-Negotiable Principles
 
-- [x] Verify org creation/selection flow works end-to-end (seed data creates Demo Company)
-- [x] Verify document/evidence upload flow works (multipart upload with S3/MinIO)
-- [x] Verify evidence-to-controls mapping displays correctly (via ArtifactControl relations)
-- [x] Verify gaps/findings are visible in UI (dynamic from readiness.getGaps API)
-- [x] Verify remediation guidance appears (actionRequired field in gap response)
-- [x] Verify inspection pack generation works (PDF + manifest + ZIP)
-- [x] Ensure demo data flows through complete system (seed.ts creates realistic data)
-- [x] Dashboard fetches real data (gaps, risks, readiness score)
+1. **Auditor-grade, not AI theater** - Every claim has citations
+2. **No guessing** - "판단 불가" when uncertain
+3. **Deterministic demo** - Same inputs → same outputs
+4. **AI is backend-owned** - Frontend never calls OpenAI directly
 
 ---
 
-## Backend
+## Phase 1: Ingestion & Detection
+- [x] PDF text extraction (existing - verify)
+- [x] DOCX text extraction (add mammoth/docx parser)
+- [x] XLSX parsing (add xlsx library)
+- [x] Scanned PDF detection (image-based PDF check)
+- [x] "판단 불가" state handling (no blocking, graceful UX)
+- [x] Content type router (PDF vs DOCX vs XLSX vs scanned)
 
-- [x] Audit hardcoded responses - minimal mocks found (only for unavailable pdf-parse)
-- [x] Verify API endpoints return proper data structures
-- [x] Check S3/MinIO integration for file uploads (working via s3.service.ts)
-- [x] Verify JWT authentication flow works (passport-jwt strategy)
-- [x] Ensure database seeding creates realistic demo data
-- [x] Verify inspection pack generation works (pack-generator.service.ts)
-- [x] Audit AI pipeline integration - documented in architecture.md
-- [x] Fix service dependencies (all modules properly configured)
-- [x] Fix TypeScript errors in frameworks.service.ts
+## Phase 2: Evidence Graph & Citations
+- [x] DocumentChunk model (artifact_id, page, offset, text)
+- [x] Citation anchors (page number + bounding box when available)
+- [x] Evidence requirement → artifact → chunk linking
+- [x] Citation API for frontend highlighting
 
----
+## Phase 3: Smart Upload Analysis
+- [x] AnalysisRun model (status, model, latency, tokens, error)
+- [x] Analysis status flow: UPLOADED → ANALYZING → ANALYZED / 판단불가
+- [x] Strict JSON schema for analysis output
+- [x] Korean summary generation
+- [x] Missing elements detection
+- [x] Exact citation extraction (page + excerpt)
+- [x] Retry analysis endpoint (POST /artifacts/:id/retry-analysis)
+- [x] Analysis status endpoint (GET /artifacts/:id/analysis-status)
 
-## Frontend
+## Phase 4: Document Generation (Enhancement)
+- [x] Staged UX (5 steps with visible progress)
+- [x] Company profile injection
+- [x] Legal requirement mapping
+- [x] Auto-link generated doc to evidence requirement
+- [x] Re-run analysis after generation
+- [x] Score improvement display (before/after score tracking)
 
-- [x] Verify dashboard page loads correctly with real data
-- [x] Fix navigation/routing (sidebar links work)
-- [x] Improve error states with loading skeletons
-- [x] Add loading/progress states for async operations
-- [x] Remove placeholder/mock UI - now fetches from API
-- [x] Verify forms submit correctly to backend
+## Phase 5: Contradiction Detection
+- [x] Fact extraction service (보관기간, 교육주기, 파기방법)
+- [x] Cross-document fact comparison
+- [x] Contradiction rules engine
+- [x] Side-by-side excerpt output
+- [x] Severity classification (HIGH/MEDIUM/LOW)
+- [x] Resolution suggestion generation
+- [x] Planted contradictions support (3년vs5년, 반기vs연1회, 즉시vs30일)
 
----
+## Phase 6: Audit Simulation
+- [x] K-ISMS question bank (5 questions)
+- [x] Auditor persona prompt
+- [x] Auto-evidence retrieval per question
+- [x] PASS/WARN/FAIL determination
+- [x] Scripted demo arc (Q1-5 with expected outcomes)
+- [x] Session management (multi-turn)
+- [x] Final readiness report
 
-## Data/Mocks
+## Phase 7: Demo Dataset
+- [x] Demo tenant: 넥스트솔루션 (주)
+- [x] Company profile with correct triggers
+- [x] 개인정보처리방침_v2.3.pdf (with 보관기간: 3년)
+- [x] 위탁계약서_클라우드서비스.docx (with 보관기간: 5년 - contradiction!)
+- [x] 내부관리계획_2024.pdf (with 파기: 30일 유예)
+- [x] 교육실시대장_2024.xlsx (FLAGGED - incomplete)
+- [x] 접근권한관리대장.xlsx (VERIFIED)
+- [x] 정책검토회의록_2024Q2.pdf (FLAGGED - scanned)
+- [x] Evidence requirements seeded
+- [x] Artifacts linked to requirements
 
-- [x] Create consistent demo dataset (seed.ts + seed-templates.ts)
-- [x] Verify seed data is realistic with Korean templates
-- [x] Ensure sample policies/evidence docs referenced
-- [x] Sample controls mapping data exists in seed
-- [x] YAML compliance content complete (packages/compliance-content/)
-
----
-
-## Testing/CI
-
-- [x] Create ESLint configuration (.eslintrc.js)
-- [x] Run npm run lint - passes with warnings only
-- [x] Run npm run build - passes successfully (3/3 packages)
-- [x] Add minimal smoke tests (27 unit tests + e2e tests created)
-- [x] Create jest.config.js for API
-- [x] Document known test limitations in README
-
----
-
-## Security/Secrets
-
-- [x] Verify no secrets in repo - all use environment variables
-- [x] Verify .env templates are correct and complete
-- [x] Check .gitignore covers sensitive files (.env, .env*.local)
-- [x] Audit JWT secret handling - placeholder values with clear warnings
-
----
-
-## Cleanup
-
-- [x] Remove dead code - minimal cleanup needed
-- [x] Fix inconsistent naming (Bam vs ComplianceOS) - now consistent
-- [x] Remove deprecated code paths - require statement fixed
-- [x] Remove unused imports - fixed in 4 files
-
----
-
-## Completion Summary
-
-**Completed**: 46 / 46 tasks (100%)
-
-**Key Deliverables Created**:
-- README.md - Complete with system loop, AI role, demo notes
-- EXECUTIVE_BRIEF.md - CEO-first summary
-- DEMO_SCRIPT.md - 15-minute walkthrough
-- docs/architecture.md - Updated with AI architecture section
-- apps/api/.eslintrc.js - ESLint configuration
-- apps/api/jest.config.js - Jest configuration
-- apps/api/test/app.e2e-spec.ts - E2E smoke tests
-- apps/api/src/health/health.controller.spec.ts - Unit tests
-
-**Build Status**: PASSING (3/3 packages)
-**Lint Status**: PASSING (warnings only)
-**Test Status**: PASSING (27 tests)
-**Demo Status**: READY
+## Phase 8: Health & Observability
+- [x] GET /health endpoint (exists - verified with AI check)
+- [x] GET /health/ai endpoint (OpenAI connectivity check)
+- [x] GET /health/ai/metrics endpoint (24h/7d stats)
+- [x] analysis_runs table with full tracking
+- [x] Token usage tracking
+- [x] Latency monitoring
+- [x] Error tracking and failure history
 
 ---
 
-## How to Run Demo
+## Demo Acceptance Criteria
 
-```bash
-# 1. Clone and setup
-cd ComplianceOS
-cp .env.example .env
+### Smart Upload
+- [ ] Upload PDF → get score + citations in <10s
+- [ ] Upload scanned PDF → "판단 불가" state (no blocking)
+- [ ] Citations show exact page + excerpt
 
-# 2. Install dependencies
-make install
+### Document Generation
+- [ ] Click "개인정보처리방침 생성" → staged progress → DOCX in <30s
+- [ ] Generated doc auto-links to evidence requirement
+- [ ] Re-analysis shows improved score
 
-# 3. Start infrastructure
-make docker-up
+### Contradiction Detection
+- [ ] Upload 개인정보처리방침 + 위탁계약서 → detect 보관기간 mismatch
+- [ ] Side-by-side comparison with highlighted text
+- [ ] Severity = HIGH
 
-# 4. Initialize database
-make db-migrate
-make db-seed
-
-# 5. Start servers
-make dev
-
-# 6. Access
-# Web: http://localhost:3000
-# Login: admin@example.com / Admin123!
-```
+### Audit Simulation
+- [ ] Start simulation → Q1-Q4 auto-pass
+- [ ] Q5 (정책검토회의록) → FAIL with "증빙 미비"
+- [ ] Final report shows gaps
 
 ---
 
-## How to Run Tests
-
-```bash
-# Unit tests
-cd apps/api && npm test
-
-# E2E tests (requires database running)
-make docker-up
-make db-migrate
-make db-seed
-cd apps/api && npm run test:e2e
-```
+## Build Order (Non-Negotiable)
+1. ✅ Ingestion + detection
+2. ✅ Evidence graph + citations
+3. ✅ Smart upload analysis
+4. ✅ Document generation enhancement
+5. ✅ Contradiction detection
+6. ✅ Audit simulation
+7. ✅ Demo dataset
+8. ✅ Health endpoints
 
 ---
 
-## Known Limitations
+## Demo Company Profile
 
-1. **AI Classification**: Uses basic file metadata, not ML models (planned)
-2. **HR Integration**: Simulates sync, not connected to real systems
-3. **Google Drive**: OAuth stub only, needs credentials to enable
-4. **Email**: Logs only in development, no real email sending
-5. **E2E Tests**: Require database to be running with seed data
+| Field | Value |
+|-------|-------|
+| 회사명 | 넥스트솔루션 (주) |
+| 업종 | Technology |
+| 직원수 | 85명 |
+| 개인정보 유형 | 직원정보, 고객정보, 결제정보 |
+| 외주업체 | 있음 |
+| 원격근무 | 있음 |
+| 해외이전 | 없음 |
+
+---
+
+## Planted Contradictions
+
+| Contradiction | Doc A | Doc B | Severity |
+|--------------|-------|-------|----------|
+| 보관기간: 3년 vs 5년 | 개인정보처리방침 | 위탁계약서 | HIGH |
+| 교육주기: 반기 vs 연1회 | 내부관리계획 | 교육실시대장 | MEDIUM |
+| 파기: 즉시삭제 vs 30일 유예 | 개인정보처리방침 | 내부관리계획 | HIGH |
+
+---
+
+## Audit Simulation Arc
+
+| Q# | Question | Expected | Outcome |
+|----|----------|----------|---------|
+| 1 | 개인정보처리방침을 보여주세요 | Auto-retrieve | PASS |
+| 2 | 정보주체 권리 행사 절차가 있나요? | Cite section 7 | PASS |
+| 3 | 위탁계약서를 확인하겠습니다 | Auto-retrieve | PASS |
+| 4 | 교육 실시 현황을 보여주세요 | Show log | WARN |
+| 5 | 최근 정책 검토 회의록이 있나요? | Missing | FAIL |
+
+---
+
+*Last updated: 2025-12-28*

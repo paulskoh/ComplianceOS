@@ -34,6 +34,10 @@ import { FrameworksModule } from './frameworks/frameworks.module';
 import { WorkersModule } from './workers/workers.module';
 import { ContentLoaderModule } from './compliance-content/content-loader.module';
 import { DocumentGenModule } from './document-gen/document-gen.module';
+import { IngestionModule } from './ingestion/ingestion.module';
+import { CitationsModule } from './citations/citations.module';
+import { ContradictionsModule } from './contradictions/contradictions.module';
+import { AuditSimulationModule } from './audit-simulation/audit-simulation.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { StructuredLogger } from './common/services/structured-logger.service';
@@ -77,6 +81,10 @@ import { StructuredLogger } from './common/services/structured-logger.service';
     EvidenceRequirementsModule,
     FrameworksModule,
     DocumentGenModule,
+    IngestionModule,
+    CitationsModule,
+    ContradictionsModule,
+    AuditSimulationModule,
   ],
   providers: [
     StructuredLogger,

@@ -1298,21 +1298,70 @@ model InspectorActivityLog {
 // Document Intelligence Pipeline
 // ============================================
 
-// Document extraction results (PDF/DOCX → text)
+// Document extraction results (PDF/DOCX/XLSX → text)
 model DocumentExtraction {
-  id            String   @id @default(uuid())
-  artifactId    String   @map("artifact_id")
-  version       Int      @default(1)
-  extractedText String   @map("extracted_text") @db.Text
-  method        String // PDF_TEXT, TEXTRACT_OCR, DOCX_TEXT
-  language      String?
-  confidence    Float?
-  metadata      Json?
-  createdAt     DateTime @default(now()) @map("created_at")
+  id               String   @id @default(uuid())
+  artifactId       String   @map("artifact_id")
+  version          Int      @default(1)
+  extractedText    String   @map("extracted_text") @db.Text
+  method           String // PDF_TEXT, TEXTRACT_OCR, DOCX_TEXT, XLSX_TABLE
+  extractionMethod String?  @map("extraction_method") // Detailed extraction method
+  language         String?
+  confidence       Float?
+  pageCount        Int?     @map("page_count")
+  wordCount        Int?     @map("word_count")
+  metadata         Json?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime? @updatedAt @map("updated_at")
 
   @@unique([artifactId, version])
   @@index([artifactId])
   @@map("document_extractions")
+}
+
+// Document chunks for page-level storage (citation support)
+model DocumentChunk {
+  id          String    @id @default(uuid())
+  artifactId  String    @map("artifact_id")
+  version     Int       @default(1)
+  pageNumber  Int       @map("page_number")
+  textContent String    @map("text_content") @db.Text
+  startOffset Int       @map("start_offset")
+  endOffset   Int       @map("end_offset")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+
+  @@unique([artifactId, version, pageNumber])
+  @@index([artifactId])
+  @@index([pageNumber])
+  @@map("document_chunks")
+}
+
+// Analysis runs for observability (CEO Demo: AI call tracking)
+model AnalysisRun {
+  id            String    @id @default(uuid())
+  tenantId      String    @map("tenant_id")
+  artifactId    String    @map("artifact_id")
+  version       Int       @default(1)
+  status        String    @default("PENDING") // PENDING, ANALYZING, COMPLETED, FAILED, UNPARSEABLE
+  statusKo      String?   @map("status_ko") // Korean status for UI
+  model         String?   // gpt-4o-mini, gpt-4o, etc.
+  promptTokens  Int?      @map("prompt_tokens")
+  outputTokens  Int?      @map("output_tokens")
+  totalTokens   Int?      @map("total_tokens")
+  latencyMs     Int?      @map("latency_ms")
+  errorMessage  String?   @map("error_message") @db.Text
+  retryCount    Int       @default(0) @map("retry_count")
+  metadata      Json?
+  startedAt     DateTime? @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([tenantId])
+  @@index([artifactId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("analysis_runs")
 }
 
 // Document classification results (rules-based + LLM)

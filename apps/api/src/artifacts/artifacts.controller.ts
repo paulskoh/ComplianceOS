@@ -21,6 +21,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CreateArtifactDto, LinkArtifactDto } from '@complianceos/shared';
 import { ArtifactsService } from './artifacts.service';
 import { ArtifactsV2Service } from './artifacts-v2.service';
+import { SyncAnalysisService } from './sync-analysis.service';
 import {
   ArtifactCreateIntentDto,
   ArtifactFinalizeDto,
@@ -34,6 +35,7 @@ export class ArtifactsController {
   constructor(
     private readonly artifactsService: ArtifactsService,
     private readonly artifactsV2Service: ArtifactsV2Service,
+    private readonly syncAnalysisService: SyncAnalysisService,
   ) {}
 
   @Post('upload-intent')
@@ -177,5 +179,35 @@ export class ArtifactsController {
       id,
       { evidenceRequirementIds: [body.evidenceRequirementId] },
     );
+  }
+
+  @Post(':id/retry-analysis')
+  @ApiOperation({ summary: 'Retry document analysis (CEO Demo: re-run failed analyses)' })
+  async retryAnalysis(@CurrentUser() user: any, @Param('id') id: string) {
+    const result = await this.syncAnalysisService.retryAnalysis(
+      user.tenantId,
+      id,
+    );
+
+    if (!result) {
+      return {
+        success: false,
+        message: '분석 재시도 실패',
+        messageEn: 'Analysis retry failed',
+      };
+    }
+
+    return {
+      success: true,
+      message: '분석이 완료되었습니다',
+      messageEn: 'Analysis completed',
+      analysis: result,
+    };
+  }
+
+  @Get(':id/analysis-status')
+  @ApiOperation({ summary: 'Get analysis status with history (CEO Demo: real-time tracking)' })
+  async getAnalysisStatus(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.syncAnalysisService.getAnalysisStatus(user.tenantId, id);
   }
 }

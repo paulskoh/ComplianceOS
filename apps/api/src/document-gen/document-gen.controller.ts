@@ -7,10 +7,12 @@ import {
   UseGuards,
   Request,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { DocumentGenService } from './document-gen.service';
+import { StagedGenerationService } from './staged-generation.service';
 import { DocumentTemplateType, GeneratedDocStatus } from '@prisma/client';
 
 class GenerateDocumentDto {
@@ -24,7 +26,10 @@ class GenerateDocumentDto {
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class DocumentGenController {
-  constructor(private readonly docGenService: DocumentGenService) {}
+  constructor(
+    private readonly docGenService: DocumentGenService,
+    private readonly stagedGenService: StagedGenerationService,
+  ) {}
 
   @Get('templates')
   @ApiOperation({ summary: 'Get available document templates' })
@@ -153,5 +158,57 @@ export class DocumentGenController {
       CUSTOM: '사용자 정의 문서',
     };
     return labels[type] || type;
+  }
+
+  // ============================================
+  // CEO Demo: Staged Generation Endpoints
+  // ============================================
+
+  @Post('generate-staged')
+  @ApiOperation({
+    summary: 'Start staged document generation (CEO Demo: 5-step progress)',
+    description: 'Starts async document generation with 5 visible progress steps. Poll /progress/:id for status.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        templateType: {
+          type: 'string',
+          enum: Object.values(DocumentTemplateType),
+          description: 'Type of document template',
+        },
+        evidenceRequirementId: {
+          type: 'string',
+          description: 'Evidence requirement to link (enables before/after score)',
+        },
+      },
+      required: ['templateType'],
+    },
+  })
+  async startStagedGeneration(
+    @Request() req,
+    @Body() body: { templateType: DocumentTemplateType; evidenceRequirementId?: string },
+  ) {
+    return this.stagedGenService.startGeneration(
+      req.user.tenantId,
+      req.user.userId,
+      body.templateType,
+      body.evidenceRequirementId,
+    );
+  }
+
+  @Get('progress/:progressId')
+  @ApiOperation({
+    summary: 'Get staged generation progress',
+    description: 'Returns current progress of staged generation with step details and score improvement',
+  })
+  @ApiParam({ name: 'progressId', description: 'Progress tracking ID from generate-staged' })
+  async getGenerationProgress(@Param('progressId') progressId: string) {
+    const progress = await this.stagedGenService.getProgress(progressId);
+    if (!progress) {
+      throw new NotFoundException('진행 상태를 찾을 수 없습니다.');
+    }
+    return progress;
   }
 }
