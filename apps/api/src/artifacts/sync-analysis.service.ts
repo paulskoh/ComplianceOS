@@ -630,12 +630,15 @@ ${text.substring(0, 10000)}
     // Try to find date in text for citation
     const dateMatch = text.match(/\d{4}[년\-\/]\d{1,2}[월\-\/]\d{1,2}[일]?/);
 
+    // Try to find signature-related text for citation
+    const signatureMatch = text.match(/.{0,30}(서명|날인|sign|signature).{0,30}/i);
+
     let score = 50;
     if (hasContent) score += 20;
     if (hasDate) score += 15;
     if (hasSignature) score += 15;
 
-    return {
+    const result: AnalysisResult = {
       overallStatus: score >= 80 ? 'COMPLIANT' : score >= 60 ? 'PARTIAL' : 'NEEDS_REVIEW',
       score,
       summaryKo: `문서 분석이 완료되었습니다. ${hasContent ? '충분한 내용이 포함되어 있으며' : '내용이 부족할 수 있으며'}, ${hasDate ? '날짜 정보가 확인되었고' : '날짜 정보가 없으며'}, ${hasSignature ? '서명/날인이 포함되어 있습니다.' : '서명/날인 확인이 필요합니다.'}`,
@@ -663,6 +666,8 @@ ${text.substring(0, 10000)}
           status: hasSignature ? 'MET' : 'NOT_MET',
           severity: hasSignature ? 'LOW' : 'MEDIUM',
           messageKo: hasSignature ? '서명 또는 날인이 확인되었습니다.' : '서명 또는 날인 확인이 필요합니다.',
+          pageRef: signatureMatch ? 1 : undefined,
+          excerpt: signatureMatch ? signatureMatch[0].trim() : undefined,
         },
       ],
       citations: dateMatch ? [{
@@ -672,7 +677,7 @@ ${text.substring(0, 10000)}
       }] : [],
     };
 
-    // Apply the same citation enforcement to fallback analysis
+    // Apply citation enforcement to fallback analysis
     return this.enforceCitationRequirement(result);
   }
 

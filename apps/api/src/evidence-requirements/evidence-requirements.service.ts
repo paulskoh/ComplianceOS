@@ -1,8 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  mapToLatestAnalysisDTO,
+  mapToLatestRunDTO,
+  LatestAnalysisDTO,
+  LatestRunDTO,
+} from '../analysis/analysis.mapper';
 
 @Injectable()
 export class EvidenceRequirementsService {
+  private readonly logger = new Logger(EvidenceRequirementsService.name);
+
   constructor(private prisma: PrismaService) {}
 
   async getOverview(tenantId: string) {
@@ -142,6 +150,31 @@ export class EvidenceRequirementsService {
     // Get obligation info
     const obligation = evidenceRequirement.control.obligations[0]?.obligation;
 
+    // Fetch latest analysis and run for each artifact
+    const artifactsWithAnalysis = await Promise.all(
+      artifacts.map(async (artifact) => {
+        const { latestAnalysis, latestRun } = await this.getArtifactAnalysis(
+          artifact.id,
+          artifact.version,
+          artifact.fileName || 'Unknown',
+        );
+
+        return {
+          artifactId: artifact.id,
+          version: artifact.version,
+          filename: artifact.fileName,
+          uploadedAt: artifact.uploadedAt,
+          status: artifact.status,
+          isApproved: artifact.isApproved,
+          analysis: latestAnalysis,
+          latestRun,
+        };
+      }),
+    );
+
+    // Get latest analysis across all artifacts
+    const latestArtifactWithAnalysis = artifactsWithAnalysis.find(a => a.analysis);
+
     return {
       id: evidenceRequirement.id,
       titleKo: evidenceRequirement.name,
@@ -151,17 +184,92 @@ export class EvidenceRequirementsService {
       obligationTitleKo: obligation?.titleKo,
       controlId: evidenceRequirement.control.id,
       controlName: evidenceRequirement.control.name,
-      artifacts: artifacts.map((artifact) => ({
-        artifactId: artifact.id,
-        version: artifact.version,
-        filename: artifact.fileName,
-        uploadedAt: artifact.uploadedAt,
-        status: artifact.status,
-        isApproved: artifact.isApproved,
-        analysis: null,
-      })),
-      latestAnalysis: null,
+      artifacts: artifactsWithAnalysis,
+      latestAnalysis: latestArtifactWithAnalysis?.analysis || null,
     };
+  }
+
+  /**
+   * Get latest analysis and run for an artifact
+   * CEO Demo: Critical for showing score + citations
+   */
+  private async getArtifactAnalysis(
+    artifactId: string,
+    version: number,
+    fileName: string,
+  ): Promise<{ latestAnalysis: LatestAnalysisDTO | null; latestRun: LatestRunDTO | null }> {
+    try {
+      // Get latest document analysis
+      const analysisResult = await this.prisma.documentAnalysis.findFirst({
+        where: { artifactId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Get latest analysis run
+      const runResult = await this.prisma.analysisRun.findFirst({
+        where: { artifactId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Check if document is scanned/unparseable
+      const extractionResult = await this.prisma.documentExtraction.findFirst({
+        where: { artifactId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const isScanned = extractionResult?.method === 'SCANNED_DETECTED';
+
+      // Map to normalized DTOs
+      const latestAnalysis = analysisResult
+        ? mapToLatestAnalysisDTO(
+            {
+              id: analysisResult.id,
+              artifactId: analysisResult.artifactId,
+              version: analysisResult.version,
+              overallCompliance: analysisResult.overallCompliance,
+              confidence: analysisResult.confidence,
+              findings: analysisResult.findings as any,
+              missingElements: analysisResult.missingElements as any,
+              recommendations: analysisResult.recommendations as any,
+              analysisMetadata: analysisResult.analysisMetadata as any,
+              createdAt: analysisResult.createdAt,
+              updatedAt: analysisResult.updatedAt,
+            },
+            fileName,
+            artifactId,
+            isScanned,
+          )
+        : isScanned
+          ? mapToLatestAnalysisDTO(null, fileName, artifactId, true)
+          : null;
+
+      const latestRun = runResult
+        ? mapToLatestRunDTO({
+            id: runResult.id,
+            tenantId: runResult.tenantId,
+            artifactId: runResult.artifactId,
+            version: runResult.version,
+            status: runResult.status,
+            statusKo: runResult.statusKo || undefined,
+            model: runResult.model || undefined,
+            promptTokens: runResult.promptTokens || undefined,
+            outputTokens: runResult.outputTokens || undefined,
+            totalTokens: runResult.totalTokens || undefined,
+            latencyMs: runResult.latencyMs || undefined,
+            errorMessage: runResult.errorMessage || undefined,
+            retryCount: runResult.retryCount,
+            metadata: runResult.metadata,
+            startedAt: runResult.startedAt || undefined,
+            completedAt: runResult.completedAt || undefined,
+            createdAt: runResult.createdAt,
+          })
+        : null;
+
+      return { latestAnalysis, latestRun };
+    } catch (error) {
+      this.logger.error(`Failed to get analysis for artifact ${artifactId}:`, error);
+      return { latestAnalysis: null, latestRun: null };
+    }
   }
 
   async getStatus(tenantId: string, evidenceRequirementId: string) {

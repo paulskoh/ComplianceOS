@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import OpenAI from 'openai';
+import {
+  isDemoMode,
+  extractFactsDeterministic,
+  getDemoSeedContradictions,
+} from './demo-fact-extractor';
 
 /**
  * Extracted fact from a document
@@ -175,13 +180,20 @@ export class ContradictionDetectionService {
   }
 
   /**
-   * Extract facts from document text using OpenAI
+   * Extract facts from document text
+   * CEO Demo: Uses deterministic regex extraction in DEMO_MODE
    */
   private async extractFacts(
     artifactId: string,
     name: string,
     text: string,
   ): Promise<ExtractedFact[]> {
+    // CEO Demo: Use deterministic extraction in demo mode
+    if (isDemoMode()) {
+      this.logger.log(`DEMO_MODE: Using deterministic fact extraction for ${name}`);
+      return extractFactsDeterministic(artifactId, name, text);
+    }
+
     if (!process.env.OPENAI_API_KEY) {
       return this.heuristicFactExtraction(text);
     }
@@ -461,8 +473,20 @@ JSON 형식으로 응답:
 
   /**
    * Get all detected contradictions for a tenant
+   * CEO Demo: Returns seeded contradictions in demo mode for consistent demo
    */
   async getContradictionsForTenant(tenantId: string): Promise<Contradiction[]> {
+    // CEO Demo: Return seeded contradictions for predictable demo
+    const demoContradictions = getDemoSeedContradictions();
+    if (demoContradictions.length > 0) {
+      this.logger.log('DEMO_MODE: Returning seeded contradictions');
+      return demoContradictions.map(c => ({
+        ...c,
+        docA: { ...c.docA, artifactId: 'demo-artifact-1' },
+        docB: { ...c.docB, artifactId: 'demo-artifact-2' },
+      }));
+    }
+
     // Get all artifacts for this tenant
     const artifacts = await this.prisma.artifact.findMany({
       where: { tenantId, isDeleted: false, status: { in: ['VERIFIED', 'FLAGGED'] } },

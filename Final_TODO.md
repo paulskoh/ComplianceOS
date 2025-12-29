@@ -3,8 +3,8 @@
 > **Target**: Korean SME CEO Demo
 > **Company**: 넥스트솔루션 (주) (85명, Technology)
 > **Demo Features**: 4 only (Smart Upload, Doc Gen, Contradiction, Audit Sim)
-> **Status**: ✅ BUILD COMPLETE
-> **Last Updated**: 2025-12-28
+> **Status**: 🔧 HARDENING IN PROGRESS
+> **Last Updated**: 2025-12-29
 
 ---
 
@@ -14,6 +14,54 @@
 2. **No guessing** - "판단 불가" when uncertain
 3. **Deterministic demo** - Same inputs → same outputs
 4. **AI is backend-owned** - Frontend never calls OpenAI directly
+
+---
+
+## CEO Demo Safe Wiring Checklist (v2)
+
+### 1. Fix Core Wiring: Evidence Detail Endpoint
+- [x] 1.1 Update evidence-requirements.service.ts to fetch latest DocumentAnalysis per artifact
+- [x] 1.2 Update evidence-requirements.service.ts to fetch latest AnalysisRun per artifact
+- [x] 1.3 Return normalized LatestAnalysisDTO shape with findings + citations
+- [x] 1.4 Return LatestRunDTO with status, model, latency, tokens, errors
+
+### 2. Make Analysis Schema Consistent
+- [x] 2.1 Create analysis.mapper.ts to translate DocumentAnalysis → LatestAnalysisDTO
+- [x] 2.2 Normalize score (0-100), overallStatus (VERIFIED/FLAGGED/NEEDS_REVIEW/FAILED)
+- [x] 2.3 Update frontend evidence/[id]/page.tsx to use normalized fields
+- [x] 2.4 Update FindingsSummary.tsx to use normalized fields
+
+### 3. Citations End-to-End
+- [x] 3.1 Enforce citations in sync-analysis.service.ts (MET without citation → PARTIAL)
+- [x] 3.2 Add locationLabel fallback when page numbers unavailable
+- [x] 3.3 Frontend: render citations per finding with expandable "근거 보기"
+- [x] 3.4 Show fileName + page/location + excerpt
+
+### 4. Deterministic Contradiction Detection in DEMO_MODE
+- [x] 4.1 Add DEMO_MODE flag to API config (from env)
+- [x] 4.2 Create demo-fact-extractor.ts with regex rules for 보관기간, 교육주기, 파기방법
+- [x] 4.3 Bypass OpenAI for contradiction extraction when DEMO_MODE=true
+- [x] 4.4 Frontend: contradictions page shows side-by-side excerpts
+
+### 5. Unify Ingestion Pipeline
+- [x] 5.1 Worker must use IngestionService for PDF/DOCX/XLSX
+- [x] 5.2 Never use buffer.toString('utf-8') for DOCX/XLSX
+- [x] 5.3 Scanned PDF → mark NEEDS_REVIEW + show "판단 불가"
+- [ ] 5.4 Scanned PDF UI: show OCR/manual review options
+
+### 6. Retry Analysis and Run Visibility
+- [x] 6.1 POST /artifacts/:id/retry-analysis creates new AnalysisRun
+- [x] 6.2 Evidence detail shows last run status + error if failed
+- [x] 6.3 Retry button visible on evidence detail
+
+### 7. Verification Checklist
+- [ ] 7.1 Upload DOCX → extraction + analysis with citations
+- [ ] 7.2 Upload XLSX → extraction + analysis with citations
+- [ ] 7.3 Upload scanned PDF → NEEDS_REVIEW + "판단 불가"
+- [ ] 7.4 Evidence detail endpoint returns latestAnalysis + latestRun
+- [ ] 7.5 Contradictions identical across 3 runs in DEMO_MODE
+- [ ] 7.6 Retry analysis works (AnalysisRun STARTED→SUCCEEDED)
+- [ ] 7.7 No 404s on demo path: register → onboarding → evidence → documents
 
 ---
 

@@ -17,6 +17,18 @@ import StatusPill from '@/components/StatusPill'
 import UploadModal from '@/components/UploadModal'
 import FindingsSummary from '@/components/FindingsSummary'
 
+interface LatestRun {
+  status: string
+  statusKo: string
+  model?: string
+  latencyMs?: number
+  tokensIn?: number
+  tokensOut?: number
+  errorMessage?: string
+  createdAt: string
+  completedAt?: string
+}
+
 interface Artifact {
   artifactId: string
   version: number
@@ -29,7 +41,9 @@ interface Artifact {
     score: number
     summaryKo: string
     findings: any[]
+    citations?: any[]
   } | null
+  latestRun?: LatestRun | null
 }
 
 interface EvidenceRequirementDetail {
@@ -116,6 +130,7 @@ export default function EvidenceDetailPage() {
   const [loading, setLoading] = useState(true)
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
   const [approving, setApproving] = useState<string | null>(null)
+  const [retrying, setRetrying] = useState<string | null>(null)
   const [polling, setPolling] = useState(false)
 
   useEffect(() => {
@@ -190,6 +205,19 @@ export default function EvidenceDetailPage() {
       console.error('Failed to approve artifact:', error)
     } finally {
       setApproving(null)
+    }
+  }
+
+  const handleRetryAnalysis = async (artifactId: string) => {
+    try {
+      setRetrying(artifactId)
+      await artifacts.retryAnalysis(artifactId)
+      // Refresh data to show new analysis status
+      fetchData()
+    } catch (error) {
+      console.error('Failed to retry analysis:', error)
+    } finally {
+      setRetrying(null)
     }
   }
 
@@ -346,6 +374,40 @@ export default function EvidenceDetailPage() {
                           </div>
                         </div>
                       )}
+
+                      {/* Run status and error display */}
+                      {artifact.latestRun && (
+                        <div className={`mt-3 p-3 rounded-lg border ${
+                          artifact.latestRun.status === 'FAILED'
+                            ? 'bg-red-50 border-red-200'
+                            : artifact.latestRun.status === 'SUCCEEDED'
+                            ? 'bg-green-50 border-green-200'
+                            : 'bg-gray-50 border-gray-200'
+                        }`}>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className={`font-medium ${
+                              artifact.latestRun.status === 'FAILED' ? 'text-red-700' :
+                              artifact.latestRun.status === 'SUCCEEDED' ? 'text-green-700' :
+                              'text-gray-600'
+                            }`}>
+                              분석 상태: {artifact.latestRun.statusKo || artifact.latestRun.status}
+                            </span>
+                            <div className="flex items-center space-x-2 text-gray-500">
+                              {artifact.latestRun.model && (
+                                <span>모델: {artifact.latestRun.model}</span>
+                              )}
+                              {artifact.latestRun.latencyMs && (
+                                <span>{(artifact.latestRun.latencyMs / 1000).toFixed(1)}초</span>
+                              )}
+                            </div>
+                          </div>
+                          {artifact.latestRun.errorMessage && (
+                            <p className="mt-2 text-xs text-red-600">
+                              오류: {artifact.latestRun.errorMessage}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex items-center space-x-2 ml-4">
@@ -357,6 +419,18 @@ export default function EvidenceDetailPage() {
                           >
                             다운로드
                           </button>
+                          {/* Retry button - show when analysis failed or needs re-run */}
+                          {(artifact.latestRun?.status === 'FAILED' ||
+                            (analysisState !== 'ANALYZING' && !artifact.analysis)) && (
+                            <button
+                              onClick={() => handleRetryAnalysis(artifact.artifactId)}
+                              disabled={retrying === artifact.artifactId}
+                              className="inline-flex items-center px-3 py-2 border border-orange-300 rounded-md text-sm font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 disabled:opacity-50"
+                            >
+                              <ArrowPathIcon className={`w-4 h-4 mr-1 ${retrying === artifact.artifactId ? 'animate-spin' : ''}`} />
+                              {retrying === artifact.artifactId ? '분석중...' : '재분석'}
+                            </button>
+                          )}
                           {!artifact.isApproved && analysisState !== 'ANALYZING' && (
                             <button
                               onClick={() => handleApproveArtifact(artifact.artifactId)}

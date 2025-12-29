@@ -78,6 +78,8 @@ export const artifacts = {
     api.post(`/artifacts/${artifactId}/link-evidence-requirement`, { evidenceRequirementId }),
   getAnalysis: (id: string) => api.get(`/artifacts/${id}/analysis`),
   approve: (id: string) => api.post(`/artifacts/${id}/approve`),
+  retryAnalysis: (id: string) => api.post(`/artifacts/${id}/retry-analysis`),
+  getAnalysisStatus: (id: string) => api.get(`/artifacts/${id}/analysis-status`),
 }
 
 export const evidenceRequirements = {
@@ -180,4 +182,12 @@ export const health = {
   getAIHealth: () => api.get('/health/ai'),
   getAIMetrics: () => api.get('/health/ai/metrics'),
   getAIStats: () => api.get('/health/ai/stats'),
+}
+
+// Contradictions API (CEO Demo: Cross-document inconsistency detection)
+export const contradictions = {
+  getAll: () => api.get('/v2/contradictions'),
+  detect: (artifactIds: string[]) => api.post('/v2/contradictions/detect', { artifactIds }),
+  getForRequirement: (requirementId: string) => api.get(`/v2/contradictions/requirement/${requirementId}`),
+  getTypes: () => api.get('/v2/contradictions/types'),
 }
