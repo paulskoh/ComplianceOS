@@ -10,7 +10,10 @@ import {
   CheckCircleIcon,
   ArrowPathIcon,
   ExclamationTriangleIcon,
-  DocumentCheckIcon
+  DocumentCheckIcon,
+  DocumentMagnifyingGlassIcon,
+  QuestionMarkCircleIcon,
+  HandRaisedIcon
 } from '@heroicons/react/24/outline'
 import { CheckCircleIcon as CheckCircleSolidIcon } from '@heroicons/react/24/solid'
 import StatusPill from '@/components/StatusPill'
@@ -65,6 +68,12 @@ type AnalysisState = 'PENDING' | 'UPLOADED' | 'ANALYZING' | 'ANALYZED' | 'NEEDS_
 
 function getAnalysisState(artifact: Artifact): AnalysisState {
   if (artifact.isApproved) return 'APPROVED'
+  // Check for scanned PDF / manual review needed
+  if (artifact.analysis?.overallStatus === 'NEEDS_REVIEW' ||
+      artifact.status === 'FLAGGED' ||
+      artifact.status === 'NEEDS_REVIEW') {
+    return 'NEEDS_REVIEW'
+  }
   if (artifact.analysis) {
     const hasIssues = artifact.analysis.findings?.some((f: any) =>
       f.severity === 'CRITICAL' || f.severity === 'HIGH'
@@ -74,6 +83,14 @@ function getAnalysisState(artifact: Artifact): AnalysisState {
   if (artifact.status === 'ANALYZING') return 'ANALYZING'
   if (artifact.status === 'READY') return 'UPLOADED'
   return 'PENDING'
+}
+
+// Check if artifact is a scanned PDF requiring manual review
+function isScannedPdf(artifact: Artifact): boolean {
+  return artifact.status === 'FLAGGED' ||
+         artifact.status === 'NEEDS_REVIEW' ||
+         artifact.analysis?.overallStatus === 'NEEDS_REVIEW' ||
+         (artifact.analysis?.summaryKo?.includes('판단 불가') ?? false)
 }
 
 function AnalysisStatusBadge({ state }: { state: AnalysisState }) {
@@ -371,6 +388,49 @@ export default function EvidenceDetailPage() {
                             <span className="text-sm text-yellow-700">
                               AI가 문서를 분석하고 있습니다... 잠시만 기다려주세요.
                             </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Scanned PDF / Manual Review Required Panel */}
+                      {isScannedPdf(artifact) && (
+                        <div className="mt-3 p-4 bg-amber-50 rounded-lg border-2 border-amber-300">
+                          <div className="flex items-start">
+                            <DocumentMagnifyingGlassIcon className="w-6 h-6 text-amber-600 mt-0.5 mr-3 flex-shrink-0" />
+                            <div className="flex-1">
+                              <h4 className="text-sm font-semibold text-amber-900 mb-1">
+                                판단 불가 (수동 검토 필요)
+                              </h4>
+                              <p className="text-sm text-amber-800 mb-3">
+                                이 문서는 이미지 기반 PDF로 자동 분석이 불가능합니다.
+                                이는 실제 감사 환경에서 자주 발생합니다.
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  onClick={() => handleRetryAnalysis(artifact.artifactId)}
+                                  disabled={retrying === artifact.artifactId}
+                                  className="inline-flex items-center px-3 py-1.5 border border-amber-400 rounded-md text-xs font-medium text-amber-800 bg-white hover:bg-amber-100 disabled:opacity-50"
+                                >
+                                  <DocumentMagnifyingGlassIcon className={`w-4 h-4 mr-1 ${retrying === artifact.artifactId ? 'animate-pulse' : ''}`} />
+                                  {retrying === artifact.artifactId ? 'OCR 시도중...' : 'OCR 분석 시도'}
+                                </button>
+                                <button
+                                  onClick={() => window.open('https://www.ilovepdf.com/pdf_to_word', '_blank')}
+                                  className="inline-flex items-center px-3 py-1.5 border border-amber-400 rounded-md text-xs font-medium text-amber-800 bg-white hover:bg-amber-100"
+                                >
+                                  <QuestionMarkCircleIcon className="w-4 h-4 mr-1" />
+                                  PDF 변환 가이드
+                                </button>
+                                <button
+                                  onClick={() => handleApproveArtifact(artifact.artifactId)}
+                                  disabled={approving === artifact.artifactId}
+                                  className="inline-flex items-center px-3 py-1.5 border border-green-400 rounded-md text-xs font-medium text-green-800 bg-white hover:bg-green-100 disabled:opacity-50"
+                                >
+                                  <HandRaisedIcon className="w-4 h-4 mr-1" />
+                                  {approving === artifact.artifactId ? '진행중...' : '수동 검토로 계속 진행'}
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}

@@ -3,7 +3,7 @@
 > **Target**: Korean SME CEO Demo
 > **Company**: 넥스트솔루션 (주) (85명, Technology)
 > **Demo Features**: 4 only (Smart Upload, Doc Gen, Contradiction, Audit Sim)
-> **Status**: 🔧 HARDENING IN PROGRESS
+> **Status**: ✅ DEMO READY
 > **Last Updated**: 2025-12-29
 
 ---
@@ -47,12 +47,20 @@
 - [x] 5.1 Worker must use IngestionService for PDF/DOCX/XLSX
 - [x] 5.2 Never use buffer.toString('utf-8') for DOCX/XLSX
 - [x] 5.3 Scanned PDF → mark NEEDS_REVIEW + show "판단 불가"
-- [ ] 5.4 Scanned PDF UI: show OCR/manual review options
+- [x] 5.4 Scanned PDF UI: show OCR/manual review options
 
 ### 6. Retry Analysis and Run Visibility
 - [x] 6.1 POST /artifacts/:id/retry-analysis creates new AnalysisRun
 - [x] 6.2 Evidence detail shows last run status + error if failed
 - [x] 6.3 Retry button visible on evidence detail
+
+### CEO Demo UI Features (Added 2025-12-29)
+- [x] Scanned PDF manual review panel with actions (OCR 분석 시도, PDF 변환 가이드, 수동 검토로 계속)
+- [x] Audit Simulation page (/dashboard/audit-sim) with question-by-question flow
+- [x] Audit Simulation in sidebar navigation
+- [x] Evidence list page shows score badges and analysis status
+- [x] Contradictions page with side-by-side excerpts
+- [x] System Status panel (demo mode only)
 
 ### 7. Verification Checklist
 - [ ] 7.1 Upload DOCX → extraction + analysis with citations

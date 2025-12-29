@@ -3,7 +3,13 @@
 import { useEffect, useState } from 'react'
 import { evidenceRequirements } from '@/lib/api'
 import Link from 'next/link'
-import { DocumentArrowUpIcon } from '@heroicons/react/24/outline'
+import {
+  DocumentArrowUpIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  DocumentMagnifyingGlassIcon
+} from '@heroicons/react/24/outline'
 import UploadModal from '@/components/UploadModal'
 import StatusPill from '@/components/StatusPill'
 import ErrorState, { EmptyState } from '@/components/ErrorState'
@@ -221,6 +227,52 @@ export default function EvidencePage() {
                             <div className="mt-2 text-sm text-gray-700">
                               <p className="line-clamp-2">{req.latestAnalysis.summaryKo}</p>
                             </div>
+                          )}
+                        </div>
+
+                        {/* Analysis Score & Status Signal */}
+                        <div className="flex-shrink-0 flex flex-col items-end space-y-2 mr-4">
+                          {req.latestAnalysis ? (
+                            <>
+                              {/* Score Badge */}
+                              <div className={`flex items-center px-2.5 py-1 rounded-lg text-sm font-bold ${
+                                req.latestAnalysis.score >= 80 ? 'bg-green-100 text-green-800' :
+                                req.latestAnalysis.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                                req.latestAnalysis.overallStatus === 'NEEDS_REVIEW' ? 'bg-amber-100 text-amber-800' :
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {req.latestAnalysis.overallStatus === 'NEEDS_REVIEW' ? (
+                                  <>
+                                    <DocumentMagnifyingGlassIcon className="w-4 h-4 mr-1" />
+                                    판단불가
+                                  </>
+                                ) : (
+                                  <>
+                                    {req.latestAnalysis.score >= 80 ? (
+                                      <CheckCircleIcon className="w-4 h-4 mr-1" />
+                                    ) : req.latestAnalysis.score >= 60 ? (
+                                      <ClockIcon className="w-4 h-4 mr-1" />
+                                    ) : (
+                                      <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
+                                    )}
+                                    {req.latestAnalysis.score}%
+                                  </>
+                                )}
+                              </div>
+                              {/* Findings count */}
+                              {req.latestAnalysis.findings && req.latestAnalysis.findings.length > 0 && (
+                                <span className="text-xs text-gray-500">
+                                  {req.latestAnalysis.findings.length}개 발견사항
+                                </span>
+                              )}
+                            </>
+                          ) : req.status === 'MISSING' ? (
+                            <span className="text-xs text-gray-400">미분석</span>
+                          ) : (
+                            <span className="text-xs text-blue-500 flex items-center">
+                              <ClockIcon className="w-3 h-3 mr-1" />
+                              분석중
+                            </span>
                           )}
                         </div>
 

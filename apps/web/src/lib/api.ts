@@ -191,3 +191,14 @@ export const contradictions = {
   getForRequirement: (requirementId: string) => api.get(`/v2/contradictions/requirement/${requirementId}`),
   getTypes: () => api.get('/v2/contradictions/types'),
 }
+
+// Audit Simulation API (CEO Demo: K-ISMS audit simulation)
+export const auditSimulation = {
+  start: () => api.post('/v2/audit-simulation/start'),
+  getSession: (sessionId: string) => api.get(`/v2/audit-simulation/session/${sessionId}`),
+  getCurrentQuestion: (sessionId: string) => api.get(`/v2/audit-simulation/session/${sessionId}/current-question`),
+  processNext: (sessionId: string) => api.post(`/v2/audit-simulation/session/${sessionId}/next`),
+  getReport: (sessionId: string) => api.get(`/v2/audit-simulation/session/${sessionId}/report`),
+  runFull: () => api.post('/v2/audit-simulation/run-full'),
+  getQuestions: () => api.get('/v2/audit-simulation/questions'),
+}

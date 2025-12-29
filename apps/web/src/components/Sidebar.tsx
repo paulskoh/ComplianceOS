@@ -10,7 +10,8 @@ import {
     BookOpenIcon,
     ArrowRightOnRectangleIcon,
     SparklesIcon,
-    ArrowsRightLeftIcon
+    ArrowsRightLeftIcon,
+    ShieldCheckIcon
 } from '@heroicons/react/24/outline'
 import SystemStatusPanel from './SystemStatusPanel'
 
@@ -23,6 +24,7 @@ const fullNavigation = [
     { name: '문서 생성', nameEn: 'Document Generator', href: '/dashboard/documents', icon: SparklesIcon },
     { name: '증빙 제출', nameEn: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
     { name: '모순 검출', nameEn: 'Contradictions', href: '/dashboard/contradictions', icon: ArrowsRightLeftIcon },
+    { name: '심사 시뮬레이션', nameEn: 'Audit Simulation', href: '/dashboard/audit-sim', icon: ShieldCheckIcon },
     { name: '준수 현황', nameEn: 'Readiness', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
     { name: '검사 팩', nameEn: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
     { name: '규제 팩', nameEn: 'Compliance Packs', href: '/dashboard/frameworks', icon: BookOpenIcon },
@@ -33,6 +35,7 @@ const demoNavigation = [
     { name: '홈', nameEn: 'Home', href: '/dashboard', icon: HomeIcon },
     { name: '증빙 제출', nameEn: 'Evidence', href: '/dashboard/evidence', icon: InboxStackIcon },
     { name: '모순 검출', nameEn: 'Contradictions', href: '/dashboard/contradictions', icon: ArrowsRightLeftIcon },
+    { name: '심사 시뮬레이션', nameEn: 'Audit Simulation', href: '/dashboard/audit-sim', icon: ShieldCheckIcon },
     { name: '준수 현황', nameEn: 'Readiness', href: '/dashboard/readiness', icon: ClipboardDocumentCheckIcon },
     { name: '검사 팩', nameEn: 'Inspection Packs', href: '/dashboard/inspection-packs', icon: DocumentDuplicateIcon },
 ]
